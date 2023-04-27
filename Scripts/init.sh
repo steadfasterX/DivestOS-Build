@@ -149,7 +149,7 @@ trap resetEnv SIGINT SIGHUP TERM
 # by default we will calculate the max CPU count automatically (used by e.g. repo commands)
 # if the required tool "nproc" is not found a default is used.
 export FALLBACK_MAX_THREADS_REPO=4;
-export MAX_THREADS_REPO_RATE=8; #to avoid being rate limited we never go above this for syncing
+export MAX_THREADS_REPO_RATE=10; #to avoid being rate limited we never go above this for syncing
 export FALLBACK_MAX_THREADS_BUILD="nolimit"; #if nothing specified we will use all CPU power available
 
 calcThreads(){
@@ -158,7 +158,7 @@ calcThreads(){
     nproc --version > /dev/null 2>&1
     if [ $? -eq 10 ];then
 	_MAX_THREADS_ALL=$(nproc --all)
-	_MAX_THREADS=$(( _MAX_THREADS_ALL - 1))
+	_MAX_THREADS=$(( _MAX_THREADS_ALL + 1 ))
     fi
     if [ -z "$_MAX_THREADS" ];then
 	echo $DEFAULT_COUNT
