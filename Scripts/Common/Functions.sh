@@ -410,7 +410,7 @@ processRelease() {
 		cp -v $OUT_DIR/$PREFIX-recovery.img* $ARCHIVE/ || true;
 
 		rename -- "-ota." "." $ARCHIVE/$PREFIX-ota.zip*;
-		rename -- "-incremental_" "-" $ARCHIVE/incrementals/$PREFIX-incremental_*.zip*;
+		[[ " ${DOS_GENERATE_DELTAS_DEVICES[@]} " =~ " ${DEVICE} " ]] && rename -- "-incremental_" "-" $ARCHIVE/incrementals/$PREFIX-incremental_*.zip*;
 		sync;
 
 		#Remove to make space for next build
