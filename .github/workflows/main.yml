@@ -1,0 +1,31 @@
+name: Sync Fork
+
+on:
+  schedule:
+    - cron: '33 */4 * * *' # every 30 minutes
+  workflow_dispatch: # on button click
+
+jobs:
+  sync:
+
+    runs-on: ubuntu-latest
+
+    steps:
+        uses: tgymnich/fork-sync@v1.2.1
+        with:
+          # Owner of the forked repository
+          #owner: # optional
+          # Token for the github API
+          #github_token: 
+          # Branch to track
+          #head: # optional, default is master
+          # Branch to keep updated
+          #base: # optional, default is master
+          # Merge method to use
+          merge_method: rebase
+          # The title of the pull request
+          pr_title: "sync with upstream"
+          # The message in the pull request
+          #pr_message: # optional
+          # ignore Exceptions
+          #ignore_fail: # optional
