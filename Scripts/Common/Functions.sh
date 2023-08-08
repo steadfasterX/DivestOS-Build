@@ -36,7 +36,9 @@ export -f startPatcher;
 
 resetWorkspace() {
 	umask 0022;
-	repo forall -j${DOS_MAX_THREADS_REPO} -c 'git add -A && git reset --hard' && rm -rf out DOS_PATCHED_FLAG && repo sync -j${DOS_MAX_THREADS_REPO} --force-sync --detach;
+	if [ "$1" == "local" ]; then local noNetwork="--local-only"; fi;
+	repo forall -c 'git add -A && git reset --hard' && rm -rf out DOS_PATCHED_FLAG && repo sync --jobs-network=6 
+	repo forall -j${DOS_MAX_THREADS_REPO} -c 'git add -A && git reset --hard' && rm -rf out DOS_PATCHED_FLAG && repo sync -j${DOS_MAX_THREADS_REPO} --jobs-checkout=${DOS_MAX_THREADS_REPO} --force-sync --detach $noNetwork;
 }
 export -f resetWorkspace;
 
@@ -359,7 +361,6 @@ processRelease() {
 	"$RELEASETOOLS_PREFIX"ota_from_target_files $BLOCK_SWITCHES -k "$KEY_DIR/releasekey" \
 		"$OUT_DIR/$PREFIX-target_files.zip" \
 		"$OUT_DIR/$PREFIX-ota.zip";
-	md5sum "$OUT_DIR/$PREFIX-ota.zip" > "$OUT_DIR/$PREFIX-ota.zip.md5sum";
 	sha512sum "$OUT_DIR/$PREFIX-ota.zip" > "$OUT_DIR/$PREFIX-ota.zip.sha512sum";
 
 	#Deltas
@@ -392,9 +393,9 @@ processRelease() {
 	fi;
 
 	#File name fixes
-	sed -i "s|$OUT_DIR/||" $OUT_DIR/*.md5sum $OUT_DIR/*.sha512sum;
-	sed -i 's/-ota\././' $OUT_DIR/*.md5sum $OUT_DIR/*.sha512sum;
-	sed -i 's/-incremental_/-/' $OUT_DIR/*.md5sum $OUT_DIR/*.sha512sum;
+	sed -i "s|$OUT_DIR/||" $OUT_DIR/*.sha512sum;
+	sed -i 's/-ota\././' $OUT_DIR/*.sha512sum;
+	sed -i 's/-incremental_/-/' $OUT_DIR/*.sha512sum;
 
 	#GPG signing
 	if [ "$DOS_GPG_SIGNING" = true ]; then
@@ -416,10 +417,10 @@ processRelease() {
 		mkdir -vp $ARCHIVE/fastboot;
 		mkdir -vp $ARCHIVE/incrementals;
 
-		cp -v $OUT_DIR/$PREFIX-fastboot.zip* $ARCHIVE/fastboot/ || true;
 		cp -v $OUT_DIR/$PREFIX-ota.zip* $ARCHIVE/ || true;
-		cp -v $OUT_DIR/$PREFIX-recovery.img* $ARCHIVE/ || true;
 		rename -- "-ota." "." $ARCHIVE/$PREFIX-ota.zip*;
+		if [ "$hasRecoveryImg" == "1" ] || [ "$hasDtboImg" == "0" ]; then cp -v $OUT_DIR/$PREFIX-fastboot.zip* $ARCHIVE/fastboot/ || true; fi;
+		if [ "$hasRecoveryImg" == "0" ] && [ "$hasDtboImg" == "1" ]; then cp -v $OUT_DIR/$PREFIX-recovery.img* $ARCHIVE/ || true; fi;
 		if [ "$DOS_GENERATE_DELTAS" = true ]; then
 			if [[ " ${DOS_GENERATE_DELTAS_DEVICES[@]} " =~ " ${DEVICE} " ]]; then
 				cp -v $OUT_DIR/$PREFIX-target_files.zip* $ARCHIVE/target_files/ || true;
@@ -626,8 +627,6 @@ export -f hardenLocationFWB;
 
 hardenUserdata() {
 	cd "$DOS_BUILD_BASE/$1";
-
-	#awk -i inplace '!/f2fs/' *fstab* */*fstab* */*/*fstab* &>/dev/null || true;
 
 	#Remove latemount to allow selinux contexts be restored upon /cache wipe
 	#Fixes broken OTA updater and broken /recovery updater
@@ -915,6 +914,18 @@ hardenDefconfig() {
 	optionsYes+=("DEBUG_RODATA" "DEBUG_SET_MODULE_RONX");
 	#optionsYes+=("DEBUG_SG"); #bootloops - https://patchwork.kernel.org/patch/8989981
 
+	if [ "$DOS_USE_KSM" = true ] && [ -f "mm/ksm.c" ]; then
+		if [[ $kernelVersion == "3."* ]] || [[ $kernelVersion == "4.4"* ]] || [[ $kernelVersion == "4.9"* ]]; then
+			optionsYes+=("KSM");
+			sed -i 's/unsigned int ksm_run = KSM_RUN_STOP;/unsigned int ksm_run = KSM_RUN_MERGE;/' mm/ksm.c &>/dev/null || true;
+			sed -i 's/unsigned long ksm_run = KSM_RUN_STOP;/unsigned long ksm_run = KSM_RUN_MERGE;/' mm/ksm.c &>/dev/null || true;
+		else
+			local ksmNotNeeded=true;
+			sed -i 's/unsigned int ksm_run = KSM_RUN_MERGE;/unsigned int ksm_run = KSM_RUN_STOP;/' mm/ksm.c &>/dev/null || true;
+			sed -i 's/unsigned long ksm_run = KSM_RUN_MERGE;/unsigned long ksm_run = KSM_RUN_STOP;/' mm/ksm.c &>/dev/null || true;
+		fi;
+	fi;
+
 	if [[ $kernelVersion == "3."* ]] || [[ $kernelVersion == "4.4"* ]] || [[ $kernelVersion == "4.9"* ]]; then
 		optionsYes+=("DEBUG_NOTIFIERS"); #(https://github.com/GrapheneOS/os-issue-tracker/issues/681)
 	fi;
@@ -1095,7 +1106,8 @@ hardenDefconfig() {
 	optionsNo+=("BLK_DEV_FD" "BT_HS" "IO_URING" "IP_DCCP" "IP_SCTP" "VIDEO_VIVID" "FB_VIRTUAL" "RDS" "RDS_TCP");
 	optionsNo+=("HIBERNATION");
 	optionsNo+=("KEXEC" "KEXEC_FILE");
-	optionsNo+=("KSM" "UKSM");
+	optionsNo+=("UKSM");
+	if [ "$DOS_USE_KSM" = false ] || [ "$ksmNotNeeded" = true ]; then optionsNo+=("KSM"); fi;
 	optionsNo+=("LIVEPATCH");
 	optionsNo+=("WIREGUARD"); #Requires root access, which we do not provide
 	if [ "$DOS_DEBLOBBER_REMOVE_IPA" = true ]; then optionsNo+=("IPA" "RMNET_IPA"); fi;
@@ -1103,7 +1115,7 @@ hardenDefconfig() {
 	optionsNo+=("GCC_PLUGIN_RANDSTRUCT_PERFORMANCE");
 	optionsNo+=("HARDENED_USERCOPY_FALLBACK");
 	optionsNo+=("SECURITY_SELINUX_DISABLE" "SECURITY_WRITABLE_HOOKS");
-	optionsNo+=("SLAB_MERGE_DEFAULT");
+	if [ "$DOS_USE_KSM" = false ]; then optionsNo+=("SLAB_MERGE_DEFAULT"); fi;
 	if [[ "$DOS_VERSION" != "LineageOS-20.0" ]]; then optionsNo+=("USERFAULTFD"); fi;
 	#optionsNo+=("CFI_PERMISSIVE");
 	#misc

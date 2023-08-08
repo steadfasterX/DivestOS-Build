@@ -8,15 +8,17 @@ Test: atest con.android.server.wifi
 (cherry picked from https://googleplex-android-review.googlesource.com/q/commit:e1a80210f3f0391c989a2a86fd4aef739bf2574c)
 Merged-In: I97522ce3607547c10025caa107cd1a40455a9c5d
 Change-Id: I97522ce3607547c10025caa107cd1a40455a9c5d
+
+Change-Id: Id95fc30cb9f22276114ecef543d7a7e9e0c3459b
 ---
- .../wifi/hotspot2/PasspointConfiguration.java | 59 +++++++++++++-
+ .../wifi/hotspot2/PasspointConfiguration.java | 47 ++++++++++-
  .../net/wifi/hotspot2/pps/Credential.java     | 10 ++-
  .../android/net/wifi/hotspot2/pps/HomeSp.java | 79 ++++++++++++++++++-
  .../hotspot2/PasspointConfigurationTest.java  |  2 +-
- 4 files changed, 146 insertions(+), 4 deletions(-)
+ 4 files changed, 134 insertions(+), 4 deletions(-)
 
 diff --git a/wifi/java/android/net/wifi/hotspot2/PasspointConfiguration.java b/wifi/java/android/net/wifi/hotspot2/PasspointConfiguration.java
-index 9095b5d927a2..eff56acf4dfb 100644
+index 9095b5d927a2..f88d6f6ca25a 100644
 --- a/wifi/java/android/net/wifi/hotspot2/PasspointConfiguration.java
 +++ b/wifi/java/android/net/wifi/hotspot2/PasspointConfiguration.java
 @@ -52,8 +52,42 @@ public final class PasspointConfiguration implements Parcelable {
@@ -45,7 +47,8 @@ index 9095b5d927a2..eff56acf4dfb 100644
 +    /**
 +     * Maximum bytes for a string entry like FQDN and friendly name.
 +     * @hide
-+     */
+      */
+-    private static final int MAX_URL_BYTES = 1023;
 +    public static final int MAX_STRING_LENGTH = 255;
 +
 +    /**
@@ -57,28 +60,15 @@ index 9095b5d927a2..eff56acf4dfb 100644
 +    /**
 +     * Organization Identifiers is 3 or 5 Octets. 24 or 36 bit.
 +     * @hide
-      */
--    private static final int MAX_URL_BYTES = 1023;
++     */
 +    public static final long MAX_OI_VALUE = ((long) 1 << 40)  - 1;
  
      /**
       * Integer value used for indicating null value in the Parcel.
-@@ -572,7 +606,30 @@ public final class PasspointConfiguration implements Parcelable {
+@@ -572,7 +606,18 @@ public final class PasspointConfiguration implements Parcelable {
              return false;
          }
  
-+        if (mAaaServerTrustedNames != null) {
-+            if (mAaaServerTrustedNames.length > MAX_NUMBER_OF_ENTRIES) {
-+                Log.d(TAG, "Too many AaaServerTrustedNames");
-+                return false;
-+            }
-+            for (String fqdn : mAaaServerTrustedNames) {
-+                if (fqdn.getBytes(StandardCharsets.UTF_8).length > MAX_STRING_LENGTH) {
-+                    Log.d(TAG, "AaaServerTrustedNames is too long");
-+                    return false;
-+                }
-+            }
-+        }
 +        if (mSubscriptionType != null) {
 +            if (mSubscriptionType.getBytes(StandardCharsets.UTF_8).length > MAX_STRING_LENGTH) {
 +                Log.d(TAG, "SubscriptionType is too long");

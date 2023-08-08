@@ -71,7 +71,7 @@ applyPatch "$DOS_PATCHES/android_bionic/0003-Graphene_Bionic_Hardening-1.patch";
 #applyPatch "$DOS_PATCHES/android_bionic/0003-Graphene_Bionic_Hardening-2.patch"; #Replace brk and sbrk with stubs (GrapheneOS) #XXX: some vendor blobs use sbrk
 #applyPatch "$DOS_PATCHES/android_bionic/0003-Graphene_Bionic_Hardening-3.patch"; #Use blocking getrandom and avoid urandom fallback (GrapheneOS) #XXX: some kernels do not have (working) getrandom
 applyPatch "$DOS_PATCHES/android_bionic/0003-Graphene_Bionic_Hardening-4.patch"; #Fix undefined out-of-bounds accesses in sched.h (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_bionic/0003-Graphene_Bionic_Hardening-5.patch"; #Stop implicitly marking mappings as mergeable (GrapheneOS)
+if [ "$DOS_USE_KSM" = false ]; then applyPatch "$DOS_PATCHES/android_bionic/0003-Graphene_Bionic_Hardening-5.patch"; fi; #Stop implicitly marking mappings as mergeable (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0003-Graphene_Bionic_Hardening-6.patch"; #Replace VLA formatting buffer with dprintf (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0003-Graphene_Bionic_Hardening-7.patch"; #Increase default pthread stack to 8MiB on 64-bit (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0003-Graphene_Bionic_Hardening-8.patch"; #Make __stack_chk_guard read-only at runtime (GrapheneOS)
@@ -97,7 +97,7 @@ sed -i '75i$(my_res_package): PRIVATE_AAPT_FLAGS += --auto-add-overlay' core/aap
 awk -i inplace '!/updatable_apex.mk/' target/product/mainline_system.mk; #Disable APEX
 sed -i 's/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 23/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 28/' core/version_defaults.mk; #Set the minimum supported target SDK to Pie (GrapheneOS)
 #sed -i 's/PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := true/PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false/' core/product_config.mk; #broken by hardenDefconfig
-sed -i 's/2023-06-05/2023-07-05/' core/version_defaults.mk; #Bump Security String #Q_asb_2023-07 #XXX
+sed -i 's/2023-06-05/2023-08-05/' core/version_defaults.mk; #Bump Security String #Q_asb_2023-08 #XXX
 fi;
 
 if enterAndClear "build/soong"; then
@@ -108,6 +108,10 @@ fi;
 if enterAndClear "device/qcom/sepolicy-legacy"; then
 applyPatch "$DOS_PATCHES/android_device_qcom_sepolicy-legacy/0001-Camera_Fix.patch"; #Fix camera on -user builds XXX: REMOVE THIS TRASH (DivestOS)
 echo "SELINUX_IGNORE_NEVERALLOWS := true" >> sepolicy.mk; #Ignore neverallow violations XXX: necessary for -user builds of legacy devices
+fi;
+
+if enterAndClear "external/aac"; then
+applyPatch "$DOS_PATCHES/android_external_aac/364027.patch"; #R_asb_2023-08 Increase patchParam array size by one and fix out-of-bounce write in resetLppTransposer().
 fi;
 
 if enterAndClear "external/chromium-webview"; then
@@ -121,6 +125,7 @@ fi;
 
 if enterAndClear "external/freetype"; then
 applyPatch "$DOS_PATCHES/android_external_freetype/360951.patch"; #R_asb_2023-07 Cherry-pick two upstream changes
+applyPatch "$DOS_PATCHES/android_external_freetype/364028-backport.patch"; #R_asb_2023-08 Cherrypick following three changes
 fi;
 
 if [ "$DOS_GRAPHENE_MALLOC" = true ]; then
@@ -141,18 +146,27 @@ git fetch https://github.com/LineageOS/android_external_zlib refs/changes/70/352
 fi;
 
 if enterAndClear "frameworks/base"; then
-#applyPatch "$DOS_PATCHES/android_frameworks_base/360952-backport.patch"; #R_asb_2023-07 Passpoint Add more check to limit the config size #XXX: Passpoint 2.0 is API30+
+applyPatch "$DOS_PATCHES/android_frameworks_base/360952-backport.patch"; #R_asb_2023-07 Passpoint Add more check to limit the config size
 applyPatch "$DOS_PATCHES/android_frameworks_base/360953-backport.patch"; #R_asb_2023-07 Sanitize VPN label to prevent HTML injection
 applyPatch "$DOS_PATCHES/android_frameworks_base/360954.patch"; #R_asb_2023-07 Limit the number of supported v1 and v2 signers
 applyPatch "$DOS_PATCHES/android_frameworks_base/360955.patch"; #R_asb_2023-07 Import translations.
-#applyPatch "$DOS_PATCHES/android_frameworks_base/360956.patch"; #R_asb_2023-07 Add size check on PPS#policy #XXX: depends on 360952
-#applyPatch "$DOS_PATCHES/android_frameworks_base/360957.patch"; #R_asb_2023-07 Limit the ServiceFriendlyNames #XXX: depends on 360952
+applyPatch "$DOS_PATCHES/android_frameworks_base/360956.patch"; #R_asb_2023-07 Add size check on PPS#policy
+applyPatch "$DOS_PATCHES/android_frameworks_base/360957.patch"; #R_asb_2023-07 Limit the ServiceFriendlyNames
 applyPatch "$DOS_PATCHES/android_frameworks_base/360958-backport.patch"; #R_asb_2023-07 Only allow NEW_TASK flag when adjusting pending intents
 applyPatch "$DOS_PATCHES/android_frameworks_base/360959.patch"; #R_asb_2023-07 Dismiss keyguard when simpin auth'd and security method is none.
 applyPatch "$DOS_PATCHES/android_frameworks_base/360960.patch"; #R_asb_2023-07 Increase notification channel limit.
-#applyPatch "$DOS_PATCHES/android_frameworks_base/360961-backport.patch"; #R_asb_2023-07 Verify URI permissions for EXTRA_REMOTE_INPUT_HISTORY_ITEMS. #XXX: RemoteInputHistoryItem doesn't exist
 applyPatch "$DOS_PATCHES/android_frameworks_base/360962-backport.patch"; #R_asb_2023-07 Truncate ShortcutInfo Id
 applyPatch "$DOS_PATCHES/android_frameworks_base/360963.patch"; #R_asb_2023-07 Visit URIs in landscape/portrait custom remote views.
+applyPatch "$DOS_PATCHES/android_frameworks_base/364029.patch"; #R_asb_2023-08 ActivityManager#killBackgroundProcesses can kill caller's own app only
+#applyPatch "$DOS_PATCHES/android_frameworks_base/364030-backport.patch"; #R_asb_2023-08 ActivityManagerService: Allow openContentUri from vendor/system/product. #TODO: needs backport of ca1ea17a
+applyPatch "$DOS_PATCHES/android_frameworks_base/364031-backport.patch"; #R_asb_2023-08 Verify URI permissions for notification shortcutIcon.
+applyPatch "$DOS_PATCHES/android_frameworks_base/364032.patch"; #R_asb_2023-08 On device lockdown, always show the keyguard
+applyPatch "$DOS_PATCHES/android_frameworks_base/364033-backport.patch"; #R_asb_2023-08 Ensure policy has no absurdly long strings
+applyPatch "$DOS_PATCHES/android_frameworks_base/364034.patch"; #R_asb_2023-08 Implement visitUris for RemoteViews ViewGroupActionAdd.
+applyPatch "$DOS_PATCHES/android_frameworks_base/364035-backport.patch"; #R_asb_2023-08 Check URIs in notification public version.
+applyPatch "$DOS_PATCHES/android_frameworks_base/364036-backport.patch"; #R_asb_2023-08 Verify URI permissions in MediaMetadata
+applyPatch "$DOS_PATCHES/android_frameworks_base/364037.patch"; #R_asb_2023-08 Use Settings.System.getIntForUser instead of getInt to make sure user specific settings are used
+applyPatch "$DOS_PATCHES/android_frameworks_base/364038-backport.patch"; #R_asb_2023-08 Resolve StatusHints image exploit across user.
 #applyPatch "$DOS_PATCHES/android_frameworks_base/272645.patch"; #ten-bt-sbc-hd-dualchannel: Add CHANNEL_MODE_DUAL_CHANNEL constant (ValdikSS)
 #applyPatch "$DOS_PATCHES/android_frameworks_base/272646-forwardport.patch"; #ten-bt-sbc-hd-dualchannel: Add Dual Channel into Bluetooth Audio Channel Mode developer options menu (ValdikSS)
 #applyPatch "$DOS_PATCHES/android_frameworks_base/272647.patch"; #ten-bt-sbc-hd-dualchannel: Allow SBC as HD audio codec in Bluetooth device configuration (ValdikSS)
@@ -194,7 +208,7 @@ applyPatch "$DOS_PATCHES/android_frameworks_base/0017-WiFi_Timeout.patch"; #Time
 if [ "$DOS_GRAPHENE_CONSTIFY" = true ]; then applyPatch "$DOS_PATCHES/android_frameworks_base/0018-constify_JNINativeMethod.patch"; fi; #Constify JNINativeMethod tables (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0019-Random_MAC.patch"; #Add option of always randomizing MAC addresses (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0020-SUPL_Toggle.patch"; #Add a setting for forcibly disabling SUPL (GrapheneOS)
-if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_frameworks_base/0021-Hardened-signature-spoofing.patch"; fi; #Hardened signature spoofing ability (DivestOS)
+if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_frameworks_base/0021-Unprivileged_microG_Handling.patch"; fi; #Unprivileged microG handling (heavily based off of a CalyxOS patch)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0006-Do-not-throw-in-setAppOnInterfaceLocked.patch"; #Fix random reboots on broken kernels when an app has data restricted XXX: ugly (DivestOS)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0007-ABI_Warning.patch"; #Warn when running activity from 32 bit app on ARM64 devices. (AOSP)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0008-No_Crash_GSF.patch"; #Don't crash apps that depend on missing Gservices provider (GrapheneOS)
@@ -223,7 +237,7 @@ fi;
 fi;
 
 if enterAndClear "frameworks/opt/net/wifi"; then
-#applyPatch "$DOS_PATCHES/android_frameworks_opt_net_wifi/360964-backport.patch"; #R_asb_2023-07 Add pre-share key check for wapi #XXX: WAPI is API30+
+applyPatch "$DOS_PATCHES/android_frameworks_opt_net_wifi/360965-backport.patch"; #R_asb_2023-07 Limit the number of Passpoint per App
 if [ "$DOS_GRAPHENE_CONSTIFY" = true ]; then applyPatch "$DOS_PATCHES/android_frameworks_opt_net_wifi/0001-constify_JNINativeMethod.patch"; fi; #Constify JNINativeMethod tables (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_opt_net_wifi/0002-Random_MAC.patch"; #Add support for always generating new random MAC (GrapheneOS)
 fi;
@@ -340,7 +354,7 @@ applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0010-Random_MAC-2.patch"
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0011-LTE_Only_Mode.patch"; #Add LTE-only option (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0012-hosts_toggle.patch"; #Add a toggle to disable /etc/hosts lookup (heavily based off of a GrapheneOS patch)
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0013-SUPL_Toggle.patch"; #Add a toggle for forcibly disabling SUPL (GrapheneOS)
-if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0014-signature_spoofing_toggle.patch"; fi; #Add a toggle to opt-in to restricted signature spoofing (heavily based off of a GrapheneOS patch)
+if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0014-microG_Toggle.patch"; fi; #Add a toggle for microG enablement (heavily based off of a GrapheneOS patch)
 applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Settings/0001-disable_apps.patch"; #Add an ability to disable non-system apps from the "App info" screen (GrapheneOS)
 sed -i 's/private int mPasswordMaxLength = 16;/private int mPasswordMaxLength = 64;/' src/com/android/settings/password/ChooseLockPassword.java; #Increase default max password length to 64 (GrapheneOS)
 sed -i 's/if (isFullDiskEncrypted()) {/if (false) {/' src/com/android/settings/accessibility/*AccessibilityService*.java; #Never disable secure start-up when enabling an accessibility service
@@ -374,9 +388,14 @@ if enterAndClear "packages/providers/DownloadProvider"; then
 applyPatch "$DOS_PATCHES/android_packages_providers_DownloadProvider/0001-Network_Permission.patch"; #Expose the NETWORK permission (GrapheneOS)
 fi;
 
-#if enterAndClear "packages/providers/TelephonyProvider"; then
+if enterAndClear "packages/providers/TelephonyProvider"; then
+applyPatch "$DOS_PATCHES/android_packages_providers_TelephonyProvider/364040-backport.patch"; #R_asb_2023-08 Update file permissions using canonical path
 #cp $DOS_PATCHES_COMMON/android_packages_providers_TelephonyProvider/carrier_list.* assets/;
-#fi;
+fi;
+
+if enterAndClear "packages/services/Telecomm"; then
+applyPatch "$DOS_PATCHES/android_packages_services_Telecomm/364041-backport.patch"; #R_asb_2023-08 Resolve StatusHints image exploit across user.
+fi;
 
 if enterAndClear "prebuilts/abi-dumps/vndk"; then
 applyPatch "$DOS_PATCHES/android_prebuilts_abi-dumps_vndk/0001-protobuf-avi.patch"; #Work around ABI changes from compiler hardening (GrapheneOS)
@@ -465,6 +484,8 @@ awk -i inplace '!/Eleven/' config/common_mobile.mk; #Remove Music Player
 awk -i inplace '!/Email/' config/common_mobile.mk; #Remove Email
 awk -i inplace '!/Exchange2/' config/common_mobile.mk;
 cp -f "$DOS_PATCHES_COMMON/config_webview_packages.xml" overlay/common/frameworks/base/core/res/res/xml/config_webview_packages.xml; #Change allowed WebView providers
+awk -i inplace '!/com.android.vending/' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml; #Remove unwanted apps
+awk -i inplace '!/com.google.android/' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml;
 fi;
 
 if enter "vendor/divested"; then
@@ -558,7 +579,6 @@ enableLowRam "device/motorola/osprey" "osprey";
 enableLowRam "device/motorola/surnia" "surnia";
 #Tweaks for <3GB RAM devices
 enableLowRam "device/cyanogen/msm8916-common" "msm8916-common";
-enableLowRam "device/motorola/clark";
 enableLowRam "device/wileyfox/crackling" "crackling";
 #Tweaks for 3GB/4GB RAM devices
 #enableLowRam "device/oneplus/oneplus2" "oneplus2";

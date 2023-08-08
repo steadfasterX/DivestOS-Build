@@ -563,16 +563,6 @@ if enterAndClear "device/lge/g4-common"; then
 sed -i '3itypeattribute hwaddrs misc_block_device_exception;' sepolicy/hwaddrs.te;
 fi;
 
-if enterAndClear "device/motorola/clark"; then
-sed -i 's/0xA04D/0xA04D|0xA052/' board-info.txt; #Allow installing on Nougat bootloader, assume the user is running the correct modem
-rm board-info.txt; #Never restrict installation
-echo "recovery_only(\`" >> sepolicy/recovery.te; #304224: Allow recovery to unzip and chmod modem firmware
-echo "  allow firmware_file labeledfs:filesystem associate;" >> sepolicy/recovery.te;
-echo "  allow recovery firmware_file:dir rw_dir_perms;" >> sepolicy/recovery.te;
-echo "  allow recovery firmware_file:file create_file_perms;" >> sepolicy/recovery.te;
-echo "')" >> sepolicy/recovery.te;
-fi;
-
 if enterAndClear "device/samsung/exynos5420-common"; then
 awk -i inplace '!/shell su/' sepolicy/shell.te; #neverallow
 fi;
@@ -644,24 +634,23 @@ enableLowRam "device/samsung/toro";
 enableLowRam "device/samsung/toroplus";
 enableLowRam "device/samsung/tuna";
 #Tweaks for <3GB RAM devices
-enableLowRam "device/amazon/apollo";
-enableLowRam "device/amazon/hdx-common";
-enableLowRam "device/amazon/thor";
-enableLowRam "device/htc/m7";
-enableLowRam "device/htc/m7-common";
-enableLowRam "device/htc/msm8960-common";
-enableLowRam "device/motorola/clark";
-enableLowRam "device/samsung/d2att";
-enableLowRam "device/samsung/d2-common";
-enableLowRam "device/samsung/d2spr";
-enableLowRam "device/samsung/d2tmo";
-enableLowRam "device/samsung/d2vzw";
-enableLowRam "device/samsung/i9305";
-enableLowRam "device/samsung/kona-common";
-enableLowRam "device/samsung/msm8960-common";
-enableLowRam "device/samsung/n5100";
-enableLowRam "device/samsung/n5110";
-enableLowRam "device/samsung/n5120";
+#enableLowRam "device/amazon/apollo";
+#enableLowRam "device/amazon/hdx-common";
+#enableLowRam "device/amazon/thor";
+#enableLowRam "device/htc/m7";
+#enableLowRam "device/htc/m7-common";
+#enableLowRam "device/htc/msm8960-common";
+#enableLowRam "device/samsung/d2att";
+#enableLowRam "device/samsung/d2-common";
+#enableLowRam "device/samsung/d2spr";
+#enableLowRam "device/samsung/d2tmo";
+#enableLowRam "device/samsung/d2vzw";
+#enableLowRam "device/samsung/i9305";
+#enableLowRam "device/samsung/kona-common";
+#enableLowRam "device/samsung/msm8960-common";
+#enableLowRam "device/samsung/n5100";
+#enableLowRam "device/samsung/n5110";
+#enableLowRam "device/samsung/n5120";
 ##Tweaks for <4GB RAM devices
 #enableLowRam "device/htc/himaul";
 #enableLowRam "device/htc/himawl";
@@ -678,11 +667,13 @@ enableLowRam "device/samsung/n5120";
 [[ -d kernel/amazon/hdx-common ]] && sed -i "s/CONFIG_ASYMMETRIC_KEY_TYPE=y/# CONFIG_ASYMMETRIC_KEY_TYPE is not set/" kernel/amazon/hdx-common/arch/arm/configs/*defconfig; #Breaks on compile
 [[ -d kernel/asus/grouper ]] && sed -i "s/CONFIG_DEBUG_RODATA=y/# CONFIG_DEBUG_RODATA is not set/" kernel/asus/grouper/arch/arm/configs/grouper_defconfig; #Breaks on compile
 [[ -d kernel/lge/msm8992 ]] && awk -i inplace '!/STACKPROTECTOR/' kernel/lge/msm8992/arch/arm64/configs/lineageos_*_defconfig; #Breaks on compile
-[[ -d kernel/motorola/msm8992 ]] && sed -i "s/CONFIG_ARM_SMMU=y/# CONFIG_ARM_SMMU is not set/" kernel/motorola/msm8992/arch/arm64/configs/*defconfig; #Breaks on compile
 #tuna fixes
 awk -i inplace '!/nfc_enhanced.mk/' device/samsung/toro*/lineage.mk || true;
 awk -i inplace '!/TARGET_RECOVERY_UPDATER_LIBS/' device/samsung/toro*/BoardConfig.mk || true;
 awk -i inplace '!/TARGET_RELEASETOOLS_EXTENSIONS/' device/samsung/toro*/BoardConfig.mk || true;
+awk -i inplace '!/SDM/' vendor/samsung/toroplus/toroplus-vendor.mk || true;
+awk -i inplace '!/HiddenMenu/' vendor/samsung/toroplus/toroplus-vendor.mk || true;
+awk -i inplace '!/SecPhone/' vendor/samsung/toroplus/toroplus-vendor.mk || true;
 
 sed -i 's/^YYLTYPE yylloc;/extern YYLTYPE yylloc;/' kernel/*/*/scripts/dtc/dtc-lexer.l* || true; #Fix builds with GCC 10
 rm -v kernel/*/*/drivers/staging/greybus/tools/Android.mk || true;

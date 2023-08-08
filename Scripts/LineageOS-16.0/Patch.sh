@@ -66,7 +66,7 @@ applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-1.patch";
 #applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-2.patch"; #Replace brk and sbrk with stubs (GrapheneOS) #XXX: some vendor blobs use sbrk
 #applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-3.patch"; #Use blocking getrandom and avoid urandom fallback (GrapheneOS) #XXX: some kernels do not have (working) getrandom
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-4.patch"; #Fix undefined out-of-bounds accesses in sched.h (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-5.patch"; #Stop implicitly marking mappings as mergeable (GrapheneOS)
+if [ "$DOS_USE_KSM" = false ]; then applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-5.patch"; fi; #Stop implicitly marking mappings as mergeable (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-6.patch"; #Replace VLA formatting buffer with dprintf (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-7.patch"; #Increase default pthread stack to 8MiB on 64-bit (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-8.patch"; #Make __stack_chk_guard read-only at runtime (GrapheneOS)
@@ -78,6 +78,7 @@ applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-9.patch";
 #applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-14.patch"; #Use a better pthread_attr junk filling pattern (GrapheneOS)
 #applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-15.patch"; #Move pthread_internal_t out of the stack mapping (GrapheneOS)
 fi;
+#applyPatch "$DOS_PATCHES/android_bionic/0004-hosts_toggle.patch"; #Add a toggle to disable /etc/hosts lookup (DivestOS)
 fi;
 
 if enterAndClear "bootable/recovery"; then
@@ -97,7 +98,7 @@ applyPatch "$DOS_PATCHES/android_build/0002-Enable_fwrapv.patch"; #Use -fwrapv a
 sed -i '74i$(my_res_package): PRIVATE_AAPT_FLAGS += --auto-add-overlay' core/aapt2.mk; #Enable auto-add-overlay for packages, this allows the vendor overlay to easily work across all branches.
 sed -i 's/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 17/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 28/' core/version_defaults.mk; #Set the minimum supported target SDK to Pie (GrapheneOS)
 awk -i inplace '!/Email/' target/product/core.mk; #Remove Email
-sed -i 's/2022-01-05/2023-07-05/' core/version_defaults.mk; #Bump Security String #P_asb_2023-07 #XXX
+sed -i 's/2022-01-05/2023-08-05/' core/version_defaults.mk; #Bump Security String #P_asb_2023-08 #XXX
 fi;
 
 if enterAndClear "build/soong"; then
@@ -107,6 +108,10 @@ fi;
 if enterAndClear "device/qcom/sepolicy-legacy"; then
 applyPatch "$DOS_PATCHES/android_device_qcom_sepolicy-legacy/0001-Camera_Fix.patch"; #Fix camera on -user builds XXX: REMOVE THIS TRASH (DivestOS)
 echo "SELINUX_IGNORE_NEVERALLOWS := true" >> sepolicy.mk; #Ignore neverallow violations XXX: necessary for -user builds of legacy devices
+fi;
+
+if enterAndClear "external/aac"; then
+applyPatch "$DOS_PATCHES/android_external_aac/364027.patch"; #R_asb_2023-08 Increase patchParam array size by one and fix out-of-bounce write in resetLppTransposer().
 fi;
 
 if enterAndClear "external/chromium-webview"; then
@@ -134,6 +139,7 @@ fi;
 
 if enterAndClear "external/freetype"; then
 applyPatch "$DOS_PATCHES/android_external_freetype/360951.patch"; #R_asb_2023-07 Cherry-pick two upstream changes
+#applyPatch "$DOS_PATCHES/android_external_freetype/364028-backport.patch"; #R_asb_2023-08 Cherrypick following three changes #XXX: needs fix
 fi;
 
 if [ "$DOS_GRAPHENE_MALLOC" = true ]; then
@@ -161,6 +167,15 @@ applyPatch "$DOS_PATCHES/android_frameworks_base/360955-backport.patch"; #R_asb_
 applyPatch "$DOS_PATCHES/android_frameworks_base/360959-backport.patch"; #R_asb_2023-07 Dismiss keyguard when simpin auth'd and security method is none.
 applyPatch "$DOS_PATCHES/android_frameworks_base/360962-backport.patch"; #R_asb_2023-07 Truncate ShortcutInfo Id
 applyPatch "$DOS_PATCHES/android_frameworks_base/360963-backport.patch"; #R_asb_2023-07 Visit URIs in landscape/portrait custom remote views.
+applyPatch "$DOS_PATCHES/android_frameworks_base/364029.patch"; #R_asb_2023-08 ActivityManager#killBackgroundProcesses can kill caller's own app only
+applyPatch "$DOS_PATCHES/android_frameworks_base/364031-backport.patch"; #R_asb_2023-08 Verify URI permissions for notification shortcutIcon.
+applyPatch "$DOS_PATCHES/android_frameworks_base/364032-backport.patch"; #R_asb_2023-08 On device lockdown, always show the keyguard
+applyPatch "$DOS_PATCHES/android_frameworks_base/364033-backport.patch"; #R_asb_2023-08 Ensure policy has no absurdly long strings
+applyPatch "$DOS_PATCHES/android_frameworks_base/364034.patch"; #R_asb_2023-08 Implement visitUris for RemoteViews ViewGroupActionAdd.
+applyPatch "$DOS_PATCHES/android_frameworks_base/364035-backport.patch"; #R_asb_2023-08 Check URIs in notification public version.
+applyPatch "$DOS_PATCHES/android_frameworks_base/364036-backport.patch"; #R_asb_2023-08 Verify URI permissions in MediaMetadata
+applyPatch "$DOS_PATCHES/android_frameworks_base/364037.patch"; #R_asb_2023-08 Use Settings.System.getIntForUser instead of getInt to make sure user specific settings are used
+applyPatch "$DOS_PATCHES/android_frameworks_base/364038-backport.patch"; #R_asb_2023-08 Resolve StatusHints image exploit across user.
 applyPatch "$DOS_PATCHES/android_frameworks_base/0007-Always_Restict_Serial.patch"; #Always restrict access to Build.SERIAL (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0008-Browser_No_Location.patch"; #Don't grant location permission to system browsers (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0009-SystemUI_No_Permission_Review.patch"; #Allow SystemUI to directly manage Bluetooth/WiFi (GrapheneOS)
@@ -186,7 +201,10 @@ applyPatch "$DOS_PATCHES/android_frameworks_base/0013-Special_Permissions.patch"
 applyPatch "$DOS_PATCHES/android_frameworks_base/0013-Network_Permission-1.patch"; #Make INTERNET into a special runtime permission (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0013-Network_Permission-2.patch"; #Add a NETWORK permission group for INTERNET (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0013-Sensors_Permission.patch"; #Add special runtime permission for other sensors (GrapheneOS)
+#applyPatch "$DOS_PATCHES/android_frameworks_base/0015-Automatic_Reboot.patch"; #Timeout for reboot (GrapheneOS)
+#applyPatch "$DOS_PATCHES/android_frameworks_base/0016-Bluetooth_Timeout.patch"; #Timeout for Bluetooth (GrapheneOS)
 if [ "$DOS_GRAPHENE_CONSTIFY" = true ]; then applyPatch "$DOS_PATCHES/android_frameworks_base/0014-constify_JNINativeMethod.patch"; fi; #Constify JNINativeMethod tables (GrapheneOS)
+#if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_frameworks_base/0021-Unprivileged_microG_Handling.patch"; fi; #Unprivileged microG handling (heavily based off of a CalyxOS patch)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0008-No_Crash_GSF.patch"; #Don't crash apps that depend on missing Gservices provider (GrapheneOS)
 sed -i 's/DEFAULT_MAX_FILES = 1000;/DEFAULT_MAX_FILES = 0;/' services/core/java/com/android/server/DropBoxManagerService.java; #Disable DropBox internal logging service
 sed -i 's/DEFAULT_MAX_FILES_LOWRAM = 300;/DEFAULT_MAX_FILES_LOWRAM = 0;/' services/core/java/com/android/server/DropBoxManagerService.java;
@@ -306,6 +324,12 @@ if enterAndClear "packages/apps/Settings"; then
 git revert --no-edit c240992b4c86c7f226290807a2f41f2619e7e5e8; #Don't hide OEM unlock
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0001-Captive_Portal_Toggle.patch"; #Add option to disable captive portal checks (MSe1969)
 #applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0004-Private_DNS.patch"; #More 'Private DNS' options (heavily based off of a CalyxOS patch) #TODO: Needs work
+#applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0005-Automatic_Reboot.patch"; #Timeout for reboot (GrapheneOS)
+#applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0006-Bluetooth_Timeout.patch"; #Timeout for Bluetooth (CalyxOS)
+#applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0008-ptrace_scope.patch"; #Add native debugging setting (GrapheneOS)
+#if [ "$DOS_GRAPHENE_EXEC" = true ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0009-exec_spawning_toggle.patch"; fi; #Add exec spawning toggle (GrapheneOS)
+#applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0012-hosts_toggle.patch"; #Add a toggle to disable /etc/hosts lookup (heavily based off of a GrapheneOS patch)
+#if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0014-microG_Toggle.patch"; fi; #Add a toggle for microG enablement (heavily based off of a GrapheneOS patch)
 sed -i 's/private int mPasswordMaxLength = 16;/private int mPasswordMaxLength = 64;/' src/com/android/settings/password/ChooseLockPassword.java; #Increase default max password length to 64 (GrapheneOS)
 sed -i 's/if (isFullDiskEncrypted()) {/if (false) {/' src/com/android/settings/accessibility/*AccessibilityService*.java; #Never disable secure start-up when enabling an accessibility service
 fi;
@@ -334,9 +358,14 @@ if enterAndClear "packages/providers/DownloadProvider"; then
 applyPatch "$DOS_PATCHES/android_packages_providers_DownloadProvider/0001-Network_Permission.patch"; #Expose the NETWORK permission (GrapheneOS)
 fi;
 
-#if enterAndClear "packages/providers/TelephonyProvider"; then
+if enterAndClear "packages/providers/TelephonyProvider"; then
+applyPatch "$DOS_PATCHES/android_packages_providers_TelephonyProvider/364040-backport.patch"; #R_asb_2023-08 Update file permissions using canonical path
 #cp $DOS_PATCHES_COMMON/android_packages_providers_TelephonyProvider/carrier_list.* assets/;
-#fi;
+fi;
+
+if enterAndClear "packages/services/Telecomm"; then
+applyPatch "$DOS_PATCHES/android_packages_services_Telecomm/364041-backport.patch"; #R_asb_2023-08 Resolve StatusHints image exploit across user.
+fi;
 
 if enterAndClear "packages/services/Telephony"; then
 git revert --no-edit 99564aaf0417c9ddf7d6aeb10d326e5b24fa8f55;
@@ -410,6 +439,8 @@ cp -f "$DOS_PATCHES_COMMON/apns-conf.xml" prebuilt/common/etc/apns-conf.xml; #Up
 awk -i inplace '!/Eleven/' config/common_mobile.mk; #Remove Music Player
 awk -i inplace '!/Exchange2/' config/common_mobile.mk; #Remove Email
 cp -f "$DOS_PATCHES_COMMON/config_webview_packages.xml" overlay/common/frameworks/base/core/res/res/xml/config_webview_packages.xml; #Change allowed WebView providers
+awk -i inplace '!/com.android.vending/' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml; #Remove unwanted apps
+awk -i inplace '!/com.google.android/' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml;
 fi;
 
 if enter "vendor/divested"; then
@@ -422,11 +453,6 @@ fi;
 #
 #START OF DEVICE CHANGES
 #
-if enterAndClear "device/lge/hammerhead"; then
-git am $DOS_PATCHES/android_device_lge_hammerhead/*.patch; #hh-p-sepolicy
-echo "SELINUX_IGNORE_NEVERALLOWS := true" >> BoardConfig.mk; #qcom-legacy sepolicy
-fi;
-
 if enterAndClear "device/wileyfox/kipper"; then
 compressRamdisks;
 fi;
@@ -455,8 +481,7 @@ cd "$DOS_BUILD_BASE";
 #Tweaks for <2GB RAM devices
 #none yet
 #Tweaks for <3GB RAM devices
-enableLowRam "device/lge/hammerhead" "hammerhead";
-enableLowRam "device/samsung/kccat6" "kccat6";
+#enableLowRam "device/samsung/kccat6" "kccat6";
 #Tweaks for <4GB RAM devices
 #enableLowRam "device/samsung/lentislte" "lentislte";
 #enableLowRam "device/wileyfox/kipper" "kipper";

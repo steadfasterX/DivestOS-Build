@@ -66,7 +66,7 @@ applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-1.patch";
 #applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-2.patch"; #Replace brk and sbrk with stubs (GrapheneOS) #XXX: some vendor blobs use sbrk
 #applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-3.patch"; #Use blocking getrandom and avoid urandom fallback (GrapheneOS) #XXX: some kernels do not have (working) getrandom
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-4.patch"; #Fix undefined out-of-bounds accesses in sched.h (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-5.patch"; #Stop implicitly marking mappings as mergeable (GrapheneOS)
+if [ "$DOS_USE_KSM" = false ]; then applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-5.patch"; fi; #Stop implicitly marking mappings as mergeable (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-6.patch"; #Replace VLA formatting with dprintf-like function (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-7.patch"; #Increase default pthread stack to 8MiB on 64-bit (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-8.patch"; #Make __stack_chk_guard read-only at runtime (GrapheneOS)
@@ -97,11 +97,16 @@ sed -i '75i$(my_res_package): PRIVATE_AAPT_FLAGS += --auto-add-overlay' core/aap
 awk -i inplace '!/updatable_apex.mk/' target/product/generic_system.mk; #Disable APEX
 sed -i 's/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 23/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 28/' core/version_defaults.mk; #Set the minimum supported target SDK to Pie (GrapheneOS)
 #sed -i 's/PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := true/PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false/' core/product_config.mk; #broken by hardenDefconfig
+sed -i 's/2023-07-05/2023-08-05/' core/version_defaults.mk; #Bump Security String #S_asb_2023-08 #XXX
 fi;
 
 if enterAndClear "build/soong"; then
 applyPatch "$DOS_PATCHES/android_build_soong/0001-Enable_fwrapv.patch"; #Use -fwrapv at a minimum (GrapheneOS)
 if [ "$DOS_GRAPHENE_MALLOC" = true ]; then applyPatch "$DOS_PATCHES/android_build_soong/0002-hm_apex.patch"; fi; #(GrapheneOS)
+fi;
+
+if enterAndClear "external/aac"; then
+git fetch https://github.com/LineageOS/android_external_aac refs/changes/80/363980/1 && git cherry-pick FETCH_HEAD; #S_asb_2023-08
 fi;
 
 if enterAndClear "external/chromium-webview"; then
@@ -174,7 +179,7 @@ applyPatch "$DOS_PATCHES/android_frameworks_base/0027-appops_reset_fix-2.patch";
 applyPatch "$DOS_PATCHES/android_frameworks_base/0028-SUPL_Toggle.patch"; #Add a setting for forcibly disabling SUPL (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0029-Allow_Disabling_NTP.patch"; #Dont ping ntp server when nitz time update is toggled off (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0030-System_JobScheduler_Allowance.patch"; #DeviceIdleJobsController: don't ignore whitelisted system apps (GrapheneOS)
-if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_frameworks_base/0031-Hardened-signature-spoofing.patch"; fi; #Hardened signature spoofing ability (DivestOS)
+if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_frameworks_base/0031-Unprivileged_microG_Handling.patch"; fi; #Unprivileged microG handling (heavily based off of a CalyxOS patch)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0007-ABI_Warning.patch"; #Warn when running activity from 32 bit app on ARM64 devices. (AOSP)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0008-No_Crash_GSF.patch"; #Don't crash apps that depend on missing Gservices provider (GrapheneOS)
 hardenLocationConf services/core/java/com/android/server/location/gnss/gps_debug.conf; #Harden the default GPS config
@@ -287,6 +292,10 @@ applyPatch "$DOS_PATCHES/android_packages_apps_LineageParts/0001-Remove_Analytic
 cp -f "$DOS_PATCHES_COMMON/contributors.db" assets/contributors.db; #Update contributors cloud
 fi;
 
+if enterAndClear "packages/apps/ManagedProvisioning"; then
+git fetch https://github.com/LineageOS/android_packages_apps_ManagedProvisioning refs/changes/19/364019/1 && git cherry-pick FETCH_HEAD; #S_asb_2023-08
+fi;
+
 if enterAndClear "packages/apps/Nfc"; then
 if [ "$DOS_GRAPHENE_CONSTIFY" = true ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Nfc/0001-constify_JNINativeMethod.patch"; fi; #Constify JNINativeMethod tables (GrapheneOS)
 fi;
@@ -304,7 +313,7 @@ applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0012-hosts_toggle.patch"
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0013-Captive_Portal_Toggle.patch"; #Add option to disable captive portal checks (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0014-LTE_Only_Mode.patch"; #Add LTE only setting (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0015-SUPL_Toggle.patch"; #Add a toggle for forcibly disabling SUPL (GrapheneOS)
-if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0016-signature_spoofing_toggle.patch"; fi; #Add a toggle to opt-in to restricted signature spoofing (heavily based off of a GrapheneOS patch)
+if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0016-microG_Toggle.patch"; fi; #Add a toggle for microG enablement (heavily based off of a GrapheneOS patch)
 applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Settings/0001-disable_apps.patch"; #Add an ability to disable non-system apps from the "App info" screen (GrapheneOS)
 sed -i 's/if (isFullDiskEncrypted()) {/if (false) {/' src/com/android/settings/accessibility/*AccessibilityService*.java; #Never disable secure start-up when enabling an accessibility service
 fi;
@@ -439,6 +448,8 @@ echo 'include vendor/divested/divestos.mk' >> config/common.mk; #Include our cus
 cp -f "$DOS_PATCHES_COMMON/apns-conf.xml" prebuilt/common/etc/apns-conf.xml; #Update APN list
 awk -i inplace '!/Eleven/' config/common_mobile.mk; #Remove Music Player
 cp -f "$DOS_PATCHES_COMMON/config_webview_packages.xml" overlay/common/frameworks/base/core/res/res/xml/config_webview_packages.xml; #Change allowed WebView providers
+awk -i inplace '!/com.android.vending/' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml; #Remove unwanted apps
+awk -i inplace '!/com.google.android/' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml;
 fi;
 
 if enter "vendor/divested"; then
@@ -446,7 +457,9 @@ awk -i inplace '!/_lookup/' overlay/common/lineage-sdk/packages/LineageSettingsP
 echo "PRODUCT_PACKAGES += vendor.lineage.trust@1.0-service" >> packages.mk; #Add deny usb service, all of our kernels have the necessary patch
 echo "PRODUCT_PACKAGES += eSpeakNG" >> packages.mk; #PicoTTS needs work to compile on 18.1, use eSpeak-NG instead
 sed -i 's/OpenCamera/SecureCamera/' packages.mk #Use the GrapheneOS camera app
+echo "PRODUCT_PACKAGES += SecureCamera" >> packages.mk;
 awk -i inplace '!/speed-profile/' build/target/product/lowram.mk; #breaks compile on some dexpreopt devices
+awk -i inplace '!/persist.traced.enable/' build/target/product/lowram.mk; #breaks compile due to duplicate
 sed -i 's/wifi,cell/internet/' overlay/common/frameworks/base/packages/SystemUI/res/values/config.xml; #Use the modern quick tile
 sed -i 's|system/etc|$(TARGET_COPY_OUT_PRODUCT)/etc|' divestos.mk;
 fi;
@@ -495,18 +508,18 @@ cd "$DOS_BUILD_BASE";
 enableLowRam "device/sony/kirin" "kirin";
 enableLowRam "device/sony/pioneer" "pioneer";
 #Tweaks for 4GB RAM devices
-enableLowRam "device/lge/h830" "h830";
-enableLowRam "device/lge/h850" "h850";
-enableLowRam "device/lge/h870" "h870";
-enableLowRam "device/lge/h910" "h910";
-enableLowRam "device/lge/h918" "h918";
-enableLowRam "device/lge/h990" "h990";
-enableLowRam "device/lge/ls997" "ls997";
-enableLowRam "device/lge/rs988" "rs988";
-enableLowRam "device/lge/us996" "us996";
-enableLowRam "device/lge/us997" "us997";
-enableLowRam "device/lge/vs995" "vs995";
-enableLowRam "device/sony/discovery" "discovery";
+#enableLowRam "device/lge/h830" "h830";
+#enableLowRam "device/lge/h850" "h850";
+#enableLowRam "device/lge/h870" "h870";
+#enableLowRam "device/lge/h910" "h910";
+#enableLowRam "device/lge/h918" "h918";
+#enableLowRam "device/lge/h990" "h990";
+#enableLowRam "device/lge/ls997" "ls997";
+#enableLowRam "device/lge/rs988" "rs988";
+#enableLowRam "device/lge/us996" "us996";
+#enableLowRam "device/lge/us997" "us997";
+#enableLowRam "device/lge/vs995" "vs995";
+#enableLowRam "device/sony/discovery" "discovery";
 #Tweaks for 4GB/6GB RAM devices
 #enableLowRam "device/sony/voyager" "voyager";
 #enableLowRam "device/sony/mermaid" "mermaid";
