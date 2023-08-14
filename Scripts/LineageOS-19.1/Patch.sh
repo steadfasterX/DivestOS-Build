@@ -93,20 +93,16 @@ git revert --no-edit 7f4b9a43f3c49a5a896dd4951be0a96584751f46; #Re-enable the do
 applyPatch "$DOS_PATCHES/android_build/0001-Enable_fwrapv.patch"; #Use -fwrapv at a minimum (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_build/0002-OTA_Keys.patch"; #Add correct keys to recovery for OTA verification (DivestOS)
 if [ "$DOS_GRAPHENE_EXEC" = true ]; then applyPatch "$DOS_PATCHES/android_build/0003-Exec_Based_Spawning.patch"; fi; #Add exec-based spawning support (GrapheneOS) #XXX: most devices override this
+applyPatch "$DOS_PATCHES_COMMON/android_build/0001-verity-openssl3.patch"; #Fix VB 1.0 failure due to openssl output format change
 sed -i '75i$(my_res_package): PRIVATE_AAPT_FLAGS += --auto-add-overlay' core/aapt2.mk; #Enable auto-add-overlay for packages, this allows the vendor overlay to easily work across all branches.
 awk -i inplace '!/updatable_apex.mk/' target/product/generic_system.mk; #Disable APEX
 sed -i 's/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 23/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 28/' core/version_defaults.mk; #Set the minimum supported target SDK to Pie (GrapheneOS)
 #sed -i 's/PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := true/PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false/' core/product_config.mk; #broken by hardenDefconfig
-sed -i 's/2023-07-05/2023-08-05/' core/version_defaults.mk; #Bump Security String #S_asb_2023-08 #XXX
 fi;
 
 if enterAndClear "build/soong"; then
 applyPatch "$DOS_PATCHES/android_build_soong/0001-Enable_fwrapv.patch"; #Use -fwrapv at a minimum (GrapheneOS)
 if [ "$DOS_GRAPHENE_MALLOC" = true ]; then applyPatch "$DOS_PATCHES/android_build_soong/0002-hm_apex.patch"; fi; #(GrapheneOS)
-fi;
-
-if enterAndClear "external/aac"; then
-git fetch https://github.com/LineageOS/android_external_aac refs/changes/80/363980/1 && git cherry-pick FETCH_HEAD; #S_asb_2023-08
 fi;
 
 if enterAndClear "external/chromium-webview"; then
@@ -290,10 +286,6 @@ if enterAndClear "packages/apps/LineageParts"; then
 rm -rf src/org/lineageos/lineageparts/lineagestats/ res/xml/anonymous_stats.xml res/xml/preview_data.xml; #Nuke part of the analytics
 applyPatch "$DOS_PATCHES/android_packages_apps_LineageParts/0001-Remove_Analytics.patch"; #Remove analytics (DivestOS)
 cp -f "$DOS_PATCHES_COMMON/contributors.db" assets/contributors.db; #Update contributors cloud
-fi;
-
-if enterAndClear "packages/apps/ManagedProvisioning"; then
-git fetch https://github.com/LineageOS/android_packages_apps_ManagedProvisioning refs/changes/19/364019/1 && git cherry-pick FETCH_HEAD; #S_asb_2023-08
 fi;
 
 if enterAndClear "packages/apps/Nfc"; then

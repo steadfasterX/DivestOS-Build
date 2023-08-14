@@ -91,11 +91,11 @@ git revert --no-edit def3f14af17ae92192d2cc7d22349cabfa906fd6; #Re-enable the do
 applyPatch "$DOS_PATCHES/android_build/0001-Enable_fwrapv.patch"; #Use -fwrapv at a minimum (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_build/0002-OTA_Keys.patch"; #Add correct keys to recovery for OTA verification (DivestOS)
 if [ "$DOS_GRAPHENE_EXEC" = true ]; then applyPatch "$DOS_PATCHES/android_build/0003-Exec_Based_Spawning.patch"; fi; #Add exec-based spawning support (GrapheneOS) #XXX: most devices override this
+applyPatch "$DOS_PATCHES_COMMON/android_build/0001-verity-openssl3.patch"; #Fix VB 1.0 failure due to openssl output format change
 sed -i '75i$(my_res_package): PRIVATE_AAPT_FLAGS += --auto-add-overlay' core/aapt2.mk; #Enable auto-add-overlay for packages, this allows the vendor overlay to easily work across all branches.
 awk -i inplace '!/updatable_apex.mk/' target/product/mainline_system.mk; #Disable APEX
 sed -i 's/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 23/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 28/' core/version_defaults.mk; #Set the minimum supported target SDK to Pie (GrapheneOS)
 #sed -i 's/PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := true/PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false/' core/product_config.mk; #broken by hardenDefconfig
-sed -i 's/2023-07-05/2023-08-05/' core/version_defaults.mk; #Bump Security String #R_asb_2023-08 #XXX
 fi;
 
 if enterAndClear "build/soong"; then
@@ -309,10 +309,6 @@ applyPatch "$DOS_PATCHES/android_packages_apps_PermissionController/0002-Sensors
 applyPatch "$DOS_PATCHES/android_packages_apps_PermissionController/0002-Special_Permissions-1.patch"; #Refactor handling of special runtime permissions (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_apps_PermissionController/0002-Special_Permissions-2.patch"; #Don't auto revoke Network and Sensors (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_apps_PermissionController/0002-Special_Permissions-3.patch"; #UI fix for special runtime permission (GrapheneOS)
-fi;
-
-if enterAndClear "packages/apps/QuickAccessWallet"; then
-git fetch https://github.com/LineageOS/android_packages_apps_QuickAccessWallet refs/changes/39/364039/1 && git cherry-pick FETCH_HEAD; #R_asb_2023-08
 fi;
 
 if enterAndClear "packages/apps/Settings"; then
