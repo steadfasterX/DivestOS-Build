@@ -25,7 +25,7 @@
 #export DOS_MAX_THREADS_BUILD="nolimit"; #Max amount of threads used for build, e.g. used by make (shouldn't exceed your CPU cores count)
 export DOS_WORKSPACE_ROOT="/mnt/dos/"; #XXX: THIS MUST BE CORRECT TO BUILD!
 #export DOS_BUILDS=$DOS_WORKSPACE_ROOT"Builds/";
-export DOS_BUILDS="/mnt/backup-1/DivestOS/Builds/"; #XXX: THIS MUST BE CORRECT TO BUILD!
+export DOS_BUILDS="/mnt/Storage-1/DivestOS/Builds/"; #XXX: THIS MUST BE CORRECT TO BUILD!
 export DOS_SIGNING_KEYS="$DOS_WORKSPACE_ROOT/Signing_Keys/4096pro";
 export DOS_SIGNING_GPG="$DOS_WORKSPACE_ROOT/Signing_Keys/gnupg";
 #export USE_CCACHE=1;
@@ -50,7 +50,7 @@ export DOS_DEBLOBBER_REMOVE_DPP=false; #Set true to remove all Display Post Proc
 export DOS_DEBLOBBER_REMOVE_FP=false; #Set true to remove all fingerprint reader blobs
 export DOS_DEBLOBBER_REMOVE_GRAPHICS=false; #Set true to remove all graphics blobs and use SwiftShader CPU renderer #TODO: Needs work
 export DOS_DEBLOBBER_REMOVE_EUICC=true; #Set true to remove all Google eUICC blobs
-export DOS_DEBLOBBER_REMOVE_EUICC_FULL=true; #Set true to remove all hardware eUICC blobs #TODO: needs work
+export DOS_DEBLOBBER_REMOVE_EUICC_FULL=false; #Set true to remove all hardware eUICC blobs
 export DOS_DEBLOBBER_REMOVE_IMS=false; #Set true to remove all IMS blobs #XXX: Carriers are phasing out 3G, making IMS mandatory for calls
 export DOS_DEBLOBBER_REMOVE_IPA=false; #Set true to remove all IPA blobs
 export DOS_DEBLOBBER_REMOVE_IR=false; #Set true to remove all IR blobs
@@ -252,6 +252,8 @@ export GRADLE_OPTS="-Xmx2048m";
 export TZ=:/etc/localtime;
 export LC_ALL=C;
 export LANG=C.UTF-8;
+
+if [[ "$DOS_VERSION" != "LineageOS-20.0" ]]; then export DOS_DEBLOBBER_REMOVE_EUICC_FULL=true; fi;
 
 #START OF VERIFICATION
 gpgVerifyGitHead "$DOS_WORKSPACE_ROOT";

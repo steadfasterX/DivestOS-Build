@@ -187,6 +187,9 @@ applyPatch "$DOS_PATCHES/android_frameworks_base/0036-Unprivileged_microG_Handli
 applyPatch "$DOS_PATCHES/android_frameworks_base/0037-filter-gms.patch"; #Filter select package queries for GMS (CalyxOS)
 fi;
 applyPatch "$DOS_PATCHES/android_frameworks_base/0038-no-camera-lpad.patch"; #Do not auto-grant Camera permission to the eUICC LPA UI app (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_frameworks_base/0039-package_hooks.patch"; #Add hooks for modifying PackageManagerService behavior (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_frameworks_base/0040-euicc-restrictions.patch"; #Integrate Google's EuiccSupportPixel package (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_frameworks_base/0041-tile_restrictions.patch"; #SystemUI: Require unlocking to use sensitive QS tiles (GrapheneOS)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0008-No_Crash_GSF.patch"; #Don't crash apps that depend on missing Gservices provider (GrapheneOS)
 hardenLocationConf services/core/java/com/android/server/location/gnss/gps_debug.conf; #Harden the default GPS config
 sed -i 's/DEFAULT_USE_COMPACTION = false;/DEFAULT_USE_COMPACTION = true;/' services/core/java/com/android/server/am/CachedAppOptimizer.java; #Enable app compaction by default (GrapheneOS)
@@ -293,6 +296,10 @@ if enterAndClear "packages/apps/Nfc"; then
 if [ "$DOS_GRAPHENE_CONSTIFY" = true ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Nfc/0001-constify_JNINativeMethod.patch"; fi; #Constify JNINativeMethod tables (GrapheneOS)
 fi;
 
+if enterAndClear "packages/apps/OpenEUICC"; then
+applyPatch "$DOS_PATCHES/android_packages_apps_OpenEUICC/0001-hacky-fix.patch"; #Hacky fix for misidentifying physical SIM (DivestOS)
+fi;
+
 if enterAndClear "packages/apps/Settings"; then
 git revert --no-edit 41b4ed345a91da1dd46c00ee11a151c2b5ff4f43;
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0004-Private_DNS.patch"; #More 'Private DNS' options (heavily based off of a CalyxOS patch)
@@ -346,6 +353,7 @@ if enterAndClear "packages/modules/DnsResolver"; then
 applyPatch "$DOS_PATCHES/android_packages_modules_DnsResolver/0001-Hosts_Cache.patch"; #DnsResolver: Sort and cache hosts file data for fast lookup (tdm)
 applyPatch "$DOS_PATCHES/android_packages_modules_DnsResolver/0001-Hosts_Wildcards.patch"; #DnsResolver: Support wildcards in cached hosts file (tdm)
 applyPatch "$DOS_PATCHES/android_packages_modules_DnsResolver/0002-hosts_toggle.patch"; #Add a toggle to disable /etc/hosts lookup (DivestOS)
+applyPatch "$DOS_PATCHES/android_packages_modules_DnsResolver/0003-Reuse-align_ptr-in-hosts_cache.patch"; #Reuse align_ptr in hosts_cache (danielk43)
 #applyPatch "$DOS_PATCHES/android_packages_modules_DnsResolver/0004-More-DoH.patch"; #Add more DoH endpoints (DivestOS)
 fi;
 
@@ -395,6 +403,7 @@ if enterAndClear "system/sepolicy"; then
 applyPatch "$DOS_PATCHES/android_system_sepolicy/0002-protected_files.patch"; #Label protected_{fifos,regular} as proc_security (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_system_sepolicy/0003-ptrace_scope-1.patch"; #Allow init to control kernel.yama.ptrace_scope (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_system_sepolicy/0003-ptrace_scope-2.patch"; #Allow system to use persist.native_debug (GrapheneOS)
+#awk -i inplace '!/true cannot be used in user builds/' Android.mk; #Allow ignoring neverallows under -user
 awk -i inplace '!/domain=gmscore_app/' private/seapp_contexts prebuilts/api/*/private/seapp_contexts; #Disable unused gmscore_app domain (GrapheneOS)
 fi;
 
@@ -431,7 +440,6 @@ sed -i 's/OpenCamera/Aperture/' packages.mk; #Use the LineageOS camera app
 awk -i inplace '!/speed-profile/' build/target/product/lowram.mk; #breaks compile on some dexpreopt devices
 sed -i 's/wifi,cell/internet/' overlay/common/frameworks/base/packages/SystemUI/res/values/config.xml; #Use the modern quick tile
 sed -i 's|system/etc|$(TARGET_COPY_OUT_PRODUCT)/etc|' divestos.mk;
-if [ "$DOS_DEBLOBBER_REMOVE_EUICC_FULL" = true ]; then sed -i 's/OpenEUICC/OpenInvalidEUICC/' packages.mk; fi; #Handle OpenEUICC inclusion
 fi;
 #
 #END OF ROM CHANGES
@@ -522,6 +530,7 @@ find "device" -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 8 -I {}
 find "kernel" -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 4 -I {} bash -c 'hardenDefconfig "{}"';
 find "kernel" -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'updateRegDb "{}"';
 find "device" -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'disableAPEX "{}"';
+if [ "$DOS_DEBLOBBER_REMOVE_EUICC_FULL" = false ]; then find "device" -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'includeOE "{}"'; fi;
 if [ "$DOS_GRAPHENE_EXEC" = true ]; then find "device" -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'disableEnforceRRO "{}"'; fi;
 cd "$DOS_BUILD_BASE";
 deblobAudio;
@@ -537,6 +546,8 @@ cd "$DOS_BUILD_BASE";
 #Tweaks for <4GB RAM devices
 enableLowRam "device/xiaomi/Mi8937" "Mi8917";
 enableLowRam "device/xiaomi/Mi8937" "Mi8937";
+#Tweaks for 3GB/4GB RAM devices
+#enableLowRam "device/zuk/z2_plus" "z2_plus";
 #Tweaks for 4GB RAM devices
 #enableLowRam "device/essential/mata" "mata";
 #enableLowRam "device/fairphone/FP3" "FP3";

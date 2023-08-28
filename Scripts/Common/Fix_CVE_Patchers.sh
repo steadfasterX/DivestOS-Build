@@ -54,7 +54,7 @@ commentPatches android_kernel_google_dragon.sh "0006-AndroidHardening-Kernel_Har
 commentPatches android_kernel_google_crosshatch.sh "CVE-2020-0067";
 commentPatches android_kernel_google_gs101_private_gs-google.sh "CVE-2021-29648/^5.11/0001.patch";
 commentPatches android_kernel_google_gs201_private_gs-google.sh "CVE-2021-29648/^5.11/0001.patch";
-commentPatches android_kernel_google_marlin.sh "0001-LinuxIncrementals/3.18/3.18.0098-0099.patch" "0006-AndroidHardening-Kernel_Hardening/3.18/0048.patch" "0006-AndroidHardening-Kernel_Hardening/3.18/0049.patch" "CVE-2017-13162/3.18/0001.patch" "CVE-2017-14883" "CVE-2017-15951" "CVE-2018-17972" "CVE-2019-16746" "CVE-2020-0427" "CVE-2020-14381" "CVE-2020-16166" "CVE-2021-39715/ANY/0001.patch" "CVE-2022-42896/4.9";
+commentPatches android_kernel_google_marlin.sh "0001-LinuxIncrementals/3.18/3.18.0098-0099.patch" "0006-AndroidHardening-Kernel_Hardening/3.18/0048.patch" "0006-AndroidHardening-Kernel_Hardening/3.18/0049.patch" "0008-Graphene-Kernel_Hardening-canaries/4.4/0002.patch" "CVE-2017-13162/3.18/0001.patch" "CVE-2017-14883" "CVE-2017-15951" "CVE-2018-17972" "CVE-2019-16746" "CVE-2020-0427" "CVE-2020-14381" "CVE-2020-16166" "CVE-2021-39715/ANY/0001.patch" "CVE-2022-42896/4.9";
 commentPatches android_kernel_google_msm.sh "CVE-2017-11015/prima" "CVE-2021-Misc2/ANY/0031.patch";
 commentPatches android_kernel_google_msm-4.9.sh "CVE-2019-19319" "CVE-2020-0067" "CVE-2020-1749" "CVE-2020-8992" "CVE-2021-30324" "CVE-2021-45469";
 commentPatches android_kernel_google_redbull.sh "CVE-2018-5873" "CVE-2021-3444" "CVE-2021-3600";
@@ -103,7 +103,7 @@ commentPatches android_kernel_xiaomi_sm8250.sh "CVE-2018-5873" "CVE-2020-1749" "
 commentPatches android_kernel_yandex_sdm660.sh "CVE-2019-11599" "CVE-2019-14070/ANY/0005.patch" "CVE-2019-19319" "CVE-2020-1749" "CVE-2020-8992" "CVE-2020-16166";
 commentPatches android_kernel_zte_msm8930.sh "CVE-2015-2922" "CVE-2017-11015/prima";
 commentPatches android_kernel_zte_msm8996.sh "0001-LinuxIncrementals/3.18/3.18.0098-0099.patch" "CVE-2017-13162" "CVE-2017-15951" "CVE-2017-16939" "CVE-2018-17972" "CVE-2019-2214" "CVE-2019-14070" "CVE-2019-16746" "CVE-2020-0427" "CVE-2020-14381" "CVE-2020-16166" "CVE-2021-39715/ANY/0001.patch" "CVE-2022-42896/4.9";
-commentPatches android_kernel_zuk_msm8996.sh "0008-Graphene-Kernel_Hardening-slab" "CVE-2019-19319" "CVE-2020-0305" "CVE-2020-1749" "CVE-2020-8992" "CVE-2020-1616";
+commentPatches android_kernel_zuk_msm8996.sh "0008-Graphene-Kernel_Hardening-slab" "0008-Graphene-Kernel_Hardening-canaries/4.4/0002.patch" "CVE-2019-19319" "CVE-2020-0305" "CVE-2020-1749" "CVE-2020-8992" "CVE-2020-1616";
 
 #Loose versioning hacks
 #3.0

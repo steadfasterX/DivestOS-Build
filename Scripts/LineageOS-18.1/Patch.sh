@@ -166,6 +166,7 @@ applyPatch "$DOS_PATCHES/android_frameworks_base/0021-SUPL_Toggle.patch"; #Add a
 applyPatch "$DOS_PATCHES/android_frameworks_base/0022-Allow_Disabling_NTP.patch"; #Dont ping ntp server when nitz time update is toggled off (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0023-System_JobScheduler_Allowance.patch"; #DeviceIdleJobsController: don't ignore whitelisted system apps (GrapheneOS)
 if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_frameworks_base/0024-Unprivileged_microG_Handling.patch"; fi; #Unprivileged microG handling (heavily based off of a CalyxOS patch)
+applyPatch "$DOS_PATCHES/android_frameworks_base/0025-tile_restrictions.patch"; #SystemUI: Require unlocking to use sensitive QS tiles (GrapheneOS)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0006-Do-not-throw-in-setAppOnInterfaceLocked.patch"; #Fix random reboots on broken kernels when an app has data restricted XXX: ugly (DivestOS)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0007-ABI_Warning.patch"; #Warn when running activity from 32 bit app on ARM64 devices. (AOSP)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0008-No_Crash_GSF.patch"; #Don't crash apps that depend on missing Gservices provider (GrapheneOS)
@@ -356,6 +357,7 @@ applyPatch "$DOS_PATCHES_COMMON/android_packages_inputmethods_LatinIME/0002-Disa
 fi;
 
 if enterAndClear "packages/modules/DnsResolver"; then
+applyPatch "$DOS_PATCHES/android_packages_modules_DnsResolver/0003-Reuse-align_ptr-in-hosts_cache.patch"; #Reuse align_ptr in hosts_cache (danielk43)
 applyPatch "$DOS_PATCHES/android_packages_modules_DnsResolver/0001-hosts_toggle.patch"; #Add a toggle to disable /etc/hosts lookup (DivestOS)
 fi;
 
@@ -560,14 +562,6 @@ echo "TARGET_RECOVERY_DENSITY := hdpi" >> BoardConfigCommon.mk;
 echo "allow hal_gnss_default ssr_device:chr_file { open read };" >> sepolicy/common/hal_gnss_default.te;
 fi;
 
-if enterAndClear "device/zuk/msm8996-common"; then
-awk -i inplace '!/WfdCommon/' msm8996.mk; #fix breakage
-fi;
-
-if enterAndClear "kernel/google/marlin"; then
-git revert --no-edit a17f0cc9d8f16df52d3cf3ff64b37bf477f589e5; #enable verity on /vendor
-fi;
-
 #Make changes to all devices
 cd "$DOS_BUILD_BASE";
 find "hardware/qcom/gps" -name "gps\.conf" -type f -print0 | xargs -0 -n 1 -P 4 -I {} bash -c 'hardenLocationConf "{}"';
@@ -638,8 +632,6 @@ enableLowRam "device/samsung/msm8974-common" "msm8974-common";
 #enableLowRam "device/moto/shamu" "shamu";
 #enableLowRam "device/nextbit/ether" "ether";
 #enableLowRam "device/oneplus/bacon" "bacon";
-#Tweaks for 3GB/4GB RAM devices
-#enableLowRam "device/zuk/z2_plus" "z2_plus";
 #Tweaks for 4GB RAM devices
 #enableLowRam "device/google/marlin" "marlin";
 #enableLowRam "device/google/marlin" "sailfish";
