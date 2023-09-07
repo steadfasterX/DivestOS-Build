@@ -109,6 +109,7 @@ fi;
 if enterAndClear "external/freetype"; then
 #applyPatch "$DOS_PATCHES/android_external_freetype/360899.patch"; #n-asb-2023-07 Cherry-pick two upstream changes
 applyPatch "$DOS_PATCHES/android_external_freetype/0001-makefile.patch"; #Add Android.mk for legacy builds (syphyr)
+applyPatch "$DOS_PATCHES/android_external_freetype/0002-fixup.patch"; #Enable png and zlib support to Android.mk (syphyr)
 fi;
 
 if enterAndClear "external/libavc"; then
@@ -155,6 +156,7 @@ applyPatch "$DOS_PATCHES/android_frameworks_av/212799.patch"; #FLAC extractor CV
 applyPatch "$DOS_PATCHES/android_frameworks_av/319987.patch"; #n-asb-2021-12 Fix heap-buffer-overflow in MPEG4Extractor
 applyPatch "$DOS_PATCHES/android_frameworks_av/321222.patch"; #n-asb-2022-01 SimpleDecodingSource:Prevent OOB write in heap mem
 applyPatch "$DOS_PATCHES/android_frameworks_av/358729.patch"; #n-asb-2023-06 Fix NuMediaExtractor::readSampleData buffer Handling
+applyPatch "$DOS_PATCHES/android_frameworks_av/365698.patch"; #n-asb-2023-09 Fix Segv on unknown address error flagged by fuzzer test.
 fi;
 
 if enterAndClear "frameworks/base"; then
@@ -245,6 +247,7 @@ applyPatch "$DOS_PATCHES/android_frameworks_native/325993.patch"; #n-asb-2022-03
 applyPatch "$DOS_PATCHES/android_frameworks_native/355868.patch"; #n-asb-2023-05 Check for malformed Sensor Flattenable
 applyPatch "$DOS_PATCHES/android_frameworks_native/355869.patch"; #n-asb-2023-05 Fix sanitizer in ISensorService list functions.
 applyPatch "$DOS_PATCHES/android_frameworks_native/355870.patch"; #n-asb-2023-05 Remove some new memory leaks from SensorManager
+applyPatch "$DOS_PATCHES/android_frameworks_native/365756.patch"; #n-asb-2023-09 Allow sensors list to be empty
 if [ "$DOS_SENSORS_PERM" = true ]; then applyPatch "$DOS_PATCHES/android_frameworks_native/0001-Sensors.patch"; fi; #Permission for sensors access (MSe1969)
 fi;
 
@@ -368,6 +371,7 @@ applyPatch "$DOS_PATCHES/android_packages_apps_Nfc/328308.patch"; #n-asb-2022-04
 applyPatch "$DOS_PATCHES/android_packages_apps_Nfc/332455.patch"; #n-asb-2022-06 OOB read in phNciNfc_RecvMfResp()
 applyPatch "$DOS_PATCHES/android_packages_apps_Nfc/346953.patch"; #n-asb-2023-01 OOBW in Mfc_Transceive()
 applyPatch "$DOS_PATCHES/android_packages_apps_Nfc/348653.patch"; #n-asb-2023-02 DO NOT MERGE OOBW in phNciNfc_MfCreateXchgDataHdr
+applyPatch "$DOS_PATCHES/android_packages_apps_Nfc/365757.patch"; #n-asb-2023-09 Ensure that SecureNFC setting cannot be bypassed
 fi;
 
 if enterAndClear "packages/apps/PackageInstaller"; then
@@ -437,6 +441,7 @@ fi;
 
 if enterAndClear "packages/services/Telephony"; then
 applyPatch "$DOS_PATCHES/android_packages_services_Telephony/346954.patch"; #n-asb-2023-01 Prevent overlays on the phone settings
+applyPatch "$DOS_PATCHES/android_packages_services_Telephony/365699.patch"; #n-asb-2023-09 Fixed leak of cross user data in multiple settings.
 applyPatch "$DOS_PATCHES/android_packages_services_Telephony/0001-PREREQ_Handle_All_Modes.patch"; #(DivestOS)
 applyPatch "$DOS_PATCHES/android_packages_services_Telephony/0002-More_Preferred_Network_Modes.patch";
 fi;
@@ -487,6 +492,10 @@ applyPatch "$DOS_PATCHES/android_system_bt/358735.patch"; #n-asb-2023-06 Prevent
 applyPatch "$DOS_PATCHES/android_system_bt/358736.patch"; #n-asb-2023-06 Revert "Revert "[RESTRICT AUTOMERGE] Validate buffer length in sdpu_build_uuid_seq""
 applyPatch "$DOS_PATCHES/android_system_bt/358737.patch"; #n-asb-2023-06 Revert "Revert "Fix wrong BR/EDR link key downgrades (P_256->P_192)""
 applyPatch "$DOS_PATCHES/android_system_bt/360892.patch"; #n-asb-2023-07 Fix gatt_end_operation buffer overflow
+applyPatch "$DOS_PATCHES/android_system_bt/365694.patch"; #n-asb-2023-09 Fix integer overflow in build_read_multi_rsp
+applyPatch "$DOS_PATCHES/android_system_bt/365695.patch"; #n-asb-2023-09 Fix reliable write.
+applyPatch "$DOS_PATCHES/android_system_bt/365696.patch"; #n-asb-2023-09 Fix UAF in gatt_cl.cc
+applyPatch "$DOS_PATCHES/android_system_bt/365697.patch"; #n-asb-2023-09 Fix an integer overflow bug in avdt_msg_asmbl
 applyPatch "$DOS_PATCHES/android_system_bt/229574.patch"; #bt-sbc-hd-dualchannel-nougat: Increase maximum Bluetooth SBC codec bitrate for SBC HD (ValdikSS)
 applyPatch "$DOS_PATCHES/android_system_bt/229575.patch"; #bt-sbc-hd-dualchannel-nougat: Explicit SBC Dual Channel (SBC HD) support (ValdikSS)
 applyPatch "$DOS_PATCHES/android_system_bt/242134.patch"; #avrc_bld_get_attrs_rsp - fix attribute length position off by one (cprhokie)
@@ -577,6 +586,12 @@ if enterAndClear "device/lge/g4-common"; then
 sed -i '3itypeattribute hwaddrs misc_block_device_exception;' sepolicy/hwaddrs.te;
 fi;
 
+if enterAndClear "device/motorola/athene"; then
+sed -i 's/camera.msm8952.so/camera.vendor.msm8952.so/' proprietary-files.txt; #Fixups
+sed -i 's/libchromatix_ov13850_polaris_default_video_bu64297/libchromatix_ov13850_polaris_default_video_bu64297.so/' proprietary-files.txt;
+awk -i inplace '!/qti-telephony-common/' proprietary-files.txt; #Fix Phone crashing
+fi;
+
 if enterAndClear "device/samsung/exynos5420-common"; then
 awk -i inplace '!/shell su/' sepolicy/shell.te; #neverallow
 fi;
@@ -624,7 +639,7 @@ find "device" -name "gps\.conf*" -type f -print0 | xargs -0 -n 1 -P 4 -I {} bash
 find "vendor" -name "gps\.conf" -type f -print0 | xargs -0 -n 1 -P 4 -I {} bash -c 'hardenLocationConf "{}"';
 find "device" -type d -name "overlay" -print0 | xargs -0 -n 1 -P 4 -I {} bash -c 'hardenLocationFWB "{}"';
 if [ "$DOS_DEBLOBBER_REMOVE_IMS" = "false" ]; then find "device" -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'volteOverride "{}"'; fi;
-find "device" -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'enableDexPreOpt "{}"';
+#find "device" -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'enableDexPreOpt "{}"';
 find "device" -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'hardenUserdata "{}"';
 if [ "$DOS_STRONG_ENCRYPTION_ENABLED" = true ]; then find "device" -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'enableStrongEncryption "{}"'; fi;
 find "kernel" -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 4 -I {} bash -c 'hardenDefconfig "{}"';
@@ -654,6 +669,7 @@ enableLowRam "device/samsung/tuna";
 #enableLowRam "device/htc/m7";
 #enableLowRam "device/htc/m7-common";
 #enableLowRam "device/htc/msm8960-common";
+#enableLowRam "device/motorola/athene";
 #enableLowRam "device/samsung/d2att";
 #enableLowRam "device/samsung/d2-common";
 #enableLowRam "device/samsung/d2spr";
@@ -681,6 +697,7 @@ enableLowRam "device/samsung/tuna";
 [[ -d kernel/amazon/hdx-common ]] && sed -i "s/CONFIG_ASYMMETRIC_KEY_TYPE=y/# CONFIG_ASYMMETRIC_KEY_TYPE is not set/" kernel/amazon/hdx-common/arch/arm/configs/*defconfig; #Breaks on compile
 [[ -d kernel/asus/grouper ]] && sed -i "s/CONFIG_DEBUG_RODATA=y/# CONFIG_DEBUG_RODATA is not set/" kernel/asus/grouper/arch/arm/configs/grouper_defconfig; #Breaks on compile
 [[ -d kernel/lge/msm8992 ]] && awk -i inplace '!/STACKPROTECTOR/' kernel/lge/msm8992/arch/arm64/configs/lineageos_*_defconfig; #Breaks on compile
+[[ -d kernel/motorola/msm8952 ]] && awk -i inplace '!/CC_STACKPROTECTOR_STRONG/' kernel/motorola/msm8952/arch/arm/configs/athene_defconfig; #Breaks on compile
 #tuna fixes
 awk -i inplace '!/nfc_enhanced.mk/' device/samsung/toro*/lineage.mk || true;
 awk -i inplace '!/TARGET_RECOVERY_UPDATER_LIBS/' device/samsung/toro*/BoardConfig.mk || true;
