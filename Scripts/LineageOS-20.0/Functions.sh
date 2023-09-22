@@ -140,6 +140,20 @@ patchWorkspaceReal() {
 	gpgVerifyGitHead "$DOS_BUILD_BASE/external/chromium-webview";
 
 	source build/envsetup.sh;
+	repopick -ipt T_asb_2023-09_pixel -e 366766,366765;
+
+	repopick -ip 366758;
+	repopick -ip 366759;
+	repopick -ip 366760;
+	repopick -ip 366761;
+	repopick -ip 366762;
+	repopick -ip 366763;
+	repopick -ip 366764;
+
+	repopick -i 366749;
+	repopick -i 366781;
+	repopick -i 366782;
+
 	repopick -i 361248; #Launcher3: Allow toggling monochrome icons for all apps
 
 	sh "$DOS_SCRIPTS/Patch.sh";

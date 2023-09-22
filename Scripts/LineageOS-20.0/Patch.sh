@@ -123,12 +123,7 @@ sed -i 's/34359738368/2147483648/' Android.bp; #revert 48-bit address space requ
 fi;
 fi;
 
-if enterAndClear "frameworks/av"; then
-git am $DOS_PATCHES/ASB2023-09/av-*.patch;
-fi;
-
 if enterAndClear "frameworks/base"; then
-git am $DOS_PATCHES/ASB2023-09/fwb-*.patch;
 git revert --no-edit d36faad3267522c6d3ff91ba9dcca8f6274bccd1; #Reverts "JobScheduler: Respect allow-in-power-save perm" in favor of below patch
 git revert --no-edit 90d6826548189ca850d91692e71fcc1be426f453; #Reverts "Remove sensitive info from SUPL requests" in favor of below patch
 applyPatch "$DOS_PATCHES/android_frameworks_base/0007-Always_Restict_Serial.patch"; #Always restrict access to Build.SERIAL (GrapheneOS)
@@ -219,7 +214,6 @@ applyPatch "$DOS_PATCHES/android_frameworks_libs_systemui/0001-Icon_Cache.patch"
 fi;
 
 if enterAndClear "frameworks/native"; then
-git am $DOS_PATCHES/ASB2023-09/native-*.patch;
 applyPatch "$DOS_PATCHES/android_frameworks_native/0001-Sensors_Permission.patch"; #Require OTHER_SENSORS permission for sensors (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_native/0001-Sensors_Permission-a1.patch"; #Protect step sensors with OTHER_SENSORS permission for targetSdk<29 apps (GrapheneOS)
 fi;
@@ -300,7 +294,6 @@ cp -f "$DOS_PATCHES_COMMON/contributors.db" assets/contributors.db; #Update cont
 fi;
 
 if enterAndClear "packages/apps/Nfc"; then
-git am $DOS_PATCHES/ASB2023-09/nfc-*.patch;
 if [ "$DOS_GRAPHENE_CONSTIFY" = true ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Nfc/0001-constify_JNINativeMethod.patch"; fi; #Constify JNINativeMethod tables (GrapheneOS)
 fi;
 
@@ -309,7 +302,6 @@ applyPatch "$DOS_PATCHES/android_packages_apps_OpenEUICC/0001-hacky-fix.patch"; 
 fi;
 
 if enterAndClear "packages/apps/Settings"; then
-git am $DOS_PATCHES/ASB2023-09/settings-*.patch;
 git revert --no-edit 41b4ed345a91da1dd46c00ee11a151c2b5ff4f43;
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0004-Private_DNS.patch"; #More 'Private DNS' options (heavily based off of a CalyxOS patch)
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0005-Automatic_Reboot.patch"; #Timeout for reboot (GrapheneOS)
@@ -338,7 +330,6 @@ git revert --no-edit fcf658d2005dc557a95d5a7fb89cb90d06b31d33; #grant permission
 fi;
 
 if enterAndClear "packages/apps/Trebuchet"; then
-git am $DOS_PATCHES/ASB2023-09/launcher-*.patch;
 cp $DOS_BUILD_BASE/vendor/divested/overlay/common/packages/apps/Trebuchet/res/xml/default_workspace_*.xml res/xml/; #XXX: Likely no longer needed
 fi;
 
@@ -350,12 +341,8 @@ sed -i 's/PROP_BUILD_VERSION_INCREMENTAL);/PROP_BUILD_VERSION_INCREMENTAL).repla
 fi;
 
 if enterAndClear "packages/inputmethods/LatinIME"; then
-applyPatch "$DOS_PATCHES_COMMON/android_packages_inputmethods_LatinIME/0001-Voice.patch"; #Remove voice input key (DivestOS)
-applyPatch "$DOS_PATCHES_COMMON/android_packages_inputmethods_LatinIME/0002-Disable_Personalization.patch"; #Disable personalization dictionary by default (GrapheneOS)
-fi;
-
-if enterAndClear "packages/modules/Bluetooth"; then
-git am $DOS_PATCHES/ASB2023-09/bt-*.patch;
+applyPatch "$DOS_PATCHES/android_packages_inputmethods_LatinIME/0001-Voice.patch"; #Remove voice input key (DivestOS)
+applyPatch "$DOS_PATCHES/android_packages_inputmethods_LatinIME/0002-Disable_Personalization.patch"; #Disable personalization dictionary by default (GrapheneOS)
 fi;
 
 if enterAndClear "packages/modules/Connectivity"; then
@@ -376,10 +363,6 @@ if enterAndClear "packages/modules/NetworkStack"; then
 applyPatch "$DOS_PATCHES/android_packages_modules_NetworkStack/0001-Random_MAC.patch"; #Avoid reusing DHCP state for full MAC randomization (GrapheneOS)
 fi;
 
-if enterAndClear "packages/modules/NeuralNetworks"; then
-git am $DOS_PATCHES/ASB2023-09/nn-*.patch;
-fi;
-
 if enterAndClear "packages/modules/Permission"; then
 applyPatch "$DOS_PATCHES/android_packages_modules_Permission/0004-Special_Permissions-1.patch"; #Add special handling for INTERNET/OTHER_SENSORS (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_modules_Permission/0004-Special_Permissions-2.patch"; #Fix usage UI summary for Network/Sensors (GrapheneOS)
@@ -396,17 +379,9 @@ if enterAndClear "packages/providers/DownloadProvider"; then
 applyPatch "$DOS_PATCHES/android_packages_providers_DownloadProvider/0001-Network_Permission.patch"; #Expose the NETWORK permission (GrapheneOS)
 fi;
 
-if enterAndClear "packages/providers/MediaProvider"; then
-git am $DOS_PATCHES/ASB2023-09/media-*.patch;
-fi;
-
 #if enterAndClear "packages/providers/TelephonyProvider"; then
 #cp $DOS_PATCHES_COMMON/android_packages_providers_TelephonyProvider/carrier_list.* assets/latest_carrier_id/;
 #fi;
-
-if enterAndClear "packages/services/Telephony"; then
-git am $DOS_PATCHES/ASB2023-09/telephony-*.patch;
-fi;
 
 if enterAndClear "system/ca-certificates"; then
 rm -rf files; #Remove old certs
@@ -532,10 +507,6 @@ fi;
 
 if enterAndClear "kernel/fairphone/sdm632"; then
 sed -i 's|/../../prebuilts/tools-lineage|/../../../prebuilts/tools-lineage|' lib/Makefile; #fixup typo
-fi;
-
-if enterAndClear "kernel/oneplus/sm8150"; then
-rm Android.bp;
 fi;
 
 if enterAndClear "kernel/oneplus/sm7250"; then
