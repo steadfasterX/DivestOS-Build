@@ -121,6 +121,10 @@ applyPatch "$DOS_PATCHES/android_external_hardened_malloc/0001-Broken_Cameras-2.
 fi;
 fi;
 
+if enterAndClear "external/libvpx"; then
+applyPatch "$DOS_PATCHES_COMMON/android_external_libvpx/CVE-2023-5217.patch"; #VP8: disallow thread count changes
+fi;
+
 if enterAndClear "external/SecureCamera"; then
 sed -i '/LOCAL_MODULE/s/Camera/SecureCamera/' Android.mk; #Change module name
 sed -i '11iLOCAL_OVERRIDES_PACKAGES := Camera Camera2 LegacyCamera Snap OpenCamera' Android.mk; #Replace the others
@@ -287,6 +291,10 @@ if enterAndClear "packages/apps/LineageParts"; then
 rm -rf src/org/lineageos/lineageparts/lineagestats/ res/xml/anonymous_stats.xml res/xml/preview_data.xml; #Nuke part of the analytics
 applyPatch "$DOS_PATCHES/android_packages_apps_LineageParts/0001-Remove_Analytics.patch"; #Remove analytics (DivestOS)
 cp -f "$DOS_PATCHES_COMMON/contributors.db" assets/contributors.db; #Update contributors cloud
+fi;
+
+if enterAndClear "packages/apps/Messaging"; then
+applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Messaging/0001-null-fix.patch"; #Handle null case (GrapheneOS)
 fi;
 
 if enterAndClear "packages/apps/Nfc"; then
