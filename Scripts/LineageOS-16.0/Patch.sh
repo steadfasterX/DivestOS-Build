@@ -99,7 +99,7 @@ applyPatch "$DOS_PATCHES_COMMON/android_build/0001-verity-openssl3.patch"; #Fix 
 sed -i '74i$(my_res_package): PRIVATE_AAPT_FLAGS += --auto-add-overlay' core/aapt2.mk; #Enable auto-add-overlay for packages, this allows the vendor overlay to easily work across all branches.
 sed -i 's/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 17/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 28/' core/version_defaults.mk; #Set the minimum supported target SDK to Pie (GrapheneOS)
 awk -i inplace '!/Email/' target/product/core.mk; #Remove Email
-sed -i 's/2022-01-05/2023-09-05/' core/version_defaults.mk; #Bump Security String #P_asb_2023-09 #XXX
+sed -i 's/2022-01-05/2023-10-05/' core/version_defaults.mk; #Bump Security String #P_asb_2023-10 #XXX
 fi;
 
 if enterAndClear "build/soong"; then
@@ -138,11 +138,6 @@ git fetch https://github.com/LineageOS/android_external_expat refs/changes/56/33
 git fetch https://github.com/LineageOS/android_external_expat refs/changes/28/349328/1 && git cherry-pick FETCH_HEAD; #P_asb_2023-02
 fi;
 
-if enterAndClear "external/freetype"; then
-applyPatch "$DOS_PATCHES/android_external_freetype/360951.patch"; #R_asb_2023-07 Cherry-pick two upstream changes
-#applyPatch "$DOS_PATCHES/android_external_freetype/364028-backport.patch"; #R_asb_2023-08 Cherrypick following three changes #XXX: needs fix
-fi;
-
 if [ "$DOS_GRAPHENE_MALLOC" = true ]; then
 if enterAndClear "external/hardened_malloc"; then
 applyPatch "$DOS_PATCHES_COMMON/android_external_hardened_malloc/0001-Broken_Audio.patch"; #DeviceDescriptor sorting wrongly relies on malloc addresses (GrapheneOS)
@@ -154,6 +149,10 @@ if enterAndClear "external/libvpx"; then
 applyPatch "$DOS_PATCHES_COMMON/android_external_libvpx/CVE-2023-5217.patch"; #VP8: disallow thread count changes
 fi;
 
+if enterAndClear "external/libxml2"; then
+applyPatch "$DOS_PATCHES/android_external_libxml2/368053.patch"; #R_asb_2023-10 malloc-fail: Fix OOB read after xmlRegGetCounter
+fi;
+
 if enterAndClear "external/svox"; then
 git revert --no-edit 1419d63b4889a26d22443fd8df1f9073bf229d3d; #Add back Makefiles
 sed -i '12iLOCAL_SDK_VERSION := current' pico/Android.mk; #Fix build under Pie
@@ -161,33 +160,18 @@ sed -i 's/about to delete/unable to delete/' pico/src/com/svox/pico/LangPackUnin
 awk -i inplace '!/deletePackage/' pico/src/com/svox/pico/LangPackUninstaller.java;
 fi;
 
-if enterAndClear "external/webp"; then
-applyPatch "$DOS_PATCHES_COMMON/android_external_webp/CVE-2023-4863.patch"; #Fix OOB write in BuildHuffmanTable.
-fi;
-
 if enterAndClear "frameworks/av"; then
-applyPatch "$DOS_PATCHES/android_frameworks_av/365962.patch"; #R_asb_2023-09 Fix Segv on unknown address error flagged by fuzzer test.
 if [ "$DOS_GRAPHENE_MALLOC" = true ]; then applyPatch "$DOS_PATCHES/android_frameworks_av/0001-HM-No_RLIMIT_AS.patch"; fi; #(GrapheneOS)
 fi;
 
 if enterAndClear "frameworks/base"; then
-applyPatch "$DOS_PATCHES/android_frameworks_base/360953-backport.patch"; #R_asb_2023-07 Sanitize VPN label to prevent HTML injection
-applyPatch "$DOS_PATCHES/android_frameworks_base/360954.patch"; #R_asb_2023-07 Limit the number of supported v1 and v2 signers
-applyPatch "$DOS_PATCHES/android_frameworks_base/360955-backport.patch"; #R_asb_2023-07 Import translations.
-applyPatch "$DOS_PATCHES/android_frameworks_base/360959-backport.patch"; #R_asb_2023-07 Dismiss keyguard when simpin auth'd and security method is none.
-applyPatch "$DOS_PATCHES/android_frameworks_base/360962-backport.patch"; #R_asb_2023-07 Truncate ShortcutInfo Id
-applyPatch "$DOS_PATCHES/android_frameworks_base/360963-backport.patch"; #R_asb_2023-07 Visit URIs in landscape/portrait custom remote views.
-applyPatch "$DOS_PATCHES/android_frameworks_base/364029.patch"; #R_asb_2023-08 ActivityManager#killBackgroundProcesses can kill caller's own app only
-applyPatch "$DOS_PATCHES/android_frameworks_base/364031-backport.patch"; #R_asb_2023-08 Verify URI permissions for notification shortcutIcon.
-applyPatch "$DOS_PATCHES/android_frameworks_base/364032-backport.patch"; #R_asb_2023-08 On device lockdown, always show the keyguard
-applyPatch "$DOS_PATCHES/android_frameworks_base/364033-backport.patch"; #R_asb_2023-08 Ensure policy has no absurdly long strings
-applyPatch "$DOS_PATCHES/android_frameworks_base/364034.patch"; #R_asb_2023-08 Implement visitUris for RemoteViews ViewGroupActionAdd.
-applyPatch "$DOS_PATCHES/android_frameworks_base/364035-backport.patch"; #R_asb_2023-08 Check URIs in notification public version.
-applyPatch "$DOS_PATCHES/android_frameworks_base/364036-backport.patch"; #R_asb_2023-08 Verify URI permissions in MediaMetadata
-applyPatch "$DOS_PATCHES/android_frameworks_base/364037.patch"; #R_asb_2023-08 Use Settings.System.getIntForUser instead of getInt to make sure user specific settings are used
-applyPatch "$DOS_PATCHES/android_frameworks_base/364038-backport.patch"; #R_asb_2023-08 Resolve StatusHints image exploit across user.
-applyPatch "$DOS_PATCHES/android_frameworks_base/365966-backport.patch"; #R_asb_2023-09 Forbid granting access to NLSes with too-long component names
-applyPatch "$DOS_PATCHES/android_frameworks_base/365967.patch"; #R_asb_2023-09 Update AccountManagerService checkKeyIntentParceledCorrectly.
+applyPatch "$DOS_PATCHES/android_frameworks_base/368055.patch"; #R_asb_2023-10 RingtoneManager: verify default ringtone is audio
+applyPatch "$DOS_PATCHES/android_frameworks_base/368059.patch"; #R_asb_2023-10 Do not share key mappings with JNI object
+applyPatch "$DOS_PATCHES/android_frameworks_base/368060-backport.patch"; #R_asb_2023-10 Verify URI Permissions in Autofill RemoteViews
+applyPatch "$DOS_PATCHES/android_frameworks_base/368061.patch"; #R_asb_2023-10 Fix KCM key mapping cloning
+applyPatch "$DOS_PATCHES/android_frameworks_base/368062-backport.patch"; #R_asb_2023-10 Disallow loading icon from content URI to PipMenu
+applyPatch "$DOS_PATCHES/android_frameworks_base/368063.patch"; #R_asb_2023-10 Fixing DatabaseUtils to detect malformed UTF-16 strings
+applyPatch "$DOS_PATCHES/android_frameworks_base/368067-backport.patch"; #R_asb_2023-10 Revert "DO NOT MERGE Dismiss keyguard when simpin auth'd and..."
 applyPatch "$DOS_PATCHES/android_frameworks_base/0007-Always_Restict_Serial.patch"; #Always restrict access to Build.SERIAL (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0008-Browser_No_Location.patch"; #Don't grant location permission to system browsers (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0009-SystemUI_No_Permission_Review.patch"; #Allow SystemUI to directly manage Bluetooth/WiFi (GrapheneOS)
@@ -232,7 +216,6 @@ rm -rf packages/PrintRecommendationService; #Creates popups to install proprieta
 fi;
 
 if enterAndClear "frameworks/native"; then
-applyPatch "$DOS_PATCHES/android_frameworks_native/365969-backport.patch"; #R_asb_2023-09 Allow sensors list to be empty
 applyPatch "$DOS_PATCHES/android_frameworks_native/0001-Sensors.patch"; #Require OTHER_SENSORS permission for sensors (GrapheneOS)
 fi;
 
@@ -327,7 +310,6 @@ applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Messaging/0001-null-fix.pa
 fi;
 
 if enterAndClear "packages/apps/Nfc"; then
-#applyPatch "$DOS_PATCHES/android_packages_apps_Nfc/365970.patch"; #R_asb_2023-09 Ensure that SecureNFC setting cannot be bypassed
 if [ "$DOS_GRAPHENE_CONSTIFY" = true ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Nfc/0001-constify_JNINativeMethod.patch"; fi; #Constify JNINativeMethod tables (GrapheneOS)
 fi;
 
@@ -339,8 +321,8 @@ applyPatch "$DOS_PATCHES/android_packages_apps_PackageInstaller/0001-Sensors_Per
 fi;
 
 if enterAndClear "packages/apps/Settings"; then
-applyPatch "$DOS_PATCHES/android_packages_apps_Settings/365973-backport.patch"; #R_asb_2023-09 Prevent non-system IME from becoming device admin
 git revert --no-edit c240992b4c86c7f226290807a2f41f2619e7e5e8; #Don't hide OEM unlock
+applyPatch "$DOS_PATCHES/android_packages_apps_Settings/368069-backport.patch"; #R_asb_2023-10 Restrict ApnEditor settings
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0001-Captive_Portal_Toggle.patch"; #Add option to disable captive portal checks (MSe1969)
 #applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0004-Private_DNS.patch"; #More 'Private DNS' options (heavily based off of a CalyxOS patch) #TODO: Needs work
 #applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0005-Automatic_Reboot.patch"; #Timeout for reboot (GrapheneOS)
@@ -358,7 +340,6 @@ applyPatch "$DOS_PATCHES/android_packages_apps_SetupWizard/0001-Remove_Analytics
 fi;
 
 if enterAndClear "packages/apps/Trebuchet"; then
-applyPatch "$DOS_PATCHES/android_packages_apps_Trebuchet/365974.patch"; #R_asb_2023-09 Fix permission issue in legacy shortcut
 cp $DOS_BUILD_BASE/vendor/divested/overlay/common/packages/apps/Trebuchet/res/xml/default_workspace_*.xml res/xml/; #XXX: Likely no longer needed
 fi;
 
@@ -378,31 +359,19 @@ if enterAndClear "packages/providers/DownloadProvider"; then
 applyPatch "$DOS_PATCHES/android_packages_providers_DownloadProvider/0001-Network_Permission.patch"; #Expose the NETWORK permission (GrapheneOS)
 fi;
 
-if enterAndClear "packages/providers/TelephonyProvider"; then
-applyPatch "$DOS_PATCHES/android_packages_providers_TelephonyProvider/364040-backport.patch"; #R_asb_2023-08 Update file permissions using canonical path
+#if enterAndClear "packages/providers/TelephonyProvider"; then
 #cp $DOS_PATCHES_COMMON/android_packages_providers_TelephonyProvider/carrier_list.* assets/;
-fi;
-
-if enterAndClear "packages/services/Telecomm"; then
-applyPatch "$DOS_PATCHES/android_packages_services_Telecomm/364041-backport.patch"; #R_asb_2023-08 Resolve StatusHints image exploit across user.
-fi;
+#fi;
 
 if enterAndClear "packages/services/Telephony"; then
-applyPatch "$DOS_PATCHES/android_packages_services_Telephony/365978-backport.patch"; #R_asb_2023-09 Fixed leak of cross user data in multiple settings.
 git revert --no-edit 99564aaf0417c9ddf7d6aeb10d326e5b24fa8f55;
 applyPatch "$DOS_PATCHES/android_packages_services_Telephony/0001-PREREQ_Handle_All_Modes.patch"; #(DivestOS)
 applyPatch "$DOS_PATCHES/android_packages_services_Telephony/0002-More_Preferred_Network_Modes.patch";
 fi;
 
-if enterAndClear "system/bt"; then
-applyPatch "$DOS_PATCHES/android_system_bt/360969.patch"; #R_asb_2023-07 Fix gatt_end_operation buffer overflow
-applyPatch "$DOS_PATCHES/android_system_bt/365979.patch"; #R_asb_2023-09 Fix an integer overflow bug in avdt_msg_asmbl
-applyPatch "$DOS_PATCHES/android_system_bt/365980.patch"; #R_asb_2023-09 Fix integer overflow in build_read_multi_rsp
-applyPatch "$DOS_PATCHES/android_system_bt/365981.patch"; #R_asb_2023-09 Fix potential abort in btu_av_act.cc
-applyPatch "$DOS_PATCHES/android_system_bt/365982-prereq.patch"; #Fix reliable write
-applyPatch "$DOS_PATCHES/android_system_bt/365982.patch"; #R_asb_2023-09 Fix UAF in gatt_cl.cc
+#if enterAndClear "system/bt"; then
 #applyPatch "$DOS_PATCHES_COMMON/android_system_bt/0001-alloc_size.patch"; #Add alloc_size attributes to the allocator (GrapheneOS)
-fi;
+#fi;
 
 if enterAndClear "system/ca-certificates"; then
 rm -rf files; #Remove old certs
@@ -422,23 +391,6 @@ if enterAndClear "system/extras"; then
 applyPatch "$DOS_PATCHES/android_system_extras/0001-ext4_pad_filenames.patch"; #FBE: pad filenames more (GrapheneOS)
 fi;
 
-if enterAndClear "system/nfc"; then
-applyPatch "$DOS_PATCHES/android_system_nfc/360972.patch"; #R_asb_2023-07 OOBW in rw_i93_send_to_upper()
-fi;
-
-if enterAndClear "tools/apksig"; then
-applyPatch "$DOS_PATCHES/android_tools_apksig/360973-backport-prereq.patch"; #R_asb_2023-07 Create source stamp verifier
-applyPatch "$DOS_PATCHES/android_tools_apksig/360973-backport.patch"; #R_asb_2023-07 Limit the number of supported v1 and v2 signers
-fi;
-
-if enterAndClear "vendor/nxp/opensource/commonsys/external/libnfc-nci"; then
-applyPatch "$DOS_PATCHES/android_vendor_nxp_opensource_commonsys_external_libnfc-nci/360974-backport.patch"; #R_asb_2023-07 OOBW in rw_i93_send_to_upper()
-fi;
-
-#if enterAndClear "vendor/nxp/opensource/commonsys/packages/apps/Nfc/"; then
-#applyPatch "$DOS_PATCHES/android_vendor_nxp_opensource_commonsys_packages_apps_Nfc/365983-backport.patch"; #R_asb_2023-09 Ensure that SecureNFC setting cannot be bypassed
-#fi;
-
 if enterAndClear "system/sepolicy"; then
 applyPatch "$DOS_PATCHES/android_system_sepolicy/0002-protected_files.patch"; #label protected_{fifos,regular} as proc_security (GrapheneOS)
 #applyPatch "$DOS_PATCHES/android_system_sepolicy/0003-ptrace_scope-1.patch"; #Allow init to control kernel.yama.ptrace_scope (GrapheneOS)
@@ -448,6 +400,11 @@ patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --direct
 patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --directory="prebuilts/api/27.0";
 patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --directory="prebuilts/api/26.0";
 awk -i inplace '!/true cannot be used in user builds/' Android.mk; #Allow ignoring neverallows under -user
+fi;
+
+if enterAndClear "tools/apksig"; then
+git fetch https://github.com/LineageOS/android_tools_apksig refs/changes/80/361280/1 && git cherry-pick FETCH_HEAD; #P_asb_2023-07
+git fetch https://github.com/LineageOS/android_tools_apksig refs/changes/81/361281/1 && git cherry-pick FETCH_HEAD;
 fi;
 
 if enterAndClear "vendor/lineage"; then
