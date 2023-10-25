@@ -181,7 +181,7 @@ echo "Deblobbing...";
 	fi;
 
 	#DRM
-	if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" == "true" ]; then
+	if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" != "false" ]; then
 		blobs=$blobs"|liboemcrypto.so|libtzdrmgenprov.so";
 		blobs=$blobs"|libpvr.so|librmp.so|libsi.so|libSSEPKCS11.so";
 		blobs=$blobs"|libdrmctaplugin.so|libdrmmtkplugin.so|libdrmmtkwhitelist.so|libmockdrmcryptoplugin.so";
@@ -650,7 +650,7 @@ echo "Deblobbing...";
 	manifests=$manifests"|wfdhdcp|wifidisplayhdcphal|WifiDisplay";
 
 	#Widevine (DRM) [Google]
-	if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" == "true" ]; then
+	if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" != "false" ]; then
 		blobs=$blobs"|libdrmwvmplugin.so|libmarlincdmplugin.so|libwvdrmengine.so|libwvdrm_L1.so|libwvdrm_L3.so|libwvhidl.so|libwvm.so|libWVphoneAPI.so|libWVStreamControlAPI_L1.so|libWVStreamControlAPI_L3.so|libdrmmtkutil.so|libsepdrm.*.so|libvtswidevine32.so|libvtswidevine64.so|android.hardware.drm.*widevine.*";
 		blobs=$blobs"|test-wvdrmplugin|oemwvtest";
 		blobs=$blobs"|com.google.widevine.software.drm.jar";
@@ -694,7 +694,7 @@ deblobDevice() {
 		if [ "$DOS_DEBLOBBER_REMOVE_IMS" = true ]; then sed -i '/ALL_DEFAULT_INSTALLED_MODULES/s/$(IMS_SYMLINKS)//' Android.mk; fi; #Remove IMS firmware
 		sed -i '/ALL_DEFAULT_INSTALLED_MODULES/s/$(PLAYREADY_SYMLINKS)//' Android.mk; #Remove Microsoft Playready firmware
 		sed -i '/ALL_DEFAULT_INSTALLED_MODULES/s/$(SECUREUI_SYMLINKS)//' Android.mk; #Remove SecureUI blobs
-  		if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" == "true" ]; then
+  		if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" != "false" ]; then
 			sed -i '/ALL_DEFAULT_INSTALLED_MODULES/s/$(WIDEVINE_SYMLINKS)//' Android.mk; #Remove Google Widevine firmware
 			sed -i '/ALL_DEFAULT_INSTALLED_MODULES/s/$(WV_SYMLINKS)//' Android.mk; #Remove Google Widevine firmware
   		fi;
@@ -742,7 +742,7 @@ deblobDevice() {
 	fi;
 
 	sed -i '/loc.nlp_name/d' *.prop *.mk &>/dev/null || true; #Disable QC Location Provider
-  	if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" == "true" ]; then sed -i 's/drm.service.enabled=true/drm.service.enabled=false/' *.prop *.mk &>/dev/null || true; fi;
+  	if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" != "false" ]; then sed -i 's/drm.service.enabled=true/drm.service.enabled=false/' *.prop *.mk &>/dev/null || true; fi;
 	if [ "$DOS_DEBLOBBER_REMOVE_APTX" = true ]; then sed -i 's/bt.enableAptXHD=true/bt.enableAptXHD=false/' *.prop *.mk &>/dev/null || true; fi; #Disable aptX
 	if [ "$DOS_DEBLOBBER_REMOVE_CNE" = true ]; then sed -i 's/cne.feature=./cne.feature=0/' *.prop *.mk &>/dev/null || true; fi; #Disable CNE
 	if [ "$DOS_DEBLOBBER_REMOVE_DPM" = true ]; then
@@ -756,7 +756,7 @@ deblobDevice() {
 	sed -i 's/wfd.enable=1/wfd.enable=0/' *.prop *.mk &>/dev/null || true; #Disable Wi-Fi display
 	sed -i '/vendor.camera.extensions/d' *.prop *.mk &>/dev/null || true; #Disable camera extensions
 	if [ -f system.prop ]; then
-		if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" == "true" ]; then if ! grep -q "drm.service.enabled=false" system.prop; then echo "drm.service.enabled=false" >> system.prop; fi; fi; #Disable DRM server
+		if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" != "false" ]; then if ! grep -q "drm.service.enabled=false" system.prop; then echo "drm.service.enabled=false" >> system.prop; fi; fi; #Disable DRM server
 		if [ "$DOS_DEBLOBBER_REMOVE_GRAPHICS" = true ]; then
 			echo "sys.ui.hw=disable" >> system.prop;
 			#echo "graphics.gles20.disable_on_bootanim=1" >> system.prop;
@@ -900,7 +900,7 @@ deblobVendorBp() {
 	sed -i -E "s/srcs.*("$blobs").*/srcs: \[\"proprietary\/vendor\/lib\/libtime_genoff.so\"\], enabled: false,/g" "$bpfile";
 	#TODO make this work for more then these two blobs
 	#Credit: https://stackoverflow.com/a/26053127
-  	if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" == "true" ]; then
+  	if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" != "false" ]; then
 		sed -i ':a;N;s/\n/&/3;Ta;/manifest_android.hardware.drm@1.*-service.widevine.xml/!{P;D};:b;N;s/\n/&/8;Tb;d' "$bpfile";
 		sed -i ':a;N;s/\n/&/3;Ta;/manifest_android.hardware.drm-service.widevine.xml/!{P;D};:b;N;s/\n/&/8;Tb;d' "$bpfile";
  	fi;
