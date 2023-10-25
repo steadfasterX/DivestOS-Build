@@ -650,7 +650,7 @@ echo "Deblobbing...";
 	manifests=$manifests"|wfdhdcp|wifidisplayhdcphal|WifiDisplay";
 
 	#Widevine (DRM) [Google]
-    if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" == "true" ]; then
+	if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" == "true" ]; then
 		blobs=$blobs"|libdrmwvmplugin.so|libmarlincdmplugin.so|libwvdrmengine.so|libwvdrm_L1.so|libwvdrm_L3.so|libwvhidl.so|libwvm.so|libWVphoneAPI.so|libWVStreamControlAPI_L1.so|libWVStreamControlAPI_L3.so|libdrmmtkutil.so|libsepdrm.*.so|libvtswidevine32.so|libvtswidevine64.so|android.hardware.drm.*widevine.*";
 		blobs=$blobs"|test-wvdrmplugin|oemwvtest";
 		blobs=$blobs"|com.google.widevine.software.drm.jar";
@@ -658,7 +658,7 @@ echo "Deblobbing...";
 		#blobs=$blobs"|smc_pa_wvdrm.ift"; breaks maguro/toro* boot
 		blobs=$blobs"|tzwidevine.*|tzwvcpybuf.*|widevine.*";
 		makes=$makes"|libshim_wvm|move_widevine_data.sh|android.hardware.drm.*widevine.*";
-    fi;
+	fi
 	#WiPower (Wireless Charging) [Qualcomm]
 	blobs=$blobs"|libwbc_jni.so|wbc_hal.default.so";
 	blobs=$blobs"|a4wpservice.apk|com.quicinc.wbcserviceapp.apk";
