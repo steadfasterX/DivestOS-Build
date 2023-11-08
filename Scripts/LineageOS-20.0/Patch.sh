@@ -236,6 +236,10 @@ if enterAndClear "hardware/qcom-caf/msm8953/audio"; then
 applyPatch "$DOS_PATCHES/android_hardware_qcom_audio/0001-Unused-8998.patch"; #audio_extn: Fix unused parameter warning in utils.c (codeworkx)
 fi;
 
+if enterAndClear "hardware/qcom-caf/msm8996/audio"; then
+applyPatch "$DOS_PATCHES/android_hardware_qcom_audio/0001-Unused-8996.patch"; #audio_extn: Fix unused parameter warning in utils.c (codeworkx)
+fi;
+
 if enterAndClear "hardware/qcom-caf/msm8998/audio"; then
 applyPatch "$DOS_PATCHES/android_hardware_qcom_audio/0001-Unused-8998.patch"; #audio_extn: Fix unused parameter warning in utils.c (codeworkx)
 fi;
@@ -274,6 +278,10 @@ fi;
 #rm -rf assets/*.xml;
 #cp $DOS_PATCHES_COMMON/android_packages_apps_CarrierConfig/*.xml assets/;
 #fi;
+
+if enterAndClear "packages/apps/CellBroadcastReceiver"; then
+applyPatch "$DOS_PATCHES/android_packages_apps_CellBroadcastReceiver/0001-presidential_alert_toggle.patch"; #Allow toggling presidential alertss (GrapheneOS)
+fi;
 
 if enterAndClear "packages/apps/Contacts"; then
 applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Contacts/0001-No_Google_Links.patch"; #Remove Privacy Policy and Terms of Service links (GrapheneOS)
@@ -414,7 +422,14 @@ if enterAndClear "system/sepolicy"; then
 applyPatch "$DOS_PATCHES/android_system_sepolicy/0002-protected_files.patch"; #Label protected_{fifos,regular} as proc_security (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_system_sepolicy/0003-ptrace_scope-1.patch"; #Allow init to control kernel.yama.ptrace_scope (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_system_sepolicy/0003-ptrace_scope-2.patch"; #Allow system to use persist.native_debug (GrapheneOS)
-#awk -i inplace '!/true cannot be used in user builds/' Android.mk; #Allow ignoring neverallows under -user
+git am "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes-New.patch"; #Fix -user builds for LGE devices (DivestOS)
+patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes-New.patch" --directory="prebuilts/api/33.0";
+patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --directory="prebuilts/api/32.0";
+patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --directory="prebuilts/api/31.0";
+patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --directory="prebuilts/api/30.0";
+patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --directory="prebuilts/api/29.0";
+patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --directory="prebuilts/api/28.0";
+awk -i inplace '!/true cannot be used in user builds/' Android.mk; #Allow ignoring neverallows under -user
 awk -i inplace '!/domain=gmscore_app/' private/seapp_contexts prebuilts/api/*/private/seapp_contexts; #Disable unused gmscore_app domain (GrapheneOS)
 fi;
 
@@ -495,6 +510,12 @@ if enterAndClear "kernel/google/wahoo"; then
 sed -i 's/asm(SET_PSTATE_UAO(1));/asm(SET_PSTATE_UAO(1)); return 0;/' arch/arm64/mm/fault.c; #fix build with CONFIG_ARM64_UAO
 fi;
 
+if enterAndClear "device/lge/msm8996-common"; then
+sed -i '3itypeattribute hwaddrs misc_block_device_exception;' sepolicy/hwaddrs.te;
+echo "allow hwaddrs block_device:lnk_file { open };" >> sepolicy/hwaddrs.te;
+echo "type sensors_data_file, file_type, data_file_type, core_data_file_type;" >> sepolicy/file.te; #only included in -userdebug
+fi;
+
 if enterAndClear "device/oneplus/msm8998-common"; then
 #awk -i inplace '!/TARGET_RELEASETOOLS_EXTENSIONS/' BoardConfigCommon.mk; #disable releasetools to fix delta ota generation
 sed -i '/PRODUCT_SYSTEM_VERITY_PARTITION/iPRODUCT_VENDOR_VERITY_PARTITION := /dev/block/bootdevice/by-name/vendor' common.mk; #Support verity on /vendor too
@@ -551,6 +572,9 @@ removeUntrustedCerts || true;
 cd "$DOS_BUILD_BASE";
 #rm -rfv device/*/*/overlay/CarrierConfigResCommon device/*/*/rro_overlays/CarrierConfigOverlay device/*/*/overlay/packages/apps/CarrierConfig/res/xml/vendor.xml;
 
+#Tweaks for 3GB RAM devices
+enableLowRam "device/sony/kirin" "kirin";
+enableLowRam "device/sony/pioneer" "pioneer";
 #Tweaks for <4GB RAM devices
 enableLowRam "device/xiaomi/Mi8937" "Mi8917";
 enableLowRam "device/xiaomi/Mi8937" "Mi8937";
@@ -565,11 +589,25 @@ enableLowRam "device/xiaomi/Mi8937" "Mi8937";
 #enableLowRam "device/google/crosshatch" "crosshatch";
 #enableLowRam "device/google/muskie/walleye" "walleye";
 #enableLowRam "device/google/taimen" "taimen";
+#enableLowRam "device/lge/h830" "h830";
+#enableLowRam "device/lge/h850" "h850";
+#enableLowRam "device/lge/h870" "h870";
+#enableLowRam "device/lge/h910" "h910";
+#enableLowRam "device/lge/h918" "h918";
+#enableLowRam "device/lge/h990" "h990";
+#enableLowRam "device/lge/ls997" "ls997";
+#enableLowRam "device/lge/rs988" "rs988";
+#enableLowRam "device/lge/us996" "us996";
+#enableLowRam "device/lge/us997" "us997";
+#enableLowRam "device/lge/vs995" "vs995";
 #enableLowRam "device/samsung/starlte" "starlte";
+#enableLowRam "device/sony/discovery" "discovery";
 #Tweaks for 4GB/6GB RAM devices
 #enableLowRam "device/sony/akari" "akari";
 #enableLowRam "device/sony/akatsuki" "akatsuki";
 #enableLowRam "device/sony/xz2c" "xz2c";
+#enableLowRam "device/sony/voyager" "voyager";
+#enableLowRam "device/sony/mermaid" "mermaid";
 
 #Fix broken options enabled by hardenDefconfig()
 [[ -d kernel/fairphone/sdm632 ]] && sed -i "s/CONFIG_PREEMPT_TRACER=n/CONFIG_PREEMPT_TRACER=y/" kernel/fairphone/sdm632/arch/arm64/configs/lineageos_*_defconfig; #Breaks on compile
@@ -581,6 +619,7 @@ enableLowRam "device/xiaomi/Mi8937" "Mi8937";
 [[ -d kernel/oneplus/sm8250 ]] && echo -e "\nCONFIG_DEBUG_FS=n" >> kernel/oneplus/sm8250/arch/arm64/configs/vendor/kona-perf_defconfig; #vintf failure
 [[ -d kernel/samsung/exynos9810 ]] && sed -i "s/CONFIG_RANDOMIZE_BASE=y/# CONFIG_RANDOMIZE_BASE is not set/" kernel/samsung/exynos9810/arch/arm64/configs/*_defconfig; #Breaks on compile
 [[ -d kernel/xiaomi/msm8937 ]] && sed -i "s/CONFIG_MITIGATE_SPECTRE_BRANCH_HISTORY=y/# CONFIG_MITIGATE_SPECTRE_BRANCH_HISTORY is not set/" kernel/xiaomi/msm8937/arch/arm64/configs/*_defconfig; #Breaks on compile
+[[ -d kernel/xiaomi/vayu ]] && echo -e "\nCONFIG_DEBUG_FS=y" >> kernel/xiaomi/vayu/arch/arm64/configs/vendor/sm8150-perf_defconfig; #compile failure
 
 if [ "$DOS_DEBLOBBER_REMOVE_EUICC_FULL" = false ]; then sed -i '/<privapp-permissions/a\ \ \ \ \ \ \ \ <deny-permission name="android.permission.INTERNET" \/>' vendor/*/*/proprietary/*/etc/permissions/com.google.euiccpixel.xml; fi; #Remove network permission
 sed -i 's/^YYLTYPE yylloc;/extern YYLTYPE yylloc;/' kernel/*/*/scripts/dtc/dtc-lexer.l* || true; #Fix builds with GCC 10
@@ -594,7 +633,7 @@ awk -i inplace '!/hardware\/google\/pixel\/lineage_health\/device/' device/*/*/*
 awk -i inplace '!/vendor.lineage.health-service.default/' device/*/*/*.mk;
 
 #Don't trip rollback protection after October update
-sed -i 's/2023-09-05/2023-10-01/' google/redbull/device-common.mk google/sunfish/device-common.mk google/gs201/device.mk google/gs101/device.mk;
+sed -i 's/2023-09-05/2023-10-01/' device/google/redbull/device-common.mk device/google/sunfish/device-common.mk device/google/gs201/device.mk device/google/gs101/device.mk;
 
 #
 #END OF DEVICE CHANGES
