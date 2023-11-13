@@ -347,7 +347,7 @@ processRelease() {
 	#Image
 	unzip -l $OUT_DIR/$PREFIX-target_files.zip | grep -q recovery.img || true
 	local hasRecoveryImg="$?";
-	unzip -l $OUT_DIR/$PREFIX-target_files.zip | grep -q dtbo.img;
+	unzip -l $OUT_DIR/$PREFIX-target_files.zip | grep -q dtbo.img || true
 	local hasDtboImg="$?";
 	if [ "$hasRecoveryImg" == "1" ] || [ "$hasDtboImg" == "0" ]; then
 		echo -e "\e[0;32mCreating fastboot image\e[0m";
