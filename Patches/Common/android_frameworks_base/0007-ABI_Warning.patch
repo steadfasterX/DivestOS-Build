@@ -83,7 +83,7 @@ index 994f07959f3b..7c04ca3e92ba 100644
 +    public void showDeprecatedAbiDialogIfNeeded(ActivityRecord r) {
 +        final String appAbi = r.info.applicationInfo.primaryCpuAbi;
 +        final boolean is64BitArmDevice = Arrays.stream(Build.SUPPORTED_64_BIT_ABIS).anyMatch("arm64-v8a"::equals);
-+        if (is64BitArmDevice && appAbi != null && appAbi != "arm64-v8a") {
++        if (is64BitArmDevice && appAbi != null && !appAbi.equals("arm64-v8a")) {
 +            mUiHandler.showDeprecatedAbiDialog(r);
 +        }
 +    }
