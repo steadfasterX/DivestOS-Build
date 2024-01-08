@@ -78,16 +78,18 @@ patchWorkspaceReal() {
 	gpgVerifyGitHead "$DOS_BUILD_BASE/external/chromium-webview";
 
 	source build/envsetup.sh;
+	repipick -i 378458; #repopick: Fix apply order of dependent commits
 	#repopick -it ten-firewall;
-	repopick -fit Q_asb_2023-03 -e 352333;
-	repopick -fit Q_asb_2023-04;
-	repopick -fit Q_asb_2023-05;
-	repopick -fit Q_asb_2023-06;
-	repopick -fit Q_asb_2023-07 -e 362202;
-	repopick -fit Q_asb_2023-08 -e 365443;
-	repopick -fit Q_asb_2023-09;
-	repopick -fit Q_asb_2023-10 -e 376554;
-	repopick -fit Q_asb_2023-11 -e 376568;
+	repopick -it Q_asb_2023-03 -e 352333;
+	repopick -it Q_asb_2023-04;
+	repopick -it Q_asb_2023-05;
+	repopick -it Q_asb_2023-06;
+	repopick -it Q_asb_2023-07 -e 362202;
+	repopick -it Q_asb_2023-08 -e 365443;
+	repopick -it Q_asb_2023-09;
+	repopick -it Q_asb_2023-10 -e 376554;
+	repopick -it Q_asb_2023-11 -e 376555;
+	repopick -it Q_asb_2023-12 -e 377251;
 
 	sh "$DOS_SCRIPTS/Patch.sh";
 	sh "$DOS_SCRIPTS_COMMON/Enable_Verity.sh";
