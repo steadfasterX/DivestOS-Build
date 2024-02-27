@@ -322,6 +322,7 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-19528/^5.4/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-19537/3.4/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-20096/3.18/0003.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-20636/3.4/0002.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-25160/3.18/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2020-0009/3.4/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2020-0030/3.10/0006.patch
 #git apply $DOS_PATCHES_LINUX_CVES/CVE-2020-0305/4.4/0005.patch
@@ -427,12 +428,13 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-39192/4.4/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-39193/4.4/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-51780/4.4/0009.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-51782/4.4/0009.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-24855/^6.4/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/Untracked-02/ANY/772877_0001-usb-core-Fix-use-after-free-for-hub-usb-device.patch
 git apply $DOS_PATCHES_LINUX_CVES/Untracked-02/ANY/797912_0001-usb-gadget-Fix-synchronization-issue-between-f_audio.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-14053/3.4/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-14053/3.4/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2022-20423/3.4/0010.patch
-editKernelLocalversion "-dos.p432"
+editKernelLocalversion "-dos.p434"
 else echo "kernel_samsung_tuna is unavailable, not patching.";
 fi;
 cd "$DOS_BUILD_BASE"

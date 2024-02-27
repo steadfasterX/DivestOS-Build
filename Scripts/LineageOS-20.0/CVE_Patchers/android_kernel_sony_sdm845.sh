@@ -287,6 +287,7 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-45469/4.9-^5.16/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-45485/4.9/0005.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-45486/4.9/0005.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-45868/4.9/0005.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-46906/4.9/0005.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2022-0330/4.9/0005.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2022-0494/4.9/0004.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2022-0617/4.9/0009.patch
@@ -460,16 +461,22 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-46343/4.14/0003.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-51780/4.14/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-51781/4.14/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-51782/4.14/0002.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-52435/^6.7/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-52436/^6.7/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-52444/^6.7/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-52445/^6.7/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-52470/^6.7/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-0340/^6.4/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-0639/4.14/0003.patch
 #git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-0775/4.14/0003.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-24855/^6.4/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/0008-Graphene-Kernel_Hardening-fortify/4.9/0003.patch
 git apply $DOS_PATCHES_LINUX_CVES/0008-Graphene-Kernel_Hardening-ro/4.9/0016.patch
 git apply $DOS_PATCHES_LINUX_CVES/0008-Graphene-Kernel_Hardening-ro/4.9/0029.patch
 git apply $DOS_PATCHES_LINUX_CVES/0008-Graphene-Kernel_Hardening-slab/4.9/0005.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2020-24586/4.9/0009.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-37159/4.9/0007.patch
-editKernelLocalversion "-dos.p469"
+editKernelLocalversion "-dos.p476"
 else echo "kernel_sony_sdm845 is unavailable, not patching.";
 fi;
 cd "$DOS_BUILD_BASE"
