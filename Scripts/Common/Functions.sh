@@ -37,8 +37,8 @@ export -f startPatcher;
 resetWorkspace() {
 	umask 0022;
 	if [ "$1" == "local" ]; then local noNetwork="--local-only"; fi;
-	repo forall -c 'git add -A && git reset --hard' && rm -rf out DOS_PATCHED_FLAG && repo sync --jobs-network=6 
-	repo forall -j${DOS_MAX_THREADS_REPO} -c 'git add -A && git reset --hard' && rm -rf out DOS_PATCHED_FLAG && repo sync -j${DOS_MAX_THREADS_REPO} --jobs-checkout=${DOS_MAX_THREADS_REPO} --force-sync --detach $noNetwork;
+	repo forall -j${DOS_MAX_THREADS_BUILD} -c 'git add -A && git reset --hard' && rm -rf out DOS_PATCHED_FLAG && repo sync --jobs-network=${DOS_MAX_THREADS_REPO} --jobs-checkout=${DOS_MAX_THREADS_BUILD} --force-sync --detach $noNetwork
+	repo forall -v -c 'echo "$REPO_PATH $(git rev-parse HEAD)"' | sort -u > "$DOS_WORKSPACE_ROOT/Logs/resetWorkspace-$DOS_VERSION.txt"
 }
 export -f resetWorkspace;
 
@@ -261,6 +261,8 @@ processRelease() {
 			--extra_apex_payload_key com.android.adbd.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.adservices.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.adservices.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.adservices.api.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.adservices.api.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.apex.cts.shim.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.apex.cts.shim.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.appsearch.apex="$KEY_DIR/releasekey" \
@@ -275,20 +277,44 @@ processRelease() {
 			--extra_apex_payload_key com.android.cellbroadcast.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.compos.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.compos.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.configinfrastructure.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.configinfrastructure.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.connectivity.resources.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.connectivity.resources.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.conscrypt.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.conscrypt.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.devicelock.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.devicelock.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.extservices.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.extservices.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.graphics.pdf.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.graphics.pdf.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.hardware.biometrics.face.virtual.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.hardware.biometrics.face.virtual.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.hardware.biometrics.fingerprint.virtual.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.hardware.biometrics.fingerprint.virtual.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.hardware.cas.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.hardware.cas.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.hardware.wifi.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.hardware.wifi.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.healthfitness.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.healthfitness.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.hotspot2.osulogin.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.hotspot2.osulogin.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.i18n.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.i18n.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.ipsec.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.ipsec.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.media.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.media.apex="$KEY_DIR/avb.pem" \
-			--extra_apks com.android.media.swcodec.apex="$KEY_DIR/releasekey" \
-			--extra_apex_payload_key com.android.media.swcodec.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.mediaprovider.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.mediaprovider.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.media.swcodec.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.media.swcodec.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.nearby.halfsheet.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.nearby.halfsheet.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.networkstack.tethering.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.networkstack.tethering.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.neuralnetworks.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.neuralnetworks.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.ondevicepersonalization.apex="$KEY_DIR/releasekey" \
@@ -299,30 +325,52 @@ processRelease() {
 			--extra_apex_payload_key com.android.permission.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.resolv.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.resolv.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.rkpd.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.rkpd.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.runtime.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.runtime.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.safetycenter.resources.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.safetycenter.resources.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.scheduling.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.scheduling.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.sdkext.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.sdkext.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.support.apexer.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.support.apexer.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.telephony.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.telephony.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.telephonymodules.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.telephonymodules.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.tethering.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.tethering.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.tzdata.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.tzdata.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.uwb.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.uwb.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.uwb.resources.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.uwb.resources.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.vibrator.drv2624.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.vibrator.drv2624.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.vibrator.sunfish.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.vibrator.sunfish.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.virt.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.virt.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.vndk.current.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.vndk.current.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.vndk.current.on_vendor.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.vndk.current.on_vendor.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.android.wifi.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.android.wifi.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.wifi.dialog.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.wifi.dialog.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.android.wifi.resources.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.android.wifi.resources.apex="$KEY_DIR/avb.pem" \
 			--extra_apks com.google.pixel.camera.hal.apex="$KEY_DIR/releasekey" \
 			--extra_apex_payload_key com.google.pixel.camera.hal.apex="$KEY_DIR/avb.pem" \
-			--extra_apks com.android.vibrator.sunfish.apex="$KEY_DIR/releasekey" \
-			--extra_apex_payload_key com.android.vibrator.sunfish.apex="$KEY_DIR/avb.pem" \
-			--extra_apks com.android.vibrator.drv2624.apex="$KEY_DIR/releasekey" \
-			--extra_apex_payload_key com.android.vibrator.drv2624.apex="$KEY_DIR/avb.pem");
+			--extra_apks com.google.pixel.vibrator.hal.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.google.pixel.vibrator.hal.apex="$KEY_DIR/avb.pem" \
+			--extra_apks com.qorvo.uwb.apex="$KEY_DIR/releasekey" \
+			--extra_apex_payload_key com.qorvo.uwb.apex="$KEY_DIR/avb.pem");
 	fi;
 
 	#Malware Scan
@@ -895,8 +943,10 @@ export -f changeDefaultDNS;
 
 editKernelLocalversion() {
 	local defconfigPath=$(getDefconfig)
-	sed -i 's/CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION="'"$1"'"/' $defconfigPath &>/dev/null || true;
-	sed -zi '/CONFIG_LOCALVERSION="'"$1"'"/!s/$/\nCONFIG_LOCALVERSION="'"$1"'"/' $defconfigPath &>/dev/null;
+	local replacement=$1;
+	if [ "$DOS_SNET" = true ]; then local replacement="-oink"; fi;
+	sed -i 's/CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION="'"$replacement"'"/' $defconfigPath &>/dev/null || true;
+	sed -zi '/CONFIG_LOCALVERSION="'"$replacement"'"/!s/$/\nCONFIG_LOCALVERSION="'"$replacement"'"/' $defconfigPath &>/dev/null;
 }
 export -f editKernelLocalversion;
 
@@ -910,7 +960,7 @@ getDefconfig() {
 	else
 		#grep TARGET_KERNEL_CONFIG Build/*/device/ -Rih | sed 's|TARGET_KERNEL_CONFIG .= |arch/arm\*/configs/|' | grep -v lineage | sort -u
 		#grep TARGET_KERNEL_VARIANT_CONFIG Build/*/device/ -Rih | sed 's|TARGET_KERNEL_VARIANT_CONFIG .= |arch/arm\*/configs/|' | grep -v lineage | sort -u
-		local defconfigPath="arch/arm*/configs/lineage*defconfig arch/arm*/configs/vendor/lineage*defconfig arch/arm*/configs/apollo_defconfig arch/arm*/configs/apq8084_sec_defconfig arch/arm*/configs/apq8084_sec_kccat6_eur_defconfig arch/arm*/configs/apq8084_sec_lentislte_skt_defconfig arch/arm*/configs/athene_defconfig arch/arm*/configs/aura_defconfig arch/arm*/configs/b1c1_defconfig arch/arm*/configs/beryllium_defconfig arch/arm*/configs/bonito_defconfig arch/arm*/configs/clark_defconfig arch/arm*/configs/cloudripper_gki_defconfig arch/arm*/configs/discovery_defconfig arch/arm*/configs/enchilada_defconfig arch/arm*/configs/exynos8890-hero2lte_defconfig arch/arm*/configs/exynos8890-herolte_defconfig arch/arm*/configs/exynos9810-crownlte_defconfig arch/arm*/configs/exynos9810-star2lte_defconfig arch/arm*/configs/exynos9810-starlte_defconfig arch/arm*/configs/floral_defconfig arch/arm*/configs/FP4_defconfig arch/arm*/configs/griffin_defconfig arch/arm*/configs/grouper_defconfig arch/arm*/configs/harpia_defconfig arch/arm*/configs/jactive_eur_defconfig arch/arm*/configs/jf_att_defconfig arch/arm*/configs/jf_eur_defconfig arch/arm*/configs/jf_spr_defconfig arch/arm*/configs/jfve_eur_defconfig arch/arm*/configs/jf_vzw_defconfig arch/arm*/configs/kirin_defconfig arch/arm*/configs/lavender_defconfig arch/arm*/configs/m1s1_defconfig arch/arm*/configs/m7_defconfig arch/arm*/configs/m8_defconfig arch/arm*/configs/m8dug_defconfig arch/arm*/configs/merlin_defconfig arch/arm*/configs/mermaid_defconfig arch/arm*/configs/msm8930_serrano_eur_3g_defconfig arch/arm*/configs/msm8930_serrano_eur_lte_defconfig arch/arm*/configs/msm8974-hdx_defconfig arch/arm*/configs/msm8974-hdx-perf_defconfig arch/arm*/configs/oneplus2_defconfig arch/arm*/configs/osprey_defconfig arch/arm*/configs/pioneer_defconfig arch/arm*/configs/platina_defconfig arch/arm*/configs/redbull_defconfig arch/arm*/configs/samsung_serrano_defconfig arch/arm*/configs/samsung_serrano_usa_defconfig arch/arm*/configs/shamu_defconfig arch/arm*/configs/slider_gki_defconfig arch/arm*/configs/sunfish_defconfig arch/arm*/configs/surnia_defconfig arch/arm*/configs/tama_akari_defconfig arch/arm*/configs/tama_akatsuki_defconfig arch/arm*/configs/tama_apollo_defconfig arch/arm*/configs/tama_aurora_defconfig arch/arm*/configs/thor_defconfig arch/arm*/configs/tulip_defconfig arch/arm*/configs/tuna_defconfig arch/arm*/configs/twrp_defconfig arch/arm*/configs/vendor/alioth_defconfig arch/arm*/configs/vendor/apollo_defconfig arch/arm*/configs/vendor/davinci.config arch/arm*/configs/vendor/fairphone/FP4.config arch/arm*/configs/vendor/kona-perf_defconfig arch/arm*/configs/vendor/lahaina-qgki_defconfig arch/arm*/configs/vendor/lito-perf_defconfig arch/arm*/configs/vendor/lmi_defconfig arch/arm*/configs/vendor/msm8937-perf_defconfig arch/arm*/configs/vendor/raphael_defconfig arch/arm*/configs/vendor/sdmsteppe-perf_defconfig arch/arm*/configs/vendor/sm8150-perf_defconfig arch/arm*/configs/vendor/vayu_defconfig arch/arm*/configs/vendor/vendor/fairphone/FP4.config arch/arm*/configs/vendor/vendor/xiaomi/sm8250-common.config arch/arm*/configs/vendor/xiaomi/alioth.config arch/arm*/configs/vendor/xiaomi/apollo.config arch/arm*/configs/vendor/xiaomi/beryllium.config arch/arm*/configs/vendor/xiaomi/dipper.config arch/arm*/configs/vendor/xiaomi/equuleus.config arch/arm*/configs/vendor/xiaomi/lmi.config arch/arm*/configs/vendor/xiaomi/mi845_defconfig arch/arm*/configs/vendor/xiaomi/polaris.config arch/arm*/configs/vendor/xiaomi/sm8150-common.config arch/arm*/configs/vendor/xiaomi/sm8250-common.config arch/arm*/configs/vendor/xiaomi/ursa.config arch/arm*/configs/vendor/xiaomi/vayu.config arch/arm*/configs/voyager_defconfig arch/arm*/configs/wayne_defconfig arch/arm*/configs/whyred_defconfig arch/arm*/configs/yellowstone_defconfig arch/arm*/configs/Z00T_defconfig arch/arm*/configs/z2_plus_defconfig arch/arm*/configs/zenfone3-perf_defconfig";
+		local defconfigPath="arch/arm*/configs/lineage*defconfig arch/arm*/configs/vendor/lineage*defconfig arch/arm*/configs/apollo_defconfig arch/arm*/configs/apq8084_sec_defconfig arch/arm*/configs/apq8084_sec_kccat6_eur_defconfig arch/arm*/configs/apq8084_sec_lentislte_skt_defconfig arch/arm*/configs/athene_defconfig arch/arm*/configs/aura_defconfig arch/arm*/configs/b1c1_defconfig arch/arm*/configs/beryllium_defconfig arch/arm*/configs/bonito_defconfig arch/arm*/configs/clark_defconfig arch/arm*/configs/cloudripper_gki_defconfig arch/arm*/configs/discovery_defconfig arch/arm*/configs/enchilada_defconfig arch/arm*/configs/exynos8890-hero2lte_defconfig arch/arm*/configs/exynos8890-herolte_defconfig arch/arm*/configs/exynos9810-crownlte_defconfig arch/arm*/configs/exynos9810-star2lte_defconfig arch/arm*/configs/exynos9810-starlte_defconfig arch/arm*/configs/floral_defconfig arch/arm*/configs/FP4_defconfig arch/arm*/configs/griffin_defconfig arch/arm*/configs/grouper_defconfig arch/arm*/configs/harpia_defconfig arch/arm*/configs/jactive_eur_defconfig arch/arm*/configs/jf_att_defconfig arch/arm*/configs/jf_eur_defconfig arch/arm*/configs/jf_spr_defconfig arch/arm*/configs/jfve_eur_defconfig arch/arm*/configs/jf_vzw_defconfig arch/arm*/configs/kirin_defconfig arch/arm*/configs/lavender_defconfig arch/arm*/configs/m1s1_defconfig arch/arm*/configs/m7_defconfig arch/arm*/configs/m8_defconfig arch/arm*/configs/m8dug_defconfig arch/arm*/configs/merlin_defconfig arch/arm*/configs/mermaid_defconfig arch/arm*/configs/msm8930_serrano_eur_3g_defconfig arch/arm*/configs/msm8930_serrano_eur_lte_defconfig arch/arm*/configs/msm8974-hdx_defconfig arch/arm*/configs/msm8974-hdx-perf_defconfig arch/arm*/configs/oneplus2_defconfig arch/arm*/configs/osprey_defconfig arch/arm*/configs/pioneer_defconfig arch/arm*/configs/platina_defconfig arch/arm*/configs/redbull_defconfig arch/arm*/configs/samsung_serrano_defconfig arch/arm*/configs/samsung_serrano_usa_defconfig arch/arm*/configs/shamu_defconfig arch/arm*/configs/slider_gki_defconfig arch/arm*/configs/sunfish_defconfig arch/arm*/configs/surnia_defconfig arch/arm*/configs/tama_akari_defconfig arch/arm*/configs/tama_akatsuki_defconfig arch/arm*/configs/tama_apollo_defconfig arch/arm*/configs/tama_aurora_defconfig arch/arm*/configs/thor_defconfig arch/arm*/configs/tulip_defconfig arch/arm*/configs/tuna_defconfig arch/arm*/configs/twrp_defconfig arch/arm*/configs/vendor/alioth_defconfig arch/arm*/configs/vendor/apollo_defconfig arch/arm*/configs/vendor/davinci.config arch/arm*/configs/vendor/fairphone/FP4.config arch/arm*/configs/vendor/kona-perf_defconfig arch/arm*/configs/vendor/lahaina-qgki_defconfig arch/arm*/configs/vendor/lito-perf_defconfig arch/arm*/configs/vendor/lmi_defconfig arch/arm*/configs/vendor/msm8937-perf_defconfig arch/arm*/configs/vendor/raphael_defconfig arch/arm*/configs/vendor/sdmsteppe-perf_defconfig arch/arm*/configs/vendor/sm8150-perf_defconfig arch/arm*/configs/vendor/vayu_defconfig arch/arm*/configs/vendor/vendor/fairphone/FP4.config arch/arm*/configs/vendor/vendor/xiaomi/sm8150-common.config arch/arm*/configs/vendor/vendor/xiaomi/sm8250-common.config arch/arm*/configs/vendor/xiaomi/alioth.config arch/arm*/configs/vendor/xiaomi/apollo.config arch/arm*/configs/vendor/xiaomi/beryllium.config arch/arm*/configs/vendor/xiaomi/dipper.config arch/arm*/configs/vendor/xiaomi/equuleus.config arch/arm*/configs/vendor/xiaomi/lmi.config arch/arm*/configs/vendor/xiaomi/mi845_defconfig arch/arm*/configs/vendor/xiaomi/polaris.config arch/arm*/configs/vendor/xiaomi/sm8150-common.config arch/arm*/configs/vendor/xiaomi/sm8250-common.config arch/arm*/configs/vendor/xiaomi/ursa.config arch/arm*/configs/vendor/xiaomi/vayu.config arch/arm*/configs/voyager_defconfig arch/arm*/configs/wayne_defconfig arch/arm*/configs/whyred_defconfig arch/arm*/configs/yellowstone_defconfig arch/arm*/configs/Z00T_defconfig arch/arm*/configs/z2_plus_defconfig arch/arm*/configs/zenfone3-perf_defconfig";
 	fi;
 	echo $defconfigPath;
 }
