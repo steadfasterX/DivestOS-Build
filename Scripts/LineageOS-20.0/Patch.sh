@@ -82,6 +82,14 @@ fi;
 applyPatch "$DOS_PATCHES/android_bionic/0003-Hosts_Cache.patch"; #Sort and cache hosts file data for fast lookup (tdm)
 applyPatch "$DOS_PATCHES/android_bionic/0003-Hosts_Wildcards.patch"; #Support wildcards in cached hosts file (tdm)
 applyPatch "$DOS_PATCHES/android_bionic/0004-hosts_toggle.patch"; #Add a toggle to disable /etc/hosts lookup (DivestOS)
+if [ "$DOS_GRAPHENE_HMALLOC_TOGGLE" = true ]; then
+applyPatch "$DOS_PATCHES/android_bionic/0005-hardened_malloc_toggle-1.patch"
+applyPatch "$DOS_PATCHES/android_bionic/0005-hardened_malloc_toggle-2.patch"
+applyPatch "$DOS_PATCHES/android_bionic/0005-hardened_malloc_toggle-3.patch"
+applyPatch "$DOS_PATCHES/android_bionic/0005-hardened_malloc_toggle-4.patch"
+applyPatch "$DOS_PATCHES/android_bionic/0005-hardened_malloc_toggle-5.patch"
+applyPatch "$DOS_PATCHES/android_bionic/0005-hardened_malloc_toggle-6.patch"
+fi
 fi;
 
 if enterAndClear "bootable/recovery"; then
@@ -209,6 +217,11 @@ sed -i 's/MAX_PASSWORD_LENGTH = 16/MAX_PASSWORD_LENGTH = 64/' core/java/android/
 sed -i 's/DEFAULT_STRONG_AUTH_TIMEOUT_MS = 72 \* 60 \* 60 \* 1000;/DEFAULT_STRONG_AUTH_TIMEOUT_MS = 12 * 60 * 60 * 1000;/' core/java/android/app/admin/DevicePolicyManager.java; #Decrease the strong auth prompt timeout to occur more often
 #rm -rf packages/CompanionDeviceManager; #Used to support Android Wear (which hard depends on GMS)
 rm -rf packages/PrintRecommendationService; #Creates popups to install proprietary print apps
+if [ "$DOS_GRAPHENE_HMALLOC_TOGGLE" = true ]; then
+applyPatch "$DOS_PATCHES/android_frameworks_base/0043-hardened_malloc_toggle-1.patch"
+applyPatch "$DOS_PATCHES/android_frameworks_base/0043-hardened_malloc_toggle-2.patch"
+applyPatch "$DOS_PATCHES/android_frameworks_base/0043-hardened_malloc_toggle-3.patch"
+fi
 fi;
 
 if enterAndClear "frameworks/ex"; then
@@ -341,6 +354,7 @@ applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0015-SUPL_Toggle.patch";
 if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0016-microG_Toggle.patch"; fi; #Add a toggle for microG enablement (heavily based off of a GrapheneOS patch)
 if [ "$DOS_DEBLOBBER_REMOVE_EUICC_FULL" = false ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0017-OpenEUICC_Toggle.patch"; fi; #Add a toggle for OpenEUICC enablement (heavily based off of a GrapheneOS patch)
 applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Settings/0001-disable_apps.patch"; #Add an ability to disable non-system apps from the "App info" screen (GrapheneOS)
+if [ "$DOS_GRAPHENE_HMALLOC_TOGGLE" = true ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0018-hardened_malloc_toggle-1.patch"; fi #Add toggle for disabling hardened malloc (GrapheneOS)
 fi;
 
 if enterAndClear "packages/apps/SetupWizard"; then
@@ -639,7 +653,7 @@ awk -i inplace '!/hardware\/google\/pixel\/lineage_health\/device/' device/*/*/*
 awk -i inplace '!/vendor.lineage.health-service.default/' device/*/*/*.mk;
 
 #Don't trip rollback protection after October update
-sed -i 's/2023-09-05/2023-10-01/' device/google/redbull/device-common.mk device/google/sunfish/device-common.mk device/google/gs201/device.mk device/google/gs101/device.mk;
+sed -i 's/2023-09-05/2023-10-01/' device/google/redbull/device-common.mk device/google/sunfish/device-common.mk device/google/gs201/device.mk device/google/gs101/device.mk || true
 
 #
 #END OF DEVICE CHANGES

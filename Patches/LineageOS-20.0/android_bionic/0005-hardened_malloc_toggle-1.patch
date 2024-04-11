@@ -1,0 +1,62 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dmitry Muhomor <muhomor.dmitry@gmail.com>
+Date: Sun, 14 Aug 2022 14:57:59 +0300
+Subject: [PATCH] add a wrapper for execveat(2)
+
+---
+ libc/SYSCALLS.TXT     | 1 +
+ libc/bionic/exec.cpp  | 6 ++++++
+ libc/include/unistd.h | 1 +
+ libc/libc.map.txt     | 1 +
+ 4 files changed, 9 insertions(+)
+
+diff --git a/libc/SYSCALLS.TXT b/libc/SYSCALLS.TXT
+index a09c614e6..16b4470e9 100644
+--- a/libc/SYSCALLS.TXT
++++ b/libc/SYSCALLS.TXT
+@@ -27,6 +27,7 @@
+ # genrules in Android.bp.
+ 
+ int     execve(const char*, char* const*, char* const*)  all
++int     __execveat:execveat(int, const char*, char* const*, char* const*, int)  all
+ 
+ uid_t   getuid:getuid32()         lp32
+ uid_t   getuid:getuid()           lp64
+diff --git a/libc/bionic/exec.cpp b/libc/bionic/exec.cpp
+index fd2c401bb..9cfdaa278 100644
+--- a/libc/bionic/exec.cpp
++++ b/libc/bionic/exec.cpp
+@@ -181,3 +181,9 @@ int fexecve(int fd, char* const* argv, char* const* envp) {
+   if (errno == ENOENT) errno = EBADF;
+   return -1;
+ }
++
++extern "C" int __execveat(int dirfd, const char* pathname, char* const* argv, char* const* envp, int flags);
++
++int execveat(int dirfd, const char* pathname, char* const* argv, char* const* envp, int flags) {
++  return __execveat(dirfd, pathname, argv, envp, flags);
++}
+diff --git a/libc/include/unistd.h b/libc/include/unistd.h
+index e36042187..65b6edc52 100644
+--- a/libc/include/unistd.h
++++ b/libc/include/unistd.h
+@@ -93,6 +93,7 @@ int execv(const char* __path, char* const* __argv);
+ int execvp(const char* __file, char* const* __argv);
+ int execvpe(const char* __file, char* const* __argv, char* const* __envp) __INTRODUCED_IN(21);
+ int execve(const char* __file, char* const* __argv, char* const* __envp);
++int execveat(int dirfd, const char* __file, char* const* __argv, char* const* __envp, int flags);
+ int execl(const char* __path, const char* __arg0, ...) __attribute__((__sentinel__));
+ int execlp(const char* __file, const char* __arg0, ...) __attribute__((__sentinel__));
+ int execle(const char* __path, const char* __arg0, ... /*,  char* const* __envp */)
+diff --git a/libc/libc.map.txt b/libc/libc.map.txt
+index ba51f9a5a..b9530f62c 100644
+--- a/libc/libc.map.txt
++++ b/libc/libc.map.txt
+@@ -329,6 +329,7 @@ LIBC {
+     execlp;
+     execv;
+     execve;
++    execveat;
+     execvp;
+     execvpe; # introduced=21
+     exit;

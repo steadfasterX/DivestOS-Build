@@ -1,4 +1,4 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From cf9fdf148bebcfabc3f86ce8d08540e02a4b0bf9 Mon Sep 17 00:00:00 2001
 From: Daniel Micay <danielmicay@gmail.com>
 Date: Wed, 5 Dec 2018 08:51:56 +0200
 Subject: [PATCH] use Scudo on 32-bit and hardened_malloc on 64-bit
@@ -9,14 +9,14 @@ Squashed with 6562b94dfc6dec13e1df79a1b029e6c78f4aa9ad
 
 Co-authored-by: anupritaisno1 <www.anuprita804@gmail.com>
 ---
- libc/Android.bp                  | 48 +++++++++++++++++++++---------
+ libc/Android.bp                  | 45 ++++++++++++++++++++++------
  libc/bionic/h_malloc_wrapper.cpp | 51 ++++++++++++++++++++++++++++++++
  libc/bionic/malloc_common.h      | 25 +++++++++-------
- 3 files changed, 99 insertions(+), 25 deletions(-)
+ 3 files changed, 101 insertions(+), 20 deletions(-)
  create mode 100644 libc/bionic/h_malloc_wrapper.cpp
 
 diff --git a/libc/Android.bp b/libc/Android.bp
-index 544a1e0b4..549c37c8b 100644
+index 372ba16bd1..ff8ed2f909 100644
 --- a/libc/Android.bp
 +++ b/libc/Android.bp
 @@ -75,6 +75,8 @@ libc_common_flags = [
@@ -28,18 +28,12 @@ index 544a1e0b4..549c37c8b 100644
  ]
  
  // Define some common cflags
-@@ -184,20 +186,30 @@ libc32_scudo_product_variables = {
+@@ -155,13 +157,30 @@ libc_scudo_product_variables = {
  // ========================================================
  cc_defaults {
      name: "libc_native_allocator_defaults",
--
--    whole_static_libs: [
--        "libjemalloc5",
--        "libc_jemalloc_wrapper",
--    ],
--    header_libs: ["gwp_asan_headers"],
 +    whole_static_libs: ["libc_jemalloc_wrapper"],
-     multilib: {
++    multilib: {
 +        lib32: {
 +            cflags: ["-DUSE_SCUDO"],
 +            whole_static_libs: ["libscudo"],
@@ -48,8 +42,7 @@ index 544a1e0b4..549c37c8b 100644
 +                "libc_jemalloc_wrapper",
 +            ],
 +        },
-         lib64: {
--            product_variables: libc_scudo_product_variables,
++        lib64: {
 +            cflags: [
 +                "-DH_MALLOC_PREFIX",
 +                "-DUSE_H_MALLOC",
@@ -59,17 +52,19 @@ index 544a1e0b4..549c37c8b 100644
 +                "libhardened_malloc",
 +                "libscudo",
 +            ],
-         },
--        lib32: {
--            product_variables: libc32_scudo_product_variables,
--        }
-     },
-+
-+    header_libs: ["gwp_asan_headers"],
++        },
++    },
+ 
+-    whole_static_libs: [
+-        "libjemalloc5",
+-        "libc_jemalloc_wrapper",
+-    ],
+     header_libs: ["gwp_asan_headers"],
+-    product_variables: libc_scudo_product_variables,
  }
  
  // Functions not implemented by jemalloc directly, or that need to
-@@ -205,12 +217,20 @@ cc_defaults {
+@@ -169,12 +188,20 @@ cc_defaults {
  cc_library_static {
      name: "libc_jemalloc_wrapper",
      defaults: ["libc_defaults"],
@@ -96,7 +91,7 @@ index 544a1e0b4..549c37c8b 100644
  // ========================================================
 diff --git a/libc/bionic/h_malloc_wrapper.cpp b/libc/bionic/h_malloc_wrapper.cpp
 new file mode 100644
-index 000000000..5fb0968c2
+index 0000000000..5fb0968c27
 --- /dev/null
 +++ b/libc/bionic/h_malloc_wrapper.cpp
 @@ -0,0 +1,51 @@
@@ -152,7 +147,7 @@ index 000000000..5fb0968c2
 +  return 0;
 +}
 diff --git a/libc/bionic/malloc_common.h b/libc/bionic/malloc_common.h
-index 4afcc4a8d..c9582bbb7 100644
+index 4afcc4a8d5..c9582bbb73 100644
 --- a/libc/bionic/malloc_common.h
 +++ b/libc/bionic/malloc_common.h
 @@ -55,21 +55,24 @@ __END_DECLS

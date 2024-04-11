@@ -1,0 +1,92 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dmitry Muhomor <muhomor.dmitry@gmail.com>
+Date: Sun, 14 Aug 2022 17:08:28 +0300
+Subject: [PATCH] exec spawning: add an option to relax app hardening
+
+---
+ .../com/android/internal/os/ExecInit.java     | 22 ++++++++++++++++++-
+ .../com/android/server/am/ProcessList.java    | 17 ++++++++++++++
+ 2 files changed, 38 insertions(+), 1 deletion(-)
+
+diff --git a/core/java/com/android/internal/os/ExecInit.java b/core/java/com/android/internal/os/ExecInit.java
+index 39f08b6a0f15..a24bbf94f698 100644
+--- a/core/java/com/android/internal/os/ExecInit.java
++++ b/core/java/com/android/internal/os/ExecInit.java
+@@ -3,6 +3,7 @@ package com.android.internal.os;
+ import android.os.Trace;
+ import android.system.ErrnoException;
+ import android.system.Os;
++import android.system.OsConstants;
+ import android.util.Slog;
+ import android.util.TimingsTraceLog;
+ import dalvik.system.VMRuntime;
+@@ -78,7 +79,26 @@ public class ExecInit {
+ 
+         WrapperInit.preserveCapabilities();
+         try {
+-            Os.execv(argv[0], argv);
++            if ((runtimeFlags & Zygote.DISABLE_HARDENED_MALLOC) != 0) {
++                // checked by bionic during early init
++                Os.setenv("DISABLE_HARDENED_MALLOC", "1", true);
++            }
++
++            if ((runtimeFlags & Zygote.ENABLE_COMPAT_VA_39_BIT) != 0) {
++                final int FLAG_COMPAT_VA_39_BIT = 1 << 30;
++
++                int errno = Zygote.execveatWrapper(-1, argv[0], argv, FLAG_COMPAT_VA_39_BIT);
++
++                if (errno == OsConstants.EINVAL) {
++                    // kernel doesn't support FLAG_COMPAT_VA_39_BIT, or a different error that will
++                    // be thrown by execv() anyway
++                    Os.execv(argv[0], argv);
++                } else {
++                    throw new ErrnoException("execveat", errno);
++                }
++            } else {
++                Os.execv(argv[0], argv);
++            }
+         } catch (ErrnoException e) {
+             throw new RuntimeException(e);
+         }
+diff --git a/services/core/java/com/android/server/am/ProcessList.java b/services/core/java/com/android/server/am/ProcessList.java
+index 8c9373b98c58..1af959400fc1 100644
+--- a/services/core/java/com/android/server/am/ProcessList.java
++++ b/services/core/java/com/android/server/am/ProcessList.java
+@@ -77,6 +77,7 @@ import android.content.Context;
+ import android.content.Intent;
+ import android.content.IntentFilter;
+ import android.content.pm.ApplicationInfo;
++import android.content.pm.GosPackageState;
+ import android.content.pm.IPackageManager;
+ import android.content.pm.PackageManager;
+ import android.content.pm.PackageManagerInternal;
+@@ -135,6 +136,7 @@ import com.android.server.am.ActivityManagerService.ProcessChangeItem;
+ import com.android.server.compat.PlatformCompat;
+ import com.android.server.pm.dex.DexManager;
+ import com.android.server.pm.parsing.pkg.AndroidPackage;
++import com.android.server.pm.pkg.GosPackageStatePm;
+ import com.android.server.pm.pkg.PackageStateInternal;
+ import com.android.server.wm.ActivityServiceConnectionsHolder;
+ import com.android.server.wm.WindowManagerService;
+@@ -1871,6 +1873,21 @@ public final class ProcessList {
+             runtimeFlags |= Zygote.getMemorySafetyRuntimeFlags(
+                     definingAppInfo, app.processInfo, instructionSet, mPlatformCompat);
+ 
++            if (GosPackageState.eligibleForRelaxHardeningFlag(app.info)) {
++                PackageManagerInternal pmi = LocalServices.getService(PackageManagerInternal.class);
++
++                GosPackageStatePm ps = pmi.getGosPackageState(app.info.packageName, userId);
++                if (ps != null) {
++                    if (ps.hasFlags(GosPackageState.FLAG_DISABLE_HARDENED_MALLOC)) {
++                        runtimeFlags |= Zygote.DISABLE_HARDENED_MALLOC;
++                    }
++
++                    if (ps.hasFlags(GosPackageState.FLAG_ENABLE_COMPAT_VA_39_BIT)) {
++                        runtimeFlags |= Zygote.ENABLE_COMPAT_VA_39_BIT;
++                    }
++                }
++            }
++
+             // the per-user SELinux context must be set
+             if (TextUtils.isEmpty(app.info.seInfoUser)) {
+                 Slog.wtf(ActivityManagerService.TAG, "SELinux tag not defined",

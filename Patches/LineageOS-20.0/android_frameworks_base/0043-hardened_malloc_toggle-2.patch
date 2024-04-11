@@ -1,0 +1,99 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dmitry Muhomor <muhomor.dmitry@gmail.com>
+Date: Sun, 14 Aug 2022 17:05:32 +0300
+Subject: [PATCH] zygote: define new runtime flags that relax app hardening
+
+---
+ core/java/com/android/internal/os/Zygote.java      |  9 +++++++++
+ .../com/android/internal/os/ZygoteConnection.java  |  7 +++----
+ ...com_android_internal_os_ZygoteCommandBuffer.cpp | 14 ++++++++++++++
+ 3 files changed, 26 insertions(+), 4 deletions(-)
+
+diff --git a/core/java/com/android/internal/os/Zygote.java b/core/java/com/android/internal/os/Zygote.java
+index e0d44a6953ad..bbc0450a37d1 100644
+--- a/core/java/com/android/internal/os/Zygote.java
++++ b/core/java/com/android/internal/os/Zygote.java
+@@ -188,6 +188,14 @@ public final class Zygote {
+      */
+     public static final int PROFILEABLE = 1 << 24;
+ 
++    public static final int DISABLE_HARDENED_MALLOC = 1 << 29;
++    public static final int ENABLE_COMPAT_VA_39_BIT = 1 << 30;
++
++    // make sure to update isSimpleForkCommand() in core/jni/com_android_internal_os_ZygoteCommandBuffer.cpp
++    // when adding new flags that depend on exec spawning
++    public static final int RUNTIME_FLAGS_DEPENDENT_ON_EXEC_SPAWNING = DISABLE_HARDENED_MALLOC | ENABLE_COMPAT_VA_39_BIT;
++    public static final int CUSTOM_RUNTIME_FLAGS = DISABLE_HARDENED_MALLOC | ENABLE_COMPAT_VA_39_BIT;
++
+     /** No external storage should be mounted. */
+     public static final int MOUNT_EXTERNAL_NONE = IVold.REMOUNT_MODE_NONE;
+     /** Default external storage should be mounted. */
+@@ -1111,6 +1119,7 @@ public final class Zygote {
+     @SuppressWarnings("unused")
+     private static void callPostForkChildHooks(int runtimeFlags, boolean isSystemServer,
+             boolean isZygote, String instructionSet) {
++        runtimeFlags &= ~CUSTOM_RUNTIME_FLAGS; // a warning is printed when an unknown flag is passed
+         ZygoteHooks.postForkChild(runtimeFlags, isSystemServer, isZygote, instructionSet);
+     }
+ 
+diff --git a/core/java/com/android/internal/os/ZygoteConnection.java b/core/java/com/android/internal/os/ZygoteConnection.java
+index 00000000000..711c2a936b 100644
+--- a/core/java/com/android/internal/os/ZygoteConnection.java
++++ b/core/java/com/android/internal/os/ZygoteConnection.java
+@@ -248,7 +248,7 @@ class ZygoteConnection {
+                     fdsToClose[1] = zygoteFd.getInt$();
+                 }
+ 
+-                if (parsedArgs.mInvokeWith != null || SystemProperties.getBoolean("persist.security.exec_spawn_new", false) || parsedArgs.mStartChildZygote
++                if (parsedArgs.mInvokeWith != null || ExtSettings.EXEC_SPAWNING.get() || parsedArgs.mStartChildZygote
+                         || !multipleOK || peer.getUid() != Process.SYSTEM_UID) {
+                     // Continue using old code for now. TODO: Handle these cases in the other path.
+                     pid = Zygote.forkAndSpecialize(parsedArgs.mUid, parsedArgs.mGid,
+@@ -536,10 +536,9 @@ class ZygoteConnection {
+             throw new IllegalStateException("WrapperInit.execApplication unexpectedly returned");
+         } else {
+             if (!isZygote) {
+-                if (SystemProperties.getBoolean("persist.security.exec_spawn_new", false) &&
+-                        (parsedArgs.mRuntimeFlags & ApplicationInfo.FLAG_DEBUGGABLE) == 0) {
++                if (ExtSettings.EXEC_SPAWNING.get()) {
+                     ExecInit.execApplication(parsedArgs.mNiceName, parsedArgs.mTargetSdkVersion,
+-                            VMRuntime.getCurrentInstructionSet(), parsedArgs.mRuntimeFlags, parsedArgs.mRemainingArgs);
++                            VMRuntime.getCurrentInstructionSet(), parsedArgs.mRemainingArgs);
+ 
+                     // Should not get here.
+                     throw new IllegalStateException("ExecInit.execApplication unexpectedly returned");
+diff --git a/core/jni/com_android_internal_os_ZygoteCommandBuffer.cpp b/core/jni/com_android_internal_os_ZygoteCommandBuffer.cpp
+index add645dee718..0b422122f03b 100644
+--- a/core/jni/com_android_internal_os_ZygoteCommandBuffer.cpp
++++ b/core/jni/com_android_internal_os_ZygoteCommandBuffer.cpp
+@@ -171,6 +171,9 @@ class NativeCommandBuffer {
+     static const size_t CA_LENGTH = strlen(CAPABILITIES);
+     static const size_t NN_LENGTH = strlen(NICE_NAME);
+ 
++    static const char* RUNTIME_FLAGS = "--runtime-flags=";
++    static const size_t RF_LENGTH = strlen(RUNTIME_FLAGS);
++
+     bool saw_setuid = false, saw_setgid = false;
+     bool saw_runtime_args = false;
+ 
+@@ -185,6 +188,17 @@ class NativeCommandBuffer {
+         saw_runtime_args = true;
+         continue;
+       }
++      if (arg_end - arg_start >= RF_LENGTH
++          && strncmp(arg_start, RUNTIME_FLAGS, RF_LENGTH) == 0) {
++        int flags = digitsVal(arg_start + RF_LENGTH, arg_end);
++        const int DISABLE_HARDENED_MALLOC = 1 << 29;
++        const int ENABLE_COMPAT_VA_39_BIT = 1 << 30;
++        if (flags & (DISABLE_HARDENED_MALLOC | ENABLE_COMPAT_VA_39_BIT)) {
++          // fallback to the slow path that calls ExecInit
++          return false;
++        }
++        continue;
++      }
+       if (arg_end - arg_start >= NN_LENGTH
+           && strncmp(arg_start, NICE_NAME, NN_LENGTH) == 0) {
+         size_t name_len = arg_end - (arg_start + NN_LENGTH);
+-- 
+2.43.0
+

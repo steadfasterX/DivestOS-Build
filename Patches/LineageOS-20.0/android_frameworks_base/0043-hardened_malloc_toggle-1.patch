@@ -1,0 +1,202 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dmitry Muhomor <muhomor.dmitry@gmail.com>
+Date: Sun, 14 Aug 2022 15:35:44 +0300
+Subject: [PATCH] add a wrapper for execveat(2)
+
+Needed for exec spawning, to pass custom flags to the kernel.
+---
+ core/java/com/android/internal/os/Zygote.java |  2 +
+ core/jni/Android.bp                           |  1 +
+ core/jni/ExecStrings.cpp                      | 74 +++++++++++++++++++
+ core/jni/ExecStrings.h                        | 37 ++++++++++
+ core/jni/com_android_internal_os_Zygote.cpp   | 15 ++++
+ 5 files changed, 129 insertions(+)
+ create mode 100644 core/jni/ExecStrings.cpp
+ create mode 100644 core/jni/ExecStrings.h
+
+diff --git a/core/java/com/android/internal/os/Zygote.java b/core/java/com/android/internal/os/Zygote.java
+index 96b56f7bd1d6..e0d44a6953ad 100644
+--- a/core/java/com/android/internal/os/Zygote.java
++++ b/core/java/com/android/internal/os/Zygote.java
+@@ -1434,4 +1434,6 @@ public final class Zygote {
+      * @hide
+      */
+     public static native void nativeHandleRuntimeFlags(int runtimeFlags);
++
++    public static native int execveatWrapper(int dirFd, String filename, String[] argv, int flags);
+ }
+diff --git a/core/jni/Android.bp b/core/jni/Android.bp
+index aa661713b1fe..0d9a89aa285c 100644
+--- a/core/jni/Android.bp
++++ b/core/jni/Android.bp
+@@ -226,6 +226,7 @@ cc_library_shared {
+                 "android_hardware_input_InputWindowHandle.cpp",
+                 "android_hardware_input_InputApplicationHandle.cpp",
+                 "android_window_WindowInfosListener.cpp",
++                "ExecStrings.cpp",
+             ],
+ 
+             static_libs: [
+diff --git a/core/jni/ExecStrings.cpp b/core/jni/ExecStrings.cpp
+new file mode 100644
+index 000000000000..6fdca3a39c63
+--- /dev/null
++++ b/core/jni/ExecStrings.cpp
+@@ -0,0 +1,74 @@
++/*
++ * Copyright (C) 2011 The Android Open Source Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++// copied from libcore/luni/src/main/native/ExecStrings.cpp, commit cab01ac294bb8ded259851673baa4c6ca226f828
++
++#define LOG_TAG "ExecStrings"
++
++#include "ExecStrings.h"
++
++#include <stdlib.h>
++
++#include <log/log.h>
++
++#include <nativehelper/ScopedLocalRef.h>
++
++ExecStrings::ExecStrings(JNIEnv* env, jobjectArray java_string_array)
++    : env_(env), java_array_(java_string_array), array_(NULL) {
++  if (java_array_ == NULL) {
++    return;
++  }
++
++  jsize length = env_->GetArrayLength(java_array_);
++  array_ = new char*[length + 1];
++  array_[length] = NULL;
++  for (jsize i = 0; i < length; ++i) {
++    ScopedLocalRef<jstring> java_string(env_, reinterpret_cast<jstring>(env_->GetObjectArrayElement(java_array_, i)));
++    // We need to pass these strings to const-unfriendly code.
++    char* string = const_cast<char*>(env_->GetStringUTFChars(java_string.get(), NULL));
++    array_[i] = string;
++  }
++}
++
++ExecStrings::~ExecStrings() {
++  if (array_ == NULL) {
++    return;
++  }
++
++  // Temporarily clear any pending exception so we can clean up.
++  jthrowable pending_exception = env_->ExceptionOccurred();
++  if (pending_exception != NULL) {
++    env_->ExceptionClear();
++  }
++
++  jsize length = env_->GetArrayLength(java_array_);
++  for (jsize i = 0; i < length; ++i) {
++    ScopedLocalRef<jstring> java_string(env_, reinterpret_cast<jstring>(env_->GetObjectArrayElement(java_array_, i)));
++    env_->ReleaseStringUTFChars(java_string.get(), array_[i]);
++  }
++  delete[] array_;
++
++  // Re-throw any pending exception.
++  if (pending_exception != NULL) {
++    if (env_->Throw(pending_exception) < 0) {
++      ALOGE("Error rethrowing exception!");
++    }
++  }
++}
++
++char** ExecStrings::get() {
++  return array_;
++}
+diff --git a/core/jni/ExecStrings.h b/core/jni/ExecStrings.h
+new file mode 100644
+index 000000000000..7a161b589741
+--- /dev/null
++++ b/core/jni/ExecStrings.h
+@@ -0,0 +1,37 @@
++/*
++ * Copyright (C) 2011 The Android Open Source Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++// copied from libcore/luni/src/main/native/ExecStrings.h, commit cab01ac294bb8ded259851673baa4c6ca226f828
++
++#include "jni.h"
++
++class ExecStrings {
++ public:
++  ExecStrings(JNIEnv* env, jobjectArray java_string_array);
++
++  ~ExecStrings();
++
++  char** get();
++
++ private:
++  JNIEnv* env_;
++  jobjectArray java_array_;
++  char** array_;
++
++  // Disallow copy and assignment.
++  ExecStrings(const ExecStrings&);
++  void operator=(const ExecStrings&);
++};
+diff --git a/core/jni/com_android_internal_os_Zygote.cpp b/core/jni/com_android_internal_os_Zygote.cpp
+index 9800b24cdff5..ea98136ed609 100644
+--- a/core/jni/com_android_internal_os_Zygote.cpp
++++ b/core/jni/com_android_internal_os_Zygote.cpp
+@@ -94,6 +94,8 @@
+ 
+ #include "nativebridge/native_bridge.h"
+ 
++#include "ExecStrings.h"
++
+ namespace {
+ 
+ // TODO (chriswailes): Add a function to initialize native Zygote data.
+@@ -2834,6 +2836,18 @@ static void nativeHandleRuntimeFlagsWrapper(JNIEnv* env, jclass, jint runtime_fl
+     HandleRuntimeFlags(env, runtime_flags, nullptr, nullptr);
+ }
+ 
++static jint execveatWrapper(JNIEnv* env, jclass, jint dirFd, jstring javaFilename, jobjectArray javaArgv, jint flags) {
++    ScopedUtfChars path(env, javaFilename);
++    if (path.c_str() == NULL) {
++        return EINVAL;
++    }
++
++    ExecStrings argv(env, javaArgv);
++    TEMP_FAILURE_RETRY(execveat(dirFd, path.c_str(), argv.get(), environ, flags));
++    // execveat never returns on success
++    return errno;
++}
++
+ static const JNINativeMethod gMethods[] = {
+         {"nativeForkAndSpecialize",
+          "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/"
+@@ -2887,6 +2901,7 @@ static const JNINativeMethod gMethods[] = {
+         {"nativeAllowFilesOpenedByPreload", "()V",
+          (void*)com_android_internal_os_Zygote_nativeAllowFilesOpenedByPreload},
+         {"nativeHandleRuntimeFlags", "(I)V", (void*)nativeHandleRuntimeFlagsWrapper},
++        {"execveatWrapper", "(ILjava/lang/String;[Ljava/lang/String;I)I", (void*)execveatWrapper},
+ };
+ 
+ int register_com_android_internal_os_Zygote(JNIEnv* env) {

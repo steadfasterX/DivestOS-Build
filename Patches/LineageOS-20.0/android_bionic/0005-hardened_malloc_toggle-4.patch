@@ -1,0 +1,99 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dmitry Muhomor <muhomor.dmitry@gmail.com>
+Date: Sun, 14 Aug 2022 15:13:01 +0300
+Subject: [PATCH] add a runtime option to disable hardened_malloc
+
+---
+ libc/bionic/malloc_common.cpp         | 50 +++++++++++++++++++++++++++
+ libc/bionic/malloc_common.h           |  1 +
+ libc/bionic/malloc_common_dynamic.cpp |  4 +++
+ 3 files changed, 55 insertions(+)
+
+diff --git a/libc/bionic/malloc_common.cpp b/libc/bionic/malloc_common.cpp
+index 9744968fc..e046e8f26 100644
+--- a/libc/bionic/malloc_common.cpp
++++ b/libc/bionic/malloc_common.cpp
+@@ -362,6 +362,56 @@ static constexpr MallocDispatch __libc_malloc_default_dispatch __attribute__((un
+   Malloc(malloc_info),
+ };
+ 
++#if defined(USE_H_MALLOC) && defined(USE_SCUDO)
++
++#define ScudoMalloc(function)  scudo_ ## function
++
++static constexpr MallocDispatch __scudo_malloc_dispatch __attribute__((unused)) = {
++  ScudoMalloc(calloc),
++  ScudoMalloc(free),
++  ScudoMalloc(mallinfo),
++  ScudoMalloc(malloc),
++  ScudoMalloc(malloc_usable_size),
++  ScudoMalloc(memalign),
++  ScudoMalloc(posix_memalign),
++#if defined(HAVE_DEPRECATED_MALLOC_FUNCS)
++  ScudoMalloc(pvalloc),
++#endif
++  ScudoMalloc(realloc),
++#if defined(HAVE_DEPRECATED_MALLOC_FUNCS)
++  ScudoMalloc(valloc),
++#endif
++  ScudoMalloc(malloc_iterate),
++  ScudoMalloc(malloc_disable),
++  ScudoMalloc(malloc_enable),
++  ScudoMalloc(mallopt),
++  ScudoMalloc(aligned_alloc),
++  ScudoMalloc(malloc_info),
++};
++
++static const MallocDispatch* native_allocator_dispatch;
++
++void InitNativeAllocatorDispatch(libc_globals* globals) {
++  const bool hardened_impl = getenv("DISABLE_HARDENED_MALLOC") == nullptr;
++
++  const MallocDispatch* table = hardened_impl ?
++    &__libc_malloc_default_dispatch :
++    &__scudo_malloc_dispatch;
++
++  if (!hardened_impl) {
++    globals->malloc_dispatch_table = __scudo_malloc_dispatch;
++    globals->current_dispatch_table = &globals->malloc_dispatch_table;
++    globals->default_dispatch_table = &globals->malloc_dispatch_table;
++  }
++
++  native_allocator_dispatch = table;
++}
++
++const MallocDispatch* NativeAllocatorDispatch() {
++  return native_allocator_dispatch;
++}
++#else
+ const MallocDispatch* NativeAllocatorDispatch() {
+   return &__libc_malloc_default_dispatch;
+ }
++#endif
+diff --git a/libc/bionic/malloc_common.h b/libc/bionic/malloc_common.h
+index c9582bbb7..f643fb8cb 100644
+--- a/libc/bionic/malloc_common.h
++++ b/libc/bionic/malloc_common.h
+@@ -68,6 +68,7 @@ __END_DECLS
+ 
+ #if defined(USE_SCUDO)
+ #include "scudo.h"
++void InitNativeAllocatorDispatch(libc_globals* globals);
+ #endif
+ 
+ #else // 32-bit
+diff --git a/libc/bionic/malloc_common_dynamic.cpp b/libc/bionic/malloc_common_dynamic.cpp
+index 6c2f4d941..28f65a596 100644
+--- a/libc/bionic/malloc_common_dynamic.cpp
++++ b/libc/bionic/malloc_common_dynamic.cpp
+@@ -374,6 +374,10 @@ extern "C" const char* __scudo_get_ring_buffer_addr();
+ 
+ // Initializes memory allocation framework once per process.
+ static void MallocInitImpl(libc_globals* globals) {
++#if defined(USE_H_MALLOC) && defined(USE_SCUDO)
++  InitNativeAllocatorDispatch(globals);
++#endif
++
+   char prop[PROP_VALUE_MAX];
+   char* options = prop;
+ 

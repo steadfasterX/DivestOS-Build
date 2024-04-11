@@ -1,0 +1,245 @@
+From e55e5eef8aab702b4f336504aee5525ec13f1c26 Mon Sep 17 00:00:00 2001
+From: Christopher Ferris <cferris@google.com>
+Date: Tue, 1 Oct 2019 17:54:42 -0700
+Subject: [PATCH] Make it easy to switch between scudo and jemalloc.
+
+Refactor some of the definitions to separate out all of the native
+allocator pieces into one place that can be changed easily. This
+should fix a few static libraries that appear to have accidentally
+included jemalloc wrapper functions. For example, I verified that
+libc_nomalloc.a no longer has references to any je_XXX functions.
+
+Modify the bionic_libc_platform_headers to not include any libraries.
+If this isn't updated, soong thinks there are cycles when used by
+libscudo.
+
+To enable scudo, change the libc_native_allocator_defaults defaults
+from libc_jemalloc5_defaults to libc_scudo_defaults and comment out
+the defaults: ["libc_scudo_wrapper_defaults"], line for the shared
+library libc_scudo.
+
+To do a final switch to scudo, it will be necessary to clean up
+some code in other parts of the tree, but this allows a single cl
+to enable or disable.
+
+Bug: 137795072
+
+Test: Builds with jemalloc or scudo with a small change.
+Test: Ran bionic unit tests.
+Change-Id: I07bb5432a0d2b2f405f92412e8d04fb9c9e51b31
+Merged-In: I07bb5432a0d2b2f405f92412e8d04fb9c9e51b31
+(cherry picked from commit ccff1b19effcecf1a0601448340d15abe71d411b)
+---
+ libc/Android.bp | 102 ++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 73 insertions(+), 29 deletions(-)
+
+diff --git a/libc/Android.bp b/libc/Android.bp
+index eee59d4110..5f82b13c4f 100644
+--- a/libc/Android.bp
++++ b/libc/Android.bp
+@@ -66,7 +66,6 @@ cc_defaults {
+     cppflags: [],
+     include_dirs: [
+         "bionic/libc/async_safe/include",
+-        "external/jemalloc_new/include",
+     ],
+ 
+     stl: "none",
+@@ -86,6 +85,56 @@ cc_defaults {
+     ldflags: ["-Wl,-z,muldefs"],
+ }
+ 
++// Defaults for native allocator libs/includes to make it
++// easier to change.
++// To enable scudo, change the below to libc_scudo_defaults
++// and comment out the defaults line in libc_scudo shared
++// library.
++// ========================================================
++cc_defaults {
++    name: "libc_native_allocator_defaults",
++
++    defaults: ["libc_jemalloc5_defaults"],
++}
++
++cc_defaults {
++    name: "libc_jemalloc5_defaults",
++
++    include_dirs: [
++        "external/jemalloc_new/include",
++    ],
++
++    whole_static_libs: [
++        "libjemalloc5",
++        "libc_jemalloc_wrapper",
++    ],
++}
++
++// Functions not implemented by jemalloc directly, or that need to
++// be modified for Android.
++cc_library_static {
++    name: "libc_jemalloc_wrapper",
++    defaults: ["libc_defaults"],
++    srcs: ["bionic/jemalloc_wrapper.cpp"],
++    cflags: ["-fvisibility=hidden"],
++
++    include_dirs: [
++        "external/jemalloc_new/include",
++    ],
++}
++
++cc_defaults {
++    name: "libc_scudo_defaults",
++
++    cflags: [
++        "-DUSE_SCUDO",
++    ],
++
++    whole_static_libs: [
++        "libscudo",
++    ],
++}
++
+ // ========================================================
+ // libc_stack_protector.a - stack protector code
+ // ========================================================
+@@ -1199,7 +1248,7 @@ cc_library_static {
+ // ========================================================
+ // libc_pthread.a - pthreads parts that previously lived in
+ // libc_bionic.a. Relocated to their own library because
+-// they can't be included in libc_ndk.a (as they layout of
++// they can't be included in libc_ndk.a (as the layout of
+ // pthread_t has changed over the years and has ABI
+ // compatibility issues).
+ // ========================================================
+@@ -1332,7 +1381,10 @@ cc_library_static {
+ 
+ cc_library_static {
+     name: "libc_ndk",
+-    defaults: ["libc_defaults"],
++    defaults: [
++        "libc_defaults",
++        "libc_native_allocator_defaults",
++    ],
+     srcs: libc_common_src_files + [
+         "bionic/malloc_common.cpp",
+         "bionic/malloc_limit.cpp",
+@@ -1365,7 +1417,6 @@ cc_library_static {
+         "libc_freebsd",
+         "libc_freebsd_large_stack",
+         "libc_gdtoa",
+-        "libc_malloc",
+         "libc_netbsd",
+         "libc_openbsd_large_stack",
+         "libc_openbsd_ndk",
+@@ -1373,7 +1424,6 @@ cc_library_static {
+         "libc_syscalls",
+         "libc_tzcode",
+         "libm",
+-        "libjemalloc5",
+         "libstdc++",
+     ],
+ }
+@@ -1399,7 +1449,6 @@ cc_library_static {
+         "libc_freebsd",
+         "libc_freebsd_large_stack",
+         "libc_gdtoa",
+-        "libc_malloc",
+         "libc_netbsd",
+         "libc_openbsd",
+         "libc_openbsd_large_stack",
+@@ -1506,17 +1555,6 @@ cc_library_static {
+     ],
+ }
+ 
+-// ========================================================
+-// libc_malloc.a: the _prefixed_ malloc functions (like dlcalloc).
+-// ========================================================
+-cc_library_static {
+-    defaults: ["libc_defaults"],
+-    srcs: ["bionic/jemalloc_wrapper.cpp"],
+-    cflags: ["-fvisibility=hidden"],
+-
+-    name: "libc_malloc",
+-}
+-
+ filegroup {
+     name: "libc_sources_shared",
+     srcs: [
+@@ -1558,7 +1596,10 @@ filegroup {
+ // libc.a + libc.so
+ // ========================================================
+ cc_library {
+-    defaults: ["libc_defaults"],
++    defaults: [
++        "libc_defaults",
++        "libc_native_allocator_defaults",
++    ],
+     name: "libc",
+     static_ndk_lib: true,
+     export_include_dirs: ["include"],
+@@ -1606,9 +1647,6 @@ cc_library {
+     static_libs: [
+         "libdl_android",
+     ],
+-    whole_static_libs: [
+-        "libjemalloc5",
+-    ],
+ 
+     nocrt: true,
+ 
+@@ -1728,6 +1766,8 @@ cc_library_headers {
+     export_include_dirs: [
+         "platform",
+     ],
++    system_shared_libs: [],
++    stl: "none",
+     sdk_version: "current",
+ }
+ 
+@@ -2475,9 +2515,8 @@ cc_library {
+ 
+ // This is a temporary library that will use scudo as the native memory
+ // allocator. To use it, add it as the first shared library.
+-cc_library_shared {
+-    name: "libc_scudo",
+-    vendor_available: true,
++cc_defaults {
++    name: "libc_scudo_wrapper_defaults",
+     srcs: [
+         "bionic/malloc_common.cpp",
+         "bionic/malloc_common_dynamic.cpp",
+@@ -2487,16 +2526,12 @@ cc_library_shared {
+         "bionic/__set_errno.cpp",
+     ],
+     cflags: ["-DUSE_SCUDO"],
+-    stl: "none",
+-    system_shared_libs: [],
++    shared_libs: ["libscudo_wrapper"],
+ 
+     header_libs: ["libc_headers"],
+ 
+     static_libs: ["libasync_safe"],
+ 
+-    allow_undefined_symbols: true,
+-    shared_libs: ["libscudo_wrapper"],
+-
+     arch: {
+         arm: {
+             srcs: [":syscalls-arm.S"],
+@@ -2518,7 +2553,16 @@ cc_library_shared {
+     // Mark this library as global so it overrides all the allocation
+     // definitions properly.
+     ldflags: ["-Wl,-z,global"],
++}
+ 
++cc_library_shared {
++    name: "libc_scudo",
++    defaults: ["libc_scudo_wrapper_defaults"],
++    vendor_available: true,
++    stl: "none",
++    system_shared_libs: [],
++
++    allow_undefined_symbols: true,
+     // Like libc, disable native coverage for libc_scudo.
+     native_coverage: false,
+ }

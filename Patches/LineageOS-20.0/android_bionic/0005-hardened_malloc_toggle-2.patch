@@ -1,0 +1,62 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dmitry Muhomor <muhomor.dmitry@gmail.com>
+Date: Sun, 14 Aug 2022 15:11:25 +0300
+Subject: [PATCH] include both hardened_malloc and Scudo on 64-bit
+
+---
+ libc/Android.bp | 34 ++++++++--------------------------
+ 1 file changed, 8 insertions(+), 26 deletions(-)
+
+diff --git a/libc/Android.bp b/libc/Android.bp
+index 8a5e18956..a6f1a915f 100644
+--- a/libc/Android.bp
++++ b/libc/Android.bp
+@@ -121,32 +121,15 @@ cc_defaults {
+     // warning since this is intended right now.
+     ldflags: ["-Wl,-z,muldefs"],
+ 
+-    multilib: {
+-        lib64: {
+-            product_variables: {
+-                malloc_zero_contents: {
+-                    cflags: ["-DSCUDO_ZERO_CONTENTS"],
+-                },
+-                malloc_pattern_fill_contents: {
+-                    cflags: ["-DSCUDO_PATTERN_FILL_CONTENTS"],
+-                },
+-                malloc_not_svelte: {
+-                    cflags: ["-DUSE_SCUDO"],
+-                },
+-            },
++    product_variables: {
++        malloc_zero_contents: {
++            cflags: ["-DSCUDO_ZERO_CONTENTS"],
+         },
+-        lib32: {
+-            product_variables: {
+-                malloc_zero_contents: {
+-                    cflags: ["-DSCUDO_ZERO_CONTENTS"],
+-                },
+-                malloc_pattern_fill_contents: {
+-                    cflags: ["-DSCUDO_PATTERN_FILL_CONTENTS"],
+-                },
+-                malloc_not_svelte_libc32: {
+-                    cflags: ["-DUSE_SCUDO"],
+-                },
+-            },
++        malloc_pattern_fill_contents: {
++            cflags: ["-DSCUDO_PATTERN_FILL_CONTENTS"],
++        },
++        malloc_not_svelte: {
++            cflags: ["-DUSE_SCUDO"],
+         },
+     },
+ 
+@@ -177,7 +160,6 @@ libc32_scudo_product_variables = {
+     },
+ }
+ 
+-
+ // Defaults for native allocator libs/includes to make it
+ // easier to change.
+ // To disable scudo for the non-svelte config remove the line:
