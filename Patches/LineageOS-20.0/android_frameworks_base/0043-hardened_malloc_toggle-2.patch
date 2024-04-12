@@ -37,7 +37,7 @@ index e0d44a6953ad..bbc0450a37d1 100644
      }
  
 diff --git a/core/java/com/android/internal/os/ZygoteConnection.java b/core/java/com/android/internal/os/ZygoteConnection.java
-index 00000000000..711c2a936b 100644
+index 5bc30d85b9fb..1eee8c8137f6 100644
 --- a/core/java/com/android/internal/os/ZygoteConnection.java
 +++ b/core/java/com/android/internal/os/ZygoteConnection.java
 @@ -248,7 +248,7 @@ class ZygoteConnection {
@@ -94,6 +94,3 @@ index add645dee718..0b422122f03b 100644
        if (arg_end - arg_start >= NN_LENGTH
            && strncmp(arg_start, NICE_NAME, NN_LENGTH) == 0) {
          size_t name_len = arg_end - (arg_start + NN_LENGTH);
--- 
-2.43.0
-
