@@ -99,7 +99,7 @@ applyPatch "$DOS_PATCHES_COMMON/android_build/0001-verity-openssl3.patch"; #Fix 
 sed -i '74i$(my_res_package): PRIVATE_AAPT_FLAGS += --auto-add-overlay' core/aapt2.mk; #Enable auto-add-overlay for packages, this allows the vendor overlay to easily work across all branches.
 sed -i 's/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 17/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 28/' core/version_defaults.mk; #Set the minimum supported target SDK to Pie (GrapheneOS)
 awk -i inplace '!/Email/' target/product/core.mk; #Remove Email
-sed -i 's/2022-01-05/2024-03-05/' core/version_defaults.mk; #Bump Security String #P_asb_2024-03 #XXX
+sed -i 's/2022-01-05/2024-04-05/' core/version_defaults.mk; #Bump Security String #P_asb_2024-04 #XXX
 fi;
 
 if enterAndClear "build/soong"; then
@@ -165,6 +165,7 @@ if [ "$DOS_GRAPHENE_MALLOC" = true ]; then applyPatch "$DOS_PATCHES/android_fram
 fi;
 
 if enterAndClear "frameworks/base"; then
+applyPatch "$DOS_PATCHES/android_frameworks_base/389014-backport.patch"; #S_asb_2024-04 Fix security vulnerability that creates user with no restrictions when accountOptions are too long.
 applyPatch "$DOS_PATCHES/android_frameworks_base/0007-Always_Restict_Serial.patch"; #Always restrict access to Build.SERIAL (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0008-Browser_No_Location.patch"; #Don't grant location permission to system browsers (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0009-SystemUI_No_Permission_Review.patch"; #Allow SystemUI to directly manage Bluetooth/WiFi (GrapheneOS)
@@ -195,6 +196,7 @@ applyPatch "$DOS_PATCHES/android_frameworks_base/0013-Sensors_Permission.patch";
 if [ "$DOS_GRAPHENE_CONSTIFY" = true ]; then applyPatch "$DOS_PATCHES/android_frameworks_base/0014-constify_JNINativeMethod.patch"; fi; #Constify JNINativeMethod tables (GrapheneOS)
 #if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_frameworks_base/0021-Unprivileged_microG_Handling.patch"; fi; #Unprivileged microG handling (heavily based off of a CalyxOS patch)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0008-No_Crash_GSF.patch"; #Don't crash apps that depend on missing Gservices provider (GrapheneOS)
+if [ "$DOS_SNET" = true ]; then git am "$DOS_PATCHES/android_frameworks_base/snet-16.patch"; fi;
 sed -i 's/DEFAULT_MAX_FILES = 1000;/DEFAULT_MAX_FILES = 0;/' services/core/java/com/android/server/DropBoxManagerService.java; #Disable DropBox internal logging service
 sed -i 's/DEFAULT_MAX_FILES_LOWRAM = 300;/DEFAULT_MAX_FILES_LOWRAM = 0;/' services/core/java/com/android/server/DropBoxManagerService.java;
 sed -i 's/(notif.needNotify)/(true)/' location/java/com/android/internal/location/GpsNetInitiatedHandler.java; #Notify the user if their location is requested via SUPL
@@ -380,6 +382,7 @@ applyPatch "$DOS_PATCHES/android_system_core/0001-Harden.patch"; #Harden mounts 
 if [ "$DOS_GRAPHENE_MALLOC" = true ]; then applyPatch "$DOS_PATCHES/android_system_core/0002-HM-Increase_vm_mmc.patch"; fi; #(GrapheneOS)
 if [ "$DOS_GRAPHENE_BIONIC" = true ]; then applyPatch "$DOS_PATCHES/android_system_core/0003-Zero_Sensitive_Info.patch"; fi; #Zero sensitive information with explicit_bzero (GrapheneOS)
 #applyPatch "$DOS_PATCHES/android_system_core/0004-ptrace_scope.patch"; #Add a property for controlling ptrace_scope (GrapheneOS)
+if [ "$DOS_SNET_EXTRA" = true ]; then applyPatch "$DOS_PATCHES/android_system_core/snet-16.patch"; fi;
 fi;
 
 if enterAndClear "system/extras"; then

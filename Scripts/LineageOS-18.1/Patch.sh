@@ -96,7 +96,7 @@ sed -i '75i$(my_res_package): PRIVATE_AAPT_FLAGS += --auto-add-overlay' core/aap
 awk -i inplace '!/updatable_apex.mk/' target/product/mainline_system.mk; #Disable APEX
 sed -i 's/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 23/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 28/' core/version_defaults.mk; #Set the minimum supported target SDK to Pie (GrapheneOS)
 #sed -i 's/PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := true/PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false/' core/product_config.mk; #broken by hardenDefconfig
-sed -i 's/2024-02-05/2024-03-05/' core/version_defaults.mk; #Bump Security String #R_asb_2024-03
+sed -i 's/2024-02-05/2024-04-05/' core/version_defaults.mk; #Bump Security String #R_asb_2024-04
 fi;
 
 if enterAndClear "build/soong"; then
@@ -172,6 +172,7 @@ applyPatch "$DOS_PATCHES/android_frameworks_base/0025-tile_restrictions.patch"; 
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0006-Do-not-throw-in-setAppOnInterfaceLocked.patch"; #Fix random reboots on broken kernels when an app has data restricted XXX: ugly (DivestOS)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0007-ABI_Warning.patch"; #Warn when running activity from 32 bit app on ARM64 devices. (AOSP)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0008-No_Crash_GSF.patch"; #Don't crash apps that depend on missing Gservices provider (GrapheneOS)
+if [ "$DOS_SNET" = true ]; then git am "$DOS_PATCHES/android_frameworks_base/snet-18.patch"; fi;
 hardenLocationConf services/core/java/com/android/server/location/gps_debug.conf; #Harden the default GPS config
 sed -i 's/DEFAULT_USE_COMPACTION = false;/DEFAULT_USE_COMPACTION = true;/' services/core/java/com/android/server/am/CachedAppOptimizer.java; #Enable app compaction by default (GrapheneOS)
 sed -i 's/DEFAULT_USE_FREEZER = false;/DEFAULT_USE_FREEZER = true;/' services/core/java/com/android/server/am/CachedAppOptimizer.java; #Enable app freezer by default (GrapheneOS)
@@ -399,6 +400,7 @@ applyPatch "$DOS_PATCHES/android_system_core/0001-Harden.patch"; #Harden mounts 
 applyPatch "$DOS_PATCHES/android_system_core/0002-ptrace_scope.patch"; #Add a property for controlling ptrace_scope (GrapheneOS)
 if [ "$DOS_GRAPHENE_MALLOC" = true ]; then applyPatch "$DOS_PATCHES/android_system_core/0003-HM-Increase_vm_mmc.patch"; fi; #(GrapheneOS)
 if [ "$DOS_GRAPHENE_BIONIC" = true ]; then applyPatch "$DOS_PATCHES/android_system_core/0004-Zero_Sensitive_Info.patch"; fi; #Zero sensitive information with explicit_bzero (GrapheneOS)
+if [ "$DOS_SNET_EXTRA" = true ]; then applyPatch "$DOS_PATCHES/android_system_core/snet-18.patch"; fi;
 fi;
 
 if enterAndClear "system/extras"; then
@@ -538,6 +540,10 @@ fi;
 if enterAndClear "device/oppo/msm8974-common"; then
 sed -i 's/libinit_msm8974/libinit_msm8974-oppo/' BoardConfigCommon.mk init/Android.bp; #Fix name conflict
 sed -i "s/TZ.BF.2.0-2.0.0134/TZ.BF.2.0-2.0.0134|TZ.BF.2.0-2.0.0137/" board-info.txt; #Suport new TZ firmware https://review.lineageos.org/#/c/178999/
+fi;
+
+if enterAndClear "device/samsung/jf-common"; then
+sed -i 's/TARGET_RECOVERY_DENSITY := xxhdpi/TARGET_RECOVERY_DENSITY := xhdpi/' BoardConfigCommon.mk; #no space
 fi;
 
 if enterAndClear "device/samsung/jactivelte"; then

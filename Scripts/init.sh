@@ -69,6 +69,8 @@ export DOS_GRAPHENE_EXEC=true; #Enables use of GrapheneOS' exec spawning feature
 export DOS_HOSTS_BLOCKING=true; #Set false to prevent inclusion of a HOSTS file
 export DOS_HOSTS_BLOCKING_LIST="https://divested.dev/hosts-wildcards"; #Must be in the format "127.0.0.1 bad.domain.tld"
 export DOS_MICROG_SUPPORT=true; #Opt-in unprivileged microG support on 17.1+18.1+19.1+20.0
+export DOS_SNET=false; #Selectively spoof select build properties
+export DOS_SNET_EXTRA=false; #Globally spoof select bootloader properties
 export DOS_SENSORS_PERM=false; #Set true to provide a per-app sensors permission for 14.1/15.1 #XXX: can break things like camera
 export DOS_STRONG_ENCRYPTION_ENABLED=false; #Set true to enable AES 256-bit FDE encryption on 14.1+15.1 #XXX: THIS WILL **DESTROY** EXISTING INSTALLS!
 export DOS_USE_KSM=false; #Set true to use KSM for increased memory efficiency at the cost of easier side-channel attacks and increased CPU usage #XXX: testing only
@@ -119,14 +121,15 @@ umask 0022;
 
 export TR_ERR=0
 export TR_PID=$$
+unset nokill
+if [ -z "$UNATTENDED_PATCHING" ];then export UNATTENDED_PATCHING=1;fi
 
 set -E;	#required for resetEnv()
 resetEnv(){
     trap - ERR EXIT USR2 SIGINT SIGHUP TERM
     echo -e "\n\e[0;32mThe environment has been reset.\e[0m\nRemember to always '\e[0;31msource ../../Scripts/init.sh\e[0m' before building.\n"
     set +E +f
-}
-export -f resetEnv
+}; export -f resetEnv
 
 # print result
 # will also ensure the corresponding status code gets returned properly
@@ -137,8 +140,47 @@ _errorReport(){
 	echo -e "\n\e[0;32m[FINAL RESULT] No error detected (please check the above output nevertheless!)\e[0m"
     fi
     return $TR_ERR
-}
-export -f _errorReport
+}; export -f _errorReport
+
+# exit
+_exit(){
+    if [ "$1" == "noreset" ] || [ $TR_ERR -eq 0 ] ;then
+	echo -e "Ended with $TR_ERR.\nThe shell env has NOT been reset, type: resetEnv if needed.\n"
+    else
+	if [ -z "$nokill" ];then nokill=0;fi
+	resetEnv
+	echo -e "\nExecution has been STOPPED (TR_ERR=$TR_ERR)."
+	if [ "$UNATTENDED_PATCHING" -eq 1 ];then
+	    echo -e "\n\e[0;31mPressing any key or waiting 10s will close this shell (set UNATTENDED_PATCHING=0 to disable auto-close)!\e[0m"
+	    read -t 10 -p "- press any key to exit the shell NOW (auto closes after 10s) -" DUMMY || true
+	else
+	    read -p "- press any key to exit the shell NOW -" DUMMY || true
+	fi
+	_SPIDS=$(ps -s $TR_PID -o pid= | tr '\n' ' ')
+	if [ -z "$_SPIDS" ];then
+	    echo -e "... ok, no childs running (I am: $TR_PID)"
+	else
+	    echo -e "... killing childs: $_SPIDS"
+	    kill -9 $_SPIDS
+	fi
+	if [ $nokill -eq 0 ];then
+	    echo "... killing shell: $TR_PID"
+	    kill -9 $TR_PID
+	fi
+    fi
+}; export -f _exit
+
+# exit & reset & report
+_exit_report(){
+    _errorReport
+    _exit
+}; export -f _exit_report
+
+# exit without reset/kill
+_exit_sigint(){
+    echo -e "\n\nCTRL+C pressed or process has been terminated.."
+    _exit noreset
+}; export _exit_sigint
 
 # trap and print errors
 # ERR: needed to fetch aborts when set -e is set
@@ -146,8 +188,8 @@ trap 'E=$?; \
       [ $E -ne 0 ] && _fetchError $E $LINENO $FUNCNAME $BASH_SOURCE \
       && export TR_ERR=$((TR_ERR + $E))' EXIT ERR
 
-trap _errorReport USR2
-trap resetEnv SIGINT SIGHUP TERM
+trap _exit_report SIGUSR2 USR2
+trap _exit_sigint SIGINT SIGHUP TERM
 
 # by default we will calculate the max CPU count automatically (used by e.g. repo commands)
 # if the required tool "nproc" is not found a default is used.
@@ -216,6 +258,11 @@ export DOS_BUILD_BASE="$DOS_WORKSPACE_ROOT/Build/$BUILD_WORKING_DIR/";
 if [ ! -d "$DOS_BUILD_BASE" ]; then
 	echo "Path mismatch! Please update init.sh!";
 	return 1;
+fi;
+
+if [ "$DOS_MICROG_SUPPORT" = false ]; then
+	export DOS_SNET=false;
+	export DOS_SNET_EXTRA=false;
 fi;
 
 export DOS_TMP_DIR="/tmp/dos_tmp";

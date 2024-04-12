@@ -1,7 +1,7 @@
 #!/bin/bash
 if cd "$DOS_BUILD_BASE""kernel/moto/shamu"; then
 git apply $DOS_PATCHES_LINUX_CVES/0002-Misc_Fixes/4.4/0009.patch
-git apply $DOS_PATCHES_LINUX_CVES/0002-Misc_Fixes/ANY/0003.patch
+git apply $DOS_PATCHES_LINUX_CVES/0002-Misc_Fixes/^3.17/0003.patch
 git apply $DOS_PATCHES_LINUX_CVES/0003-syzkaller-Misc2/ANY/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/0006-AndroidHardening-Kernel_Hardening/3.10/0004-No_dir-relax.patch
 git apply $DOS_PATCHES_LINUX_CVES/0006-AndroidHardening-Kernel_Hardening/3.10/0005.patch
@@ -69,9 +69,9 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2016-8404/ANY/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2016-8464/3.10/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2016-10153/3.4/0003.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2016-10741/3.18/0005.patch
-git apply $DOS_PATCHES_LINUX_CVES/CVE-2017-16USB/ANY/0001.patch
-git apply $DOS_PATCHES_LINUX_CVES/CVE-2017-16USB/ANY/0003.patch
-git apply $DOS_PATCHES_LINUX_CVES/CVE-2017-16USB/ANY/0006.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2017-16USB/^4.13/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2017-16USB/^4.14/0003.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2017-16USB/^4.14/0006.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2017-0404/^3.18/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2017-0524/ANY/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2017-0537/ANY/0001.patch
@@ -296,6 +296,12 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-47114/4.4/0004.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-47118/3.18/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-47121/3.18/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-47122/3.18/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-47145/3.18/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-47149/3.18/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-47153/3.18/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-47169/3.18/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-47171/3.18/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-47173/3.18/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-Misc2/3.4/0065.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-Misc2/3.4/0073.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2022-1353/4.4/0001.patch
@@ -388,6 +394,10 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-26606/^6.8/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-26625/4.4/0008.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-26633/4.4/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-26635/4.4/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-26675/4.4/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-26696/4.4/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-26697/4.4/0001.patch
+#git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-26773/4.4/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/Untracked-02/ANY/797912_0001-usb-gadget-Fix-synchronization-issue-between-f_audio.patch
 git apply $DOS_PATCHES_LINUX_CVES/Untracked-02/ANY/870057_0001-wcnss-add-null-check-in-pm_ops-unregister.patch
 git apply $DOS_PATCHES_LINUX_CVES/Untracked-02/ANY/1035495_0001-cnss-Add-NULL-check-for-PM-related-APIs.patch
@@ -398,7 +408,7 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-14283/3.18/0004.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2020-29660/3.18/0007.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2022-20423/3.4/0010.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-52601/4.4/0008.patch
-editKernelLocalversion "-dos.p398"
+editKernelLocalversion "-dos.p408"
 else echo "kernel_moto_shamu is unavailable, not patching.";
 fi;
 cd "$DOS_BUILD_BASE"
