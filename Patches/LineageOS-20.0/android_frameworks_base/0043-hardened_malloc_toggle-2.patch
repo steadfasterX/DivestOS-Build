@@ -4,10 +4,10 @@ Date: Sun, 14 Aug 2022 17:05:32 +0300
 Subject: [PATCH] zygote: define new runtime flags that relax app hardening
 
 ---
- core/java/com/android/internal/os/Zygote.java      |  9 +++++++++
- .../com/android/internal/os/ZygoteConnection.java  |  7 +++----
- ...com_android_internal_os_ZygoteCommandBuffer.cpp | 14 ++++++++++++++
- 3 files changed, 26 insertions(+), 4 deletions(-)
+ core/java/com/android/internal/os/Zygote.java     |  9 +++++++++
+ .../com/android/internal/os/ZygoteConnection.java | 15 +++++++++++----
+ ...om_android_internal_os_ZygoteCommandBuffer.cpp | 14 ++++++++++++++
+ 3 files changed, 34 insertions(+), 4 deletions(-)
 
 diff --git a/core/java/com/android/internal/os/Zygote.java b/core/java/com/android/internal/os/Zygote.java
 index e0d44a6953ad..bbc0450a37d1 100644
@@ -37,28 +37,36 @@ index e0d44a6953ad..bbc0450a37d1 100644
      }
  
 diff --git a/core/java/com/android/internal/os/ZygoteConnection.java b/core/java/com/android/internal/os/ZygoteConnection.java
-index 5bc30d85b9fb..1eee8c8137f6 100644
+index 8e638ac7e939..252c0d08ac5a 100644
 --- a/core/java/com/android/internal/os/ZygoteConnection.java
 +++ b/core/java/com/android/internal/os/ZygoteConnection.java
-@@ -248,7 +248,7 @@ class ZygoteConnection {
-                     fdsToClose[1] = zygoteFd.getInt$();
+@@ -249,7 +249,8 @@ class ZygoteConnection {
                  }
  
--                if (parsedArgs.mInvokeWith != null || SystemProperties.getBoolean("persist.security.exec_spawn_new", false) || parsedArgs.mStartChildZygote
-+                if (parsedArgs.mInvokeWith != null || ExtSettings.EXEC_SPAWNING.get() || parsedArgs.mStartChildZygote
-                         || !multipleOK || peer.getUid() != Process.SYSTEM_UID) {
+                 if (parsedArgs.mInvokeWith != null || ExtSettings.EXEC_SPAWNING.get() || parsedArgs.mStartChildZygote
+-                        || !multipleOK || peer.getUid() != Process.SYSTEM_UID) {
++                        || !multipleOK || peer.getUid() != Process.SYSTEM_UID
++                        || (parsedArgs.mRuntimeFlags & Zygote.RUNTIME_FLAGS_DEPENDENT_ON_EXEC_SPAWNING) != 0) {
                      // Continue using old code for now. TODO: Handle these cases in the other path.
                      pid = Zygote.forkAndSpecialize(parsedArgs.mUid, parsedArgs.mGid,
-@@ -536,10 +536,9 @@ class ZygoteConnection {
+                             parsedArgs.mGids, parsedArgs.mRuntimeFlags, rlimits,
+@@ -536,10 +537,16 @@ class ZygoteConnection {
              throw new IllegalStateException("WrapperInit.execApplication unexpectedly returned");
          } else {
              if (!isZygote) {
--                if (SystemProperties.getBoolean("persist.security.exec_spawn_new", false) &&
+-                if (ExtSettings.EXEC_SPAWNING.get()  &&
 -                        (parsedArgs.mRuntimeFlags & ApplicationInfo.FLAG_DEBUGGABLE) == 0) {
-+                if (ExtSettings.EXEC_SPAWNING.get()) {
++                final int runtimeFlags = parsedArgs.mRuntimeFlags;
++                boolean useExecInit =
++                        ((runtimeFlags & Zygote.RUNTIME_FLAGS_DEPENDENT_ON_EXEC_SPAWNING) != 0
++                            || ExtSettings.EXEC_SPAWNING.get())
++                        &&
++                        (runtimeFlags & ApplicationInfo.FLAG_DEBUGGABLE) == 0;
++
++                if (useExecInit) {
                      ExecInit.execApplication(parsedArgs.mNiceName, parsedArgs.mTargetSdkVersion,
 -                            VMRuntime.getCurrentInstructionSet(), parsedArgs.mRuntimeFlags, parsedArgs.mRemainingArgs);
-+                            VMRuntime.getCurrentInstructionSet(), parsedArgs.mRemainingArgs);
++                            VMRuntime.getCurrentInstructionSet(), runtimeFlags, parsedArgs.mRemainingArgs);
  
                      // Should not get here.
                      throw new IllegalStateException("ExecInit.execApplication unexpectedly returned");
