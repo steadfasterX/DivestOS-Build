@@ -641,7 +641,7 @@ awk -i inplace '!/hardware\/google\/pixel\/lineage_health\/device/' device/*/*/*
 awk -i inplace '!/vendor.lineage.health-service.default/' device/*/*/*.mk;
 
 #Don't trip rollback protection after October update
-sed -i 's/2023-09-05/2023-10-01/' device/google/redbull/device-common.mk device/google/sunfish/device-common.mk device/google/gs201/device.mk device/google/gs101/device.mk;
+sed -i 's/2023-09-05/2023-10-01/' device/google/redbull/device-common.mk device/google/sunfish/device-common.mk device/google/gs201/device.mk device/google/gs101/device.mk || true;
 
 #
 #END OF DEVICE CHANGES
