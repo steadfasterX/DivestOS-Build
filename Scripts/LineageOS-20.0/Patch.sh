@@ -499,7 +499,7 @@ fi;
 if enterAndClear "device/google/gs201"; then
 if [ "$DOS_DEBLOBBER_REMOVE_CNE" = true ]; then sed -i '/google iwlan/,+8d' device.mk; fi; #fix stray
 if [ "$DOS_DEBLOBBER_REMOVE_EUICC" = true ]; then sed -i '/eSIM MEP/,+4d' device.mk; fi; #fix stray
-awk -i inplace '!/PRODUCT_PACKAGES/' widevine/device.mk;
+if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" != "false" ]; then awk -i inplace '!/PRODUCT_PACKAGES/' widevine/device.mk;fi
 fi;
 
 if enterAndClear "device/google/redbull"; then

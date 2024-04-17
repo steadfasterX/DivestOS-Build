@@ -102,9 +102,11 @@ echo "Deblobbing...";
 	fi;
 
 	#Clearkey (DRM) [Google]
-	blobs=$blobs"|libdrmclearkeyplugin.so";
-	makes=$makes"|android.hardware.drm.*clearkey.*|libdrmclearkeyplugin";
-	manifests=$manifests"|clearkey";
+	if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" != "false" ]; then
+	    blobs=$blobs"|libdrmclearkeyplugin.so";
+	    makes=$makes"|android.hardware.drm.*clearkey.*|libdrmclearkeyplugin";
+	    manifests=$manifests"|clearkey";
+	fi
 
 	#CMN (?) [?]
 	#blobs=$blobs"|cmnlib.*";
@@ -935,8 +937,10 @@ else
 echo "Skipping manifest deblobbing";
 fi;
 deblobVendors; #Deblob entire vendor directory
-rm -rf frameworks/av/drm/mediadrm/plugins/clearkey; #Remove ClearKey
-#rm -rf frameworks/av/drm/mediacas/plugins/clearkey; #XXX: breaks protobuf inclusion
+if [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" != "false" ]; then
+    rm -rf frameworks/av/drm/mediadrm/plugins/clearkey; #Remove ClearKey
+    #rm -rf frameworks/av/drm/mediacas/plugins/clearkey; #XXX: breaks protobuf inclusion
+fi
 [[ -d vendor/samsung/nodevice ]] && rm -rf vendor/samsung/nodevice;
 
 #Remove proprietary libraries
