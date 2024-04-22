@@ -16,12 +16,12 @@ Signed-off-by: Tad <tad@spotco.us>
  create mode 100644 src/com/android/settings/security/OpenEuiccPreferenceController.java
 
 diff --git a/res/values/strings.xml b/res/values/strings.xml
-index ce056d7ab0..751f4a4037 100644
+index 6e619cc2c4a..2226e964297 100644
 --- a/res/values/strings.xml
 +++ b/res/values/strings.xml
-@@ -759,6 +759,9 @@
-     <string name="sig_spoof_title">Unprivileged microG enablement</string>
-     <string name="sig_spoof_summary">Allows official builds of microG apps to function. Not supported, not recommended. May break apps and/or degrade their security model. Notes: 1) microG connects directly to Google, 2) apps talking to microG do so using proprietary Google libraries, 3) microG can download/execute proprietary code from Google.</string>
+@@ -756,6 +756,9 @@
+     <string name="hosts_disable_title">Disable DNS content blocker</string>
+     <string name="hosts_disable_summary">Disables use of the included /etc/hosts database for data collection and malware blocking.</string>
  
 +    <string name="openeuicc_title">Enable eUICC management</string>
 +    <string name="openeuicc_summary">Enables the OpenEUICC app to allow management of virtual (eSIM) and physical eUICC cards. Reboot required after toggling.</string>
@@ -30,12 +30,12 @@ index ce056d7ab0..751f4a4037 100644
      <string name="trust_lost_locks_screen_title">Lock screen when trust is lost</string>
      <!-- Text shown for the description of the lock when trust lost option [CHAR LIMIT=NONE -->
 diff --git a/res/xml/security_dashboard_settings.xml b/res/xml/security_dashboard_settings.xml
-index 604e8720e6..de90cec5bc 100644
+index db158b72433..738394cdd7a 100644
 --- a/res/xml/security_dashboard_settings.xml
 +++ b/res/xml/security_dashboard_settings.xml
-@@ -92,6 +92,12 @@
-             android:title="@string/sig_spoof_title"
-             android:summary="@string/sig_spoof_summary"
+@@ -86,6 +86,12 @@
+             android:title="@string/hosts_disable_title"
+             android:summary="@string/hosts_disable_summary"
              android:persistent="false" />
 +
 +        <SwitchPreference
@@ -48,7 +48,7 @@ index 604e8720e6..de90cec5bc 100644
      <Preference
 diff --git a/src/com/android/settings/security/OpenEuiccPreferenceController.java b/src/com/android/settings/security/OpenEuiccPreferenceController.java
 new file mode 100644
-index 0000000000..9ecfa96bfd
+index 00000000000..9ecfa96bfd5
 --- /dev/null
 +++ b/src/com/android/settings/security/OpenEuiccPreferenceController.java
 @@ -0,0 +1,106 @@
@@ -159,13 +159,13 @@ index 0000000000..9ecfa96bfd
 +    }
 +}
 diff --git a/src/com/android/settings/security/SecuritySettings.java b/src/com/android/settings/security/SecuritySettings.java
-index 0076663587..ef92897f88 100644
+index 643de279a49..77fa67855b8 100644
 --- a/src/com/android/settings/security/SecuritySettings.java
 +++ b/src/com/android/settings/security/SecuritySettings.java
-@@ -110,6 +110,7 @@ public class SecuritySettings extends DashboardFragment {
+@@ -109,6 +109,7 @@ public class SecuritySettings extends DashboardFragment {
+         securityPreferenceControllers.add(new ExecSpawnPreferenceController(context));
          securityPreferenceControllers.add(new NativeDebugPreferenceController(context));
          securityPreferenceControllers.add(new HostsPreferenceController(context));
-         securityPreferenceControllers.add(new SigSpoofPreferenceController(context));
 +        securityPreferenceControllers.add(new OpenEuiccPreferenceController(context));
          controllers.add(new PreferenceCategoryController(context, SECURITY_CATEGORY)
                  .setChildren(securityPreferenceControllers));
