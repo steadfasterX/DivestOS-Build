@@ -1,6 +1,6 @@
 #!/bin/bash
-#DivestOS: A privacy focused mobile distribution
-#Copyright (c) 2015-2022 Divested Computing Group
+#DivestOS: A mobile operating system divested from the norm.
+#Copyright (c) 2015-2024 Divested Computing Group
 #
 #This program is free software: you can redistribute it and/or modify
 #it under the terms of the GNU General Public License as published by
@@ -577,6 +577,7 @@ enableAutoVarInit || true;
 changeDefaultDNS; #Change the default DNS servers
 fixupCarrierConfigs || true; #Remove silly carrier restrictions
 removeUntrustedCerts || true;
+sed -i 's/SSLv23_NO_TLSv1_2/TLSv1_2/' device/*/*/gps*xml* device/*/*/location/gps*xml* device/*/*/gnss/*/config/gps*xml*; #Enforce TLSv1.2 for SUPL on Tensor devices (GrapheneOS)
 cd "$DOS_BUILD_BASE";
 #rm -rfv device/*/*/overlay/CarrierConfigResCommon device/*/*/rro_overlays/CarrierConfigOverlay device/*/*/overlay/packages/apps/CarrierConfig/res/xml/vendor.xml;
 
