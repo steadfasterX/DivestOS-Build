@@ -18,12 +18,12 @@
 umask 0022;
 set -uo pipefail;
 
-export copyPartsZip="/mnt/backup-1/DivestOS/Builds/Extras/copy-partitions-20210323_1922-cleaned.zip"; #XXX: ADJUST ME
+export copyPartsZip="/mnt/Storage-1/DivestOS/Builds/Extras/copy-partitions-20210323_1922-cleaned.zip"; #XXX: ADJUST ME
 
-export repoDir="/mnt/backup-1/DivestOS/Builds/Supporting_Files/";
+export repoDir="/mnt/Storage-1/DivestOS/Builds/Supporting_Files/";
 mkdir -p $repoDir;
 
-devicesCopy=(akari akatsuki alioth Amber aura aurora avicii barbet bluejay blueline bonito bramble cheetah cheryl coral crosshatch davinci discovery enchilada fajita flame FP3 FP4 guacamole guacamoleb hotdog hotdogb instantnoodle instantnoodlep kebab kirin lemonade lemonadep lemonades marlin mata mermaid oriole panther pioneer pro1 pro1x raven redfin sailfish sargo sunfish taimen voyager walleye xz2c);
+devicesCopy=(akari akatsuki alioth Amber aura aurora avicii barbet bluejay blueline bonito bramble cheetah cheryl coral crosshatch davinci discovery enchilada fajita felix flame FP3 FP4 guacamole guacamoleb hotdog hotdogb instantnoodle instantnoodlep kebab kirin lemonade lemonadep lemonades lynx marlin mata mermaid oriole panther pioneer pro1 pro1x raven redfin sailfish sargo sunfish taimen tangorpro voyager walleye xz2c);
 
 for device in "${devicesCopy[@]}"
 do
@@ -36,7 +36,7 @@ do
 	fi;
 done;
 
-devicesAVB=(akari akatsuki alioth Amber apollon aura aurora avicii barbet beryllium bluejay blueline bonito bramble cheetah coral crosshatch davinci dipper enchilada equuleus fajita flame FP3 FP4 guacamole guacamoleb hotdog hotdogb instantnoodle instantnoodlep jasmine_sprout kebab lavender lemonade lemonadep lemonades lmi oriole panther platina polaris pro1 pro1x raphael raven redfin sargo sunfish taimen twolip ursa vayu walleye wayne whyred xz2c);
+devicesAVB=(akari akatsuki alioth Amber apollon aura aurora avicii barbet beryllium bluejay blueline bonito bramble cheetah coral crosshatch davinci dipper enchilada equuleus fajita felix flame FP3 FP4 guacamole guacamoleb hotdog hotdogb instantnoodle instantnoodlep jasmine_sprout kebab lavender lemonade lemonadep lemonades lmi lynx oriole panther platina polaris pro1 pro1x raphael raven redfin sargo sunfish taimen tangorpro twolip ursa vayu walleye wayne whyred xz2c);
 
 for device in "${devicesAVB[@]}"
 do

@@ -13,7 +13,7 @@ Signed-off-by: Tad <tad@spotco.us>
  1 file changed, 35 insertions(+), 10 deletions(-)
 
 diff --git a/services/core/java/com/android/server/location/gnss/GnssPsdsDownloader.java b/services/core/java/com/android/server/location/gnss/GnssPsdsDownloader.java
-index 243910dd9541..07f0f8a6a4af 100644
+index 243910dd9541..f90c5b04abca 100644
 --- a/services/core/java/com/android/server/location/gnss/GnssPsdsDownloader.java
 +++ b/services/core/java/com/android/server/location/gnss/GnssPsdsDownloader.java
 @@ -18,6 +18,7 @@ package com.android.server.location.gnss;
@@ -41,7 +41,7 @@ index 243910dd9541..07f0f8a6a4af 100644
      private int mNextServerIndex;
  
 +    private static boolean shouldUseBroadcomServer() {
-+        boolean supportedDevice = Build.DEVICE.equals("cheetah") || Build.DEVICE.equals("panther") || Build.DEVICE.equals("raven") || Build.DEVICE.equals("oriole") || Build.DEVICE.equals("bluejay");
++        boolean supportedDevice = Build.DEVICE.equals("cheetah") || Build.DEVICE.equals("panther") || Build.DEVICE.equals("raven") || Build.DEVICE.equals("oriole") || Build.DEVICE.equals("bluejay") || Build.DEVICE.equals("lynx") || Build.DEVICE.equals("tangorpro") || Build.DEVICE.equals("felix");
 +        return supportedDevice;
 +    }
 +
