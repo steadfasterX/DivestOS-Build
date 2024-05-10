@@ -2,6 +2,8 @@ name: "Sync"
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron:  '6 6 * * *'  # run once per day at midnight
 
 # Sets permissions of the GITHUB_TOKEN to allow pushing via github token
 permissions:
@@ -16,5 +18,5 @@ jobs:
         remote-branch: master
         local-repo: ${{ github.repository_owner }}/${{ github.event.repository.name }}
         local-branch: axp
-        dryrun: true
+        dryrun: false
     secrets: inherit
