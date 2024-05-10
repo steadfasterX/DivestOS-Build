@@ -16,4 +16,5 @@ jobs:
         remote-branch: master
         local-repo: ${{ github.repository_owner }}/${{ github.event.repository.name }}
         local-branch: axp
+        dryrun: true
     secrets: inherit
