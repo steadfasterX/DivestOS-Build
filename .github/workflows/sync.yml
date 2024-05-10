@@ -1,14 +1,22 @@
+name: "Sync"
+
 on:
   workflow_dispatch:
+  schedule:
+    - cron:  '6 6 * * *'  # run once per day at midnight
+
+# Sets permissions of the GITHUB_TOKEN to allow pushing via github token
+permissions:
+  contents: write # allow git push
 
 jobs:
   call-org-workflow:
+    name: "Calling AXP workflow"
     uses: AXP-OS/.github/.github/workflows/sync_upstream.yml@main
     with:
-      remote-domain: github.com
-      remote-repo: Divested-Mobile/DivestOS-Build
-      remote-branch: master
-      local-domain: github.com
-      local-repo: ${{ github.event.repository.name }}
-      local-branch: axp
+        remote-repo: Divested-Mobile/DivestOS-Build
+        remote-branch: master
+        local-repo: ${{ github.repository_owner }}/${{ github.event.repository.name }}
+        local-branch: axp
+        dryrun: false
     secrets: inherit
