@@ -7,12 +7,13 @@ permissions:
 
 jobs:
   call-org-workflow:
+    name: "Calling AXP workflow"
     uses: AXP-OS/.github/.github/workflows/sync_upstream.yml@main
     with:
-      remote-domain: github.com
-      remote-repo: Divested-Mobile/DivestOS-Build
-      remote-branch: master
-      local-domain: github.com
-      local-repo: ${{ github.event.repository.name }}
-      local-branch: axp
+        remote-domain: github.com
+        remote-repo: Divested-Mobile/DivestOS-Build
+        remote-branch: master
+        local-domain: github.com
+        local-repo: ${{ github.event.repository.name }}
+        local-branch: axp
     secrets: inherit
