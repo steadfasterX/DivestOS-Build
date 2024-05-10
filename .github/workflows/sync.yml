@@ -1,6 +1,10 @@
 on:
   workflow_dispatch:
 
+# Sets permissions of the GITHUB_TOKEN to allow pushing via github token
+permissions:
+  contents: write # allow git push
+
 jobs:
   call-org-workflow:
     uses: AXP-OS/.github/.github/workflows/sync_upstream.yml@main
