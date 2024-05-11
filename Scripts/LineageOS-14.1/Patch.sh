@@ -130,11 +130,11 @@ fi;
 #sed -i -e '76,78d;' Android.bp; #fix compile under A10
 #awk -i inplace '!/ramdisk_available/' Android.bp; #fix compile under A10
 #git revert --no-edit 8974af86d12f7e29b54b5090133ab3d7eea0e519; #fix compile under A10
-#git revert --no-edit a28da3c65aed0528036da9ebd33e0c05b2c5884a; #fix compile under A8
+#git revert --no-edit a28da3c65aed0528036da9ebd33e0c05b2c5884a; #fix compile under A9
 #mv include/h_malloc.h  . ; #fix compile under A10
 #awk -i inplace '!/recovery_available/' Android.bp; #fix compile under A9
 #awk -i inplace '!/system_shared_libs/' Android.bp; #fix compile under A9
-#sed -i 's/c17/c11/' Android.bp; #fix compile under A8
+#sed -i 's/c17/c11/' Android.bp; #fix compile under A9
 #sed -i 's/struct mallinfo info = {0};/struct mallinfo info = {};/' h_malloc.c; #fix compile under A8
 #fi;
 #fi;
@@ -172,7 +172,7 @@ fi;
 
 if enterAndClear "external/sonivox"; then
 applyPatch "$DOS_PATCHES/android_external_sonivox/317038.patch"; #n-asb-2021-10 Fix global buffer overflow in WT_InterpolateNoLoop
-applyPatch "$DOS_PATCHES/android_external_sonivox/391896.patch"; #n-asb-2024-05 Fix buffer overrun in eas_wtengine
+applyPatch "$DOS_PATCHES_COMMON/android_external_sonivox/391896.patch"; #n-asb-2024-05 Fix buffer overrun in eas_wtengine
 fi;
 
 if enterAndClear "external/sqlite"; then

@@ -78,7 +78,7 @@ applyPatch "$DOS_PATCHES/android_build/0002-Enable_fwrapv.patch"; #Use -fwrapv a
 applyPatch "$DOS_PATCHES/android_build/0003-verity-openssl3.patch"; #Fix VB 1.0 failure due to openssl output format change
 sed -i '57i$(my_res_package): PRIVATE_AAPT_FLAGS += --auto-add-overlay' core/aapt2.mk; #Enable auto-add-overlay for packages, this allows the vendor overlay to easily work across all branches.
 awk -i inplace '!/Email/' target/product/core.mk; #Remove Email
-sed -i 's/2021-10-05/2024-04-05/' core/version_defaults.mk; #Bump Security String #XXX
+sed -i 's/2021-10-05/2024-05-05/' core/version_defaults.mk; #Bump Security String #XXX
 fi;
 
 if enterAndClear "build/soong"; then
@@ -135,11 +135,11 @@ rm -rfv androidtest; #fix compile under A11
 sed -i -e '76,78d;' Android.bp; #fix compile under A10
 awk -i inplace '!/ramdisk_available/' Android.bp; #fix compile under A10
 git revert --no-edit 8974af86d12f7e29b54b5090133ab3d7eea0e519; #fix compile under A10
-git revert --no-edit a28da3c65aed0528036da9ebd33e0c05b2c5884a; #fix compile under A8
+git revert --no-edit a28da3c65aed0528036da9ebd33e0c05b2c5884a; #fix compile under A9
 mv include/h_malloc.h  . ; #fix compile under A10
 awk -i inplace '!/recovery_available/' Android.bp; #fix compile under A9
 awk -i inplace '!/system_shared_libs/' Android.bp; #fix compile under A9
-sed -i 's/c17/c11/' Android.bp; #fix compile under A8
+sed -i 's/c17/c11/' Android.bp; #fix compile under A9
 sed -i 's/struct mallinfo info = {0};/struct mallinfo info = {};/' h_malloc.c; #fix compile under A8
 fi;
 fi;
@@ -150,6 +150,10 @@ fi;
 
 if enterAndClear "external/libxml2"; then
 applyPatch "$DOS_PATCHES/android_external_libxml2/368053.patch"; #R_asb_2023-10 malloc-fail: Fix OOB read after xmlRegGetCounter
+fi;
+
+if enterAndClear "external/sonivox"; then
+applyPatch "$DOS_PATCHES_COMMON/android_external_sonivox/391896.patch"; #n-asb-2024-05 Fix buffer overrun in eas_wtengine
 fi;
 
 if enterAndClear "external/svox"; then
