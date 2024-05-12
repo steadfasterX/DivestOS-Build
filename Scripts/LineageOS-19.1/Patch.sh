@@ -98,7 +98,7 @@ sed -i '75i$(my_res_package): PRIVATE_AAPT_FLAGS += --auto-add-overlay' core/aap
 awk -i inplace '!/updatable_apex.mk/' target/product/generic_system.mk; #Disable APEX
 sed -i 's/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 23/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 28/' core/version_defaults.mk; #Set the minimum supported target SDK to Pie (GrapheneOS)
 #sed -i 's/PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := true/PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false/' core/product_config.mk; #broken by hardenDefconfig
-sed -i 's/2024-03-05/2024-05-05/' core/version_defaults.mk; #Bump Security String #x_asb_2024-05
+sed -i 's/2024-04-05/2024-05-05/' core/version_defaults.mk; #Bump Security String #x_asb_2024-05
 fi;
 
 if enterAndClear "build/soong"; then
@@ -132,11 +132,11 @@ sed -i '11iLOCAL_OVERRIDES_PACKAGES := Camera Camera2 LegacyCamera Snap OpenCame
 fi;
 
 if enterAndClear "external/sonivox"; then
-applyPatch "$DOS_PATCHES_COMMON/android_external_sonivox/317780080.patch"; #x-asb_2024-05 Fix buffer overrun in eas_wtengine
+applyPatch "$DOS_PATCHES_COMMON/android_external_sonivox/392224.patch"; #T_asb_2024-05 Fix buffer overrun in eas_wtengine
 fi;
 
 if enterAndClear "frameworks/base"; then
-applyPatch "$DOS_PATCHES/android_frameworks_base/293301736-19.patch"; #x-asb_2024-05 Prioritize system toasts
+applyPatch "$DOS_PATCHES/android_frameworks_base/392225.patch"; #T_asb_2024-05 Prioritize system toasts
 git revert --no-edit 83fe523914728a3674debba17a6019cb74803045; #Reverts "Allow signature spoofing for microG Companion/Services" in favor of below patch
 applyPatch "$DOS_PATCHES/android_frameworks_base/344888-backport.patch"; #fixup! fw/b: Add support for allowing/disallowing apps on cellular, vpn and wifi networks (CalyxOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0007-Always_Restict_Serial.patch"; #Always restrict access to Build.SERIAL (GrapheneOS)

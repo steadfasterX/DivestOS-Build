@@ -6,16 +6,16 @@ Subject: [PATCH] Fix security vulnerability that creates user with no
 
 Bug: 293602970
 Test: atest UserManagerTest#testAddUserAccountData_validStringValuesAreSaved_validBundleIsSaved && atest UserManagerTest#testAddUserAccountData_invalidStringValuesAreTruncated_invalidBundleIsDropped
-(cherry picked from https://googleplex-android-review.googlesource.com/q/commit:944ea959ab8464c39a8f6a4fc391fb6953e1df89)
+(cherry picked from https://googleplex-android-review.googlesource.com/q/commit:8dc6feaee7c0a5cea093b5280acaad862921cf3e)
 Merged-In: I23c971f671546ac085060add89485cfac6691ca3
 Change-Id: I23c971f671546ac085060add89485cfac6691ca3
 ---
  core/java/android/os/PersistableBundle.java   |  37 +++++++
  core/java/android/os/UserManager.java         |  23 +++-
- .../app/ConfirmUserCreationActivity.java      |  12 +++
- .../android/server/pm/UserManagerService.java |  29 ++---
- .../android/server/pm/UserManagerTest.java    | 102 ++++++++++++++++++
- 5 files changed, 187 insertions(+), 16 deletions(-)
+ .../app/ConfirmUserCreationActivity.java      |  12 ++
+ .../android/server/pm/UserManagerService.java |  29 +++--
+ .../android/server/pm/UserManagerTest.java    | 103 ++++++++++++++++++
+ 5 files changed, 188 insertions(+), 16 deletions(-)
 
 diff --git a/core/java/android/os/PersistableBundle.java b/core/java/android/os/PersistableBundle.java
 index 3e6312754359..bf584c957aa0 100644
@@ -217,10 +217,19 @@ index 318c11141cfe..645ee1a2f12e 100644
              }
              if (persist) {
 diff --git a/services/tests/servicestests/src/com/android/server/pm/UserManagerTest.java b/services/tests/servicestests/src/com/android/server/pm/UserManagerTest.java
-index e9edba58a3dd..331bbb753ebf 100644
+index e9edba58a3dd..69548f839c1e 100644
 --- a/services/tests/servicestests/src/com/android/server/pm/UserManagerTest.java
 +++ b/services/tests/servicestests/src/com/android/server/pm/UserManagerTest.java
-@@ -24,6 +24,7 @@ import android.content.IntentFilter;
+@@ -16,6 +16,8 @@
+ 
+ package com.android.server.pm;
+ 
++import static org.junit.Assert.assertTrue;
++
+ import android.app.ActivityManager;
+ import android.content.BroadcastReceiver;
+ import android.content.Context;
+@@ -24,6 +26,7 @@ import android.content.IntentFilter;
  import android.content.pm.PackageManager;
  import android.content.pm.UserInfo;
  import android.os.Bundle;
@@ -228,7 +237,7 @@ index e9edba58a3dd..331bbb753ebf 100644
  import android.os.UserHandle;
  import android.os.UserManager;
  import android.provider.Settings;
-@@ -601,6 +602,107 @@ public class UserManagerTest extends AndroidTestCase {
+@@ -601,6 +604,106 @@ public class UserManagerTest extends AndroidTestCase {
          assertEquals(canBeCreatedCount, created.get());
      }
  
@@ -331,7 +340,6 @@ index e9edba58a3dd..331bbb753ebf 100644
 +        }
 +        return resultString.toString();
 +    }
-+
 +
      private boolean isPackageInstalledForUser(String packageName, int userId) {
          try {
