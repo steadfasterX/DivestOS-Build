@@ -38,6 +38,7 @@ commentPatches() {
 #crash when unplugging headphones while using FM radio
 #	CVE-2021-Misc2/3.4/0049.patch
 
+commentPatches android_kernel_samsung_exynos7870.sh "CVE-2019-16746/3.18/0006.patch" "CVE-2020-16166/3.18/0002.patch" "0006-AndroidHardening-Kernel_Hardening/3.18/0030.patch" "CVE-2020-0427/3.18/0007.patch"
 commentPatches android_kernel_amazon_hdx-common.sh "CVE-2021-Misc2/3.4/0055.patch" "CVE-2021-Misc2/3.4/0056.patch";
 commentPatches android_kernel_asus_fugu.sh "CVE-2014-2568" "CVE-2014-8559" "CVE-2015-8746" "CVE-2017-5551" "LVT-2017-0003/3.10/0001.patch";
 commentPatches android_kernel_asus_grouper.sh "CVE-2017-15868" "CVE-2021-Misc2/3.4/0055.patch" "CVE-2021-Misc2/3.4/0056.patch";
@@ -130,7 +131,7 @@ do
 	commentPatches $script "CVE-2016-1583/3.18" "CVE-2018-17972/3.18" "CVE-2018-20169/3.18" "CVE-2019-2214/3.18" "CVE-2020-0427/3.18" "CVE-2021-21781/3.18" "CVE-2021-46939/3.18" "CVE-2022-40768/4.4" "CVE-2024-26773";
 done
 #3.18
-declare -a threeDotEighteen=("${threeDotTen[@]}" "android_kernel_samsung_universal8890.sh" "android_kernel_google_dragon.sh" "android_kernel_zte_msm8996.sh" "android_kernel_asus_msm8953.sh" "android_kernel_google_marlin.sh" "android_kernel_motorola_msm8996.sh" "android_kernel_oneplus_msm8996.sh");
+declare -a threeDotEighteen=("${threeDotTen[@]}" "android_kernel_samsung_universal8890.sh" "android_kernel_google_dragon.sh" "android_kernel_zte_msm8996.sh" "android_kernel_asus_msm8953.sh" "android_kernel_google_marlin.sh" "android_kernel_motorola_msm8996.sh" "android_kernel_oneplus_msm8996.sh" "android_kernel_samsung_exynos7870.sh");
 for script in "${threeDotEighteen[@]}"
 do
 	commentPatches $script "0008-Graphene-Kernel_Hardening-slub/4.4/0002.patch" "CVE-2018-16597/4.4" "CVE-2019-19319/4.4" "CVE-2020-0305/4.4" "CVE-2020-0429/4.4" "CVE-2020-8992/4.4" "CVE-2021-1048/4.4" "CVE-2021-3428/4.4" "CVE-2021-20265/4.4" "CVE-2022-1184/4.4/0014.patch" "CVE-2022-1184/4.9/0007.patch" "CVE-2022-40768/4.9/0007.patch" "CVE-2022-40768/4.4/0008.patch" "CVE-2022-47929/4.4" "CVE-2023-0458" "CVE-2024-26889";
