@@ -12,6 +12,8 @@
 WHAT="$1"
 WHERE="$2"
 
+which ugrep > /dev/null 2>&1|| (echo "ERROR: pls install 'ugrep' first"; exit 4)
+
 if [ ! -d "$DOS_PATCHES_LINUX_CVES" ];then
   echo "ERROR: do you have sourced init.sh??"
   echo "ensure you do this from your android source directory:"
@@ -19,7 +21,7 @@ if [ ! -d "$DOS_PATCHES_LINUX_CVES" ];then
   exit 4
 fi
 
-for p in $(rgrep -l "$WHAT" $DOS_PATCHES_LINUX_CVES | sed "s#$DOS_PATCHES_LINUX_CVES##g");do
+for p in $(ugrep -l -r "$WHAT" $DOS_PATCHES_LINUX_CVES | sed "s#$DOS_PATCHES_LINUX_CVES##g");do
     #echo "DEBUG: found declaration of >$WHAT< in patch file: $p"
-    grep "$p" $WHERE && echo FOUND $DOS_PATCHES_LINUX_CVES/$p in $WHERE
+    ugrep "$p" $WHERE && echo FOUND $DOS_PATCHES_LINUX_CVES/$p in $WHERE
 done
