@@ -91,7 +91,9 @@ export -f gitReset;
 
 applyPatchReal() {
 	currentWorkingPatch=$1;
+ 	short_patch=$(echo "$currentWorkingPatch" | sed -E 's#(\$DOS_PATCHES/+)(.*)#\2#g')
 	firstLine=$(head -n1 "$currentWorkingPatch");
+ 
 	if [[ "$firstLine" = *"Mon Sep 17 00:00:00 2001"* ]] || [[ "$firstLine" = *"Thu Jan  1 00:00:00 1970"* ]]; then
 		if git am "$@"; then
 			if [ "$DOS_REFRESH_PATCHES" = true ]; then
@@ -102,12 +104,16 @@ applyPatchReal() {
 		else
 		    echo "Applying (git am): $currentWorkingPatch - FAILED"
 		    git am --abort || true
-		    echo "Applying (patch fallback): $currentWorkingPatch"
-		    patch -r - --no-backup-if-mismatch --forward --ignore-whitespace --verbose -p1 < $currentWorkingPatch
+		    echo "Applying (am - patch fallback): $currentWorkingPatch"
+		    patch -r - --no-backup-if-mismatch --forward --ignore-whitespace --verbose -p1 < $currentWorkingPatch \
+      			&& git add -A \
+      		    	&& git commit --author="${DOS_GIT_AUTHOR} <${DOS_GIT_MAIL}>" -m "$short_patch\n\nsource: ${DOS_PATCHER_URI_ANDROID}/$short_patch"
 		fi;
 	else
-		echo "Applying (as diff): $currentWorkingPatch";
-		git apply "$@";
+		echo "Applying (no-am - patch fallback): $currentWorkingPatch"
+  		patch -r - --no-backup-if-mismatch --forward --ignore-whitespace --verbose -p1 < $currentWorkingPatch \
+    		    && git add -A \
+	  	    && git commit --author="${DOS_GIT_AUTHOR} <${DOS_GIT_MAIL}>" -m "$short_patch\n\nsource: ${DOS_PATCHER_URI_ANDROID}/$short_patch"
 	fi;
 }
 export -f applyPatchReal;
