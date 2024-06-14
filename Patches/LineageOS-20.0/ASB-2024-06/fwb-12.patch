@@ -1,27 +1,25 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From e3979baab5718a69f6d58040ba42f67b4fd73d35 Mon Sep 17 00:00:00 2001
 From: Ameer Armaly <aarmaly@google.com>
 Date: Fri, 8 Mar 2024 19:41:06 +0000
-Subject: [PATCH] AccessibilityManagerService: remove uninstalled services from
- enabled list after service update.
+Subject: [PATCH] [RESTRICT AUTOMERGE] AccessibilityManagerService: remove
+ uninstalled services from enabled list after service update.
 
 Bug: 326485767
 Test: atest AccessibilityEndToEndTest#testUpdateServiceWithoutIntent_disablesService
-(cherry picked from https://googleplex-android-review.googlesource.com/q/commit:f6192d3a77520d40b6a93de8f45400e19f5ba29f)
-Merged-In: Ia86857d58ebab925ec6e55f9e5fa64e265326ec0
-Change-Id: Ia86857d58ebab925ec6e55f9e5fa64e265326ec0
-
-Change-Id: I898044b388399bded66acb22dba55c5df26ccc9f
+(cherry picked from https://googleplex-android-review.googlesource.com/q/commit:766911c3312573196b33efd1c3c29ccece806846)
+Merged-In: I958d58953b300c8093335a22e207baac471ae9f9
+Change-Id: I958d58953b300c8093335a22e207baac471ae9f9
 ---
  .../AccessibilityManagerService.java          | 22 +++++++++++++++++++
  1 file changed, 22 insertions(+)
 
 diff --git a/services/accessibility/java/com/android/server/accessibility/AccessibilityManagerService.java b/services/accessibility/java/com/android/server/accessibility/AccessibilityManagerService.java
-index cae1adcafc23..b030dd4f6ead 100644
+index 3818a884c94a..8271aed181c9 100644
 --- a/services/accessibility/java/com/android/server/accessibility/AccessibilityManagerService.java
 +++ b/services/accessibility/java/com/android/server/accessibility/AccessibilityManagerService.java
-@@ -1302,10 +1302,13 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
-         boolean isUnlockingOrUnlocked = mContext.getSystemService(UserManager.class)
-                 .isUserUnlockingOrUnlocked(userState.mUserId);
+@@ -2161,10 +2161,13 @@ private void updateServicesLocked(AccessibilityUserState userState) {
+         boolean isUnlockingOrUnlocked = LocalServices.getService(UserManagerInternal.class)
+                     .isUserUnlockingOrUnlocked(userState.mUserId);
  
 +        // Store the list of installed services.
 +        mTempComponentNameSet.clear();
@@ -31,12 +29,12 @@ index cae1adcafc23..b030dd4f6ead 100644
                      installedService.getId());
 +            mTempComponentNameSet.add(componentName);
  
-             Service service = componentNameToServiceMap.get(componentName);
+             AccessibilityServiceConnection service = componentNameToServiceMap.get(componentName);
  
-@@ -1333,6 +1336,25 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub {
-             }
+@@ -2215,6 +2218,25 @@ this, getTraceManager(), mWindowManagerService,
+             audioManager.setAccessibilityServiceUids(mTempIntArray);
          }
- 
+         mActivityTaskManagerService.setAccessibilityServiceUids(mTempIntArray);
 +        // If any services have been removed, remove them from the enabled list and the touch
 +        // exploration granted list.
 +        boolean anyServiceRemoved =
@@ -56,6 +54,6 @@ index cae1adcafc23..b030dd4f6ead 100644
 +                    userState.mUserId);
 +        }
 +        mTempComponentNameSet.clear();
-         updateAccessibilityEnabledSetting(userState);
+         updateAccessibilityEnabledSettingLocked(userState);
      }
  
