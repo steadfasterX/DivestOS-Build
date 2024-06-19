@@ -38,7 +38,7 @@ commentPatches() {
 #crash when unplugging headphones while using FM radio
 #	CVE-2021-Misc2/3.4/0049.patch
 
-commentPatches android_kernel_samsung_exynos7870.sh "CVE-2019-16746/3.18/0006.patch" "CVE-2020-16166/3.18/0002.patch" "0006-AndroidHardening-Kernel_Hardening/3.18/0030.patch" "CVE-2020-0427/3.18/0007.patch"
+commentPatches android_kernel_samsung_exynos7870.sh "CVE-2019-16746/3.18/0006.patch" "CVE-2020-16166/3.18/0002.patch" "0006-AndroidHardening-Kernel_Hardening/3.18/0030.patch" "CVE-2020-0427/3.18/0007.patch" "CVE-2021-47277/3.18/0001.patch"
 commentPatches android_kernel_amazon_hdx-common.sh "CVE-2021-Misc2/3.4/0055.patch" "CVE-2021-Misc2/3.4/0056.patch";
 commentPatches android_kernel_asus_fugu.sh "CVE-2014-2568" "CVE-2014-8559" "CVE-2015-8746" "CVE-2017-5551" "LVT-2017-0003/3.10/0001.patch";
 commentPatches android_kernel_asus_grouper.sh "CVE-2017-15868" "CVE-2021-Misc2/3.4/0055.patch" "CVE-2021-Misc2/3.4/0056.patch";
