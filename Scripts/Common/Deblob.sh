@@ -715,7 +715,7 @@ deblobDevice() {
 	sed -i 's/wfd.enable=1/wfd.enable=0/' *.prop *.mk &>/dev/null || true; #Disable Wi-Fi display
 	sed -i '/vendor.camera.extensions/d' *.prop *.mk &>/dev/null || true; #Disable camera extensions
 	if [ -f system.prop ] && [ "$DOS_DEBLOBBER_REMOVE_WIDEVINE_DRM" != "false" ]; then
-			if ! grep -q "drm.service.enabled=false" system.prop; then echo "drm.service.enabled=false" >> system.prop; fi;
+		if ! grep -q "drm.service.enabled=false" system.prop; then echo -e "\ndrm.service.enabled=false\n" >> system.prop; fi; #Disable DRM server
 	fi
 	if [ "$DOS_DEBLOBBER_REMOVE_IMS" = true ]; then
 		sed -i 's/ims.volte=true/ims.volte=false/' *.prop *.mk &>/dev/null || true;
