@@ -129,11 +129,16 @@ applyPatch() {
 				echo "Already applied: $currentWorkingPatch";
 			else
 				if git apply --check "$@" --3way &> /dev/null; then
+    					echo "Applying (as 3way): $currentWorkingPatch";
 					applyPatchReal "$@" --3way;
-					echo "Applied (as 3way): $currentWorkingPatch";
 				else
+	 				echo "Applying (last resort): $currentWorkingPatch"
+    					applyPatchReal "$@"
+	 			fi
+     				if [ $? -ne 0 ];then
 					echo -e "\e[0;31mERROR: Cannot apply: $currentWorkingPatch\e[0m";
 					false
+     				fi
 				fi;
 			fi;
 		fi;
