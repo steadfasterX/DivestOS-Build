@@ -139,7 +139,6 @@ applyPatch() {
 					echo -e "\e[0;31mERROR: Cannot apply: $currentWorkingPatch\e[0m";
 					false
      				fi
-				fi;
 			fi;
 		fi;
 	else
