@@ -160,13 +160,13 @@ index 00000000000..a3e5aa17591
 +    }
 +}
 diff --git a/src/com/android/settings/security/SecuritySettings.java b/src/com/android/settings/security/SecuritySettings.java
-index 5248d74c376..fcf244e720b 100644
+index 0fbcd27104..1868638788 100644
 --- a/src/com/android/settings/security/SecuritySettings.java
 +++ b/src/com/android/settings/security/SecuritySettings.java
-@@ -123,6 +123,7 @@ public class SecuritySettings extends DashboardFragment {
+@@ -122,6 +122,7 @@ public class SecuritySettings extends DashboardFragment {
+         securityPreferenceControllers.add(new ExecSpawnPreferenceController(context));
          securityPreferenceControllers.add(new NativeDebugPreferenceController(context));
          securityPreferenceControllers.add(new HostsPreferenceController(context));
-         securityPreferenceControllers.add(new SigSpoofPreferenceController(context));
 +        securityPreferenceControllers.add(new CarrierConfig2PreferenceController(context));
          controllers.add(new PreferenceCategoryController(context, SECURITY_CATEGORY)
                  .setChildren(securityPreferenceControllers));
