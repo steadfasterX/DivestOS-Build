@@ -290,5 +290,15 @@ sed -i 's/^\treturn VERITY_STATE_DISABLE;//' kernel/*/*/drivers/md/dm-android-ve
 [[ -d device/moto/shamu ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/moto/shamu/system.prop &>/dev/null || true;
 [[ -d device/moto/shamu ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/moto/shamu/vendor.prop &>/dev/null || true;
 
+########## AXP.OS-only devices
+# LG G4
+enableVerity "device/lge/g4-common"
+[[ -d kernel/lge/msm8992 ]] && sed -i 's/wait/wait,verify/g' kernel/lge/msm8992/arch/arm64/boot/dts/lge/msm8992-lge.dtsi &>/dev/null #/system
+[[ -d device/lge/g4-common ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/lge/g4-common/system_prop.mk &>/dev/null || true
+# Samsung J5 2017
+enableVerity "device/samsung/exynos7870-common"
+[[ -d kernel/samsung/exynos7870 ]] && sed -i 's/wait/wait,verify/g' kernel/samsung/exynos7870/arch/arm64/boot/dts/exynos7870-j5y17lte_common.dtsi &>/dev/null #/system
+[[ -d device/samsung/exynos7870-common ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/samsung/exynos7870-common/vendor_prop.mk &>/dev/null || true
+
 cd "$DOS_BUILD_BASE";
 echo -e "\e[0;32m[SCRIPT COMPLETE] Verity enablement complete\e[0m";
