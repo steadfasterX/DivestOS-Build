@@ -111,6 +111,13 @@ if enterAndClear "external/conscrypt"; then
 applyPatch "$DOS_PATCHES/android_external_conscrypt/0001-constify_JNINativeMethod.patch"; #Constify JNINativeMethod tables (GrapheneOS)
 fi;
 
+if enterAndClear "external/expat"; then
+applyPatch "$DOS_PATCHES/android_external_expat/0001-lib-Reject-negative-len-for-XML_ParseBuffer.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0002-lib-Detect-integer-overflow-in-dtdCopy.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0003-lib-Detect-integer-overflow-in-function-nextScaffold.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0004-lib-Stop-leaking-opening-tag-bindings-after-closing-.patch";
+fi;
+
 if enterAndClear "external/hardened_malloc"; then
 applyPatch "$DOS_PATCHES_COMMON/android_external_hardened_malloc/0001-Broken_Cameras-1.patch"; #Workarounds for Pixel 3 SoC era camera driver bugs (GrapheneOS)
 applyPatch "$DOS_PATCHES_COMMON/android_external_hardened_malloc/0001-Broken_Cameras-2.patch"; #Expand workaround to all camera executables (DivestOS)
@@ -449,6 +456,7 @@ if [ "$DOS_DEBLOBBER_REMOVE_AUDIOFX" = true ]; then sed -i '/TARGET_EXCLUDES_AUD
 sed -i 's/LINEAGE_BUILDTYPE := UNOFFICIAL/LINEAGE_BUILDTYPE := dos/' config/*.mk; #Change buildtype
 echo 'include vendor/divested/divestos.mk' >> config/common.mk; #Include our customizations
 cp -f "$DOS_PATCHES_COMMON/apns-conf.xml" prebuilt/common/etc/apns-conf.xml; #Update APN list
+cp -f "$DOS_PATCHES_COMMON/sensitive_pn.xml" prebuilt/common/etc/sensitive_pn.xml; #Update helplines
 awk -i inplace '!/Eleven/' config/common_mobile.mk; #Remove Music Player
 cp -f "$DOS_PATCHES_COMMON/config_webview_packages.xml" overlay/common/frameworks/base/core/res/res/xml/config_webview_packages.xml; #Change allowed WebView providers
 awk -i inplace '!/com.android.vending/' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml; #Remove unwanted apps
