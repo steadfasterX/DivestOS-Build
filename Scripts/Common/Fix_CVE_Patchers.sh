@@ -140,7 +140,7 @@ done
 declare -a threeDotEighteen=("${threeDotTen[@]}" "android_kernel_samsung_universal8890.sh" "android_kernel_google_dragon.sh" "android_kernel_zte_msm8996.sh" "android_kernel_asus_msm8953.sh" "android_kernel_google_marlin.sh" "android_kernel_motorola_msm8996.sh" "android_kernel_oneplus_msm8996.sh" "android_kernel_samsung_exynos7870.sh");
 for script in "${threeDotEighteen[@]}"
 do
-	commentPatches $script "0008-Graphene-Kernel_Hardening-slub/4.4/0002.patch" "CVE-2016-20022/3.18" "CVE-2018-16597/4.4" "CVE-2019-19319/4.4" "CVE-2020-0305/4.4" "CVE-2020-0429/4.4" "CVE-2020-8992/4.4" "CVE-2021-1048/4.4" "CVE-2021-3428/4.4" "CVE-2021-20265/4.4" "CVE-2021-47277" "CVE-2021-47320" "CVE-2022-1184/4.4/0014.patch" "CVE-2022-1184/4.9/0007.patch" "CVE-2022-40768/4.9/0007.patch" "CVE-2022-40768/4.4/0008.patch" "CVE-2022-47929/4.4" "CVE-2023-0458" "CVE-2023-52435" "CVE-2024-26889" "CVE-2024-35954/^6.9" "CVE-2021-47495/4.4" "CVE-2024-44944";
+	commentPatches $script "0008-Graphene-Kernel_Hardening-slub/4.4/0002.patch" "CVE-2016-20022/3.18" "CVE-2018-16597/4.4" "CVE-2019-19319/4.4" "CVE-2020-0305/4.4" "CVE-2020-0429/4.4" "CVE-2020-8992/4.4" "CVE-2021-1048/4.4" "CVE-2021-3428/4.4" "CVE-2021-20265/4.4" "CVE-2021-47277" "CVE-2021-47320" "CVE-2022-1184/4.4/0014.patch" "CVE-2022-1184/4.9/0007.patch" "CVE-2022-40768/4.9/0007.patch" "CVE-2022-40768/4.4/0008.patch" "CVE-2022-47929/4.4" "CVE-2023-0458" "CVE-2023-52435" "CVE-2024-26889" "CVE-2024-35954/^6.9" "CVE-2021-47495/4.4" "CVE-2024-44944" "CVE-2024-42265";
 	#TODO: missing USB_SPEED_SUPER_PLUS
 	#sed -i 's|CVE-2016-20022/3.18|CVE-2016-20022/3.10|' $script;
 done
@@ -160,7 +160,7 @@ do
 done
 
 #4.14
-declare -a fourDotFourteen=("${fourDotNine[@]}" "android_kernel_google_msm-4.14.sh" "android_kernel_xiaomi_sm6150.sh" "android_kernel_oneplus_sm8150.sh" "android_kernel_xiaomi_sm8150.sh"  "android_kernel_xiaomi_vayu.sh");
+declare -a fourDotFourteen=("${fourDotNine[@]}" "android_kernel_google_msm-4.14.sh" "android_kernel_xiaomi_sm6150.sh" "android_kernel_oneplus_sm8150.sh" "android_kernel_xiaomi_sm8150.sh" "android_kernel_xiaomi_vayu.sh");
 for script in "${fourDotFourteen[@]}"
 do
 	commentPatches $script "CVE-2019-19252/4.19" "CVE-2021-46921/4.19" "CVE-2023-51043/4.19" "CVE-2024-38618" "CVE-2023-52486/^6.7" "CVE-2024-35910" "CVE-2024-0607/4.14/0008.patch"

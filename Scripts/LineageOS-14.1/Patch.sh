@@ -108,8 +108,13 @@ applyPatch "$DOS_PATCHES/android_external_expat/337987-backport.patch"; #n-asb-2
 applyPatch "$DOS_PATCHES/android_external_expat/337988-backport.patch"; #n-asb-2022-09 Prevent integer overflow in function doProlog
 applyPatch "$DOS_PATCHES/android_external_expat/337989-backport.patch"; #n-asb-2022-09 Prevent more integer overflows
 applyPatch "$DOS_PATCHES/android_external_expat/348649.patch"; #n-asb-2023-02 Fix overeager DTD destruction (fixes #649)
-applyPatch "$DOS_PATCHES/android_external_expat/0001-lib-Detect-integer-overflow-in-dtdCopy.patch.patch";
-applyPatch "$DOS_PATCHES/android_external_expat/0002-lib-Detect-integer-overflow-in-function-nextScaffold.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0001-Validate-parser-parameter-to-XML_UseForeignDTD.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0002-expat.h-Fix-version-hint-on-XML_ERROR_INVALID_ARGUME.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0003-Validate-parser-parameter-for-XML_ParseBuffer.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0004-lib-Reject-negative-len-for-XML_ParseBuffer.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0005-lib-Detect-integer-overflow-in-dtdCopy.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0006-lib-Detect-integer-overflow-in-function-nextScaffold.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0007-lib-Stop-leaking-opening-tag-bindings-after-closing-.patch";
 fi;
 
 if enterAndClear "external/freetype"; then
@@ -292,7 +297,7 @@ applyPatch "$DOS_PATCHES/android_frameworks_base/393648.patch"; #n-asb-2024-06 C
 applyPatch "$DOS_PATCHES/android_frameworks_base/393649.patch"; #n-asb-2024-06 AccessibilityManagerService: remove uninstalled services from enabled list after service update.
 applyPatch "$DOS_PATCHES/android_frameworks_base/396611.patch"; #n-asb-2024-07 Verify UID of incoming Zygote connections.
 applyPatch "$DOS_PATCHES/android_frameworks_base/399269.patch"; #n-asb-2024-08 Restrict USB poups while setup is in progress
-applyPatch "$DOS_PATCHES/android_frameworks_base/400926.patch"; #n-asb-2024-09  Sanitized uri scheme by removing scheme delimiter
+applyPatch "$DOS_PATCHES/android_frameworks_base/400926.patch"; #n-asb-2024-09 Sanitized uri scheme by removing scheme delimiter
 git revert --no-edit 0326bb5e41219cf502727c3aa44ebf2daa19a5b3; #Re-enable doze on devices without gms
 applyPatch "$DOS_PATCHES/android_frameworks_base/248599.patch"; #Make SET_TIME_ZONE permission match SET_TIME (AOSP)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0001-Reduced_Resolution.patch"; #Allow reducing resolution to save power TODO: Add 800x480 (DivestOS)
