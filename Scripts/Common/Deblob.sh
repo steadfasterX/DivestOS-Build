@@ -122,7 +122,7 @@ echo "Deblobbing...";
 		manifests=$manifests"|com.quicinc.cne|iwlan";
 		blobs=$blobs"|QualifiedNetworksService.apk"; #Google
 		blobs=$blobs"|qualifiednetworksservice.xml";
-		makes=$makes"|Iwlan|CNEService|CneApp|IWlanService";
+		makes=$makes"|Iwlan|CNEService|CneApp|IWlanService|IwlanTestApp";
 	fi;
 
 	#CPPF (DRM) [?]
