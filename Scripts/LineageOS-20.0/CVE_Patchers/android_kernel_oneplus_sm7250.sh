@@ -51,6 +51,8 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-19068/4.19/0003.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-19602/^5.4/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-20908/^5.2/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2020-11146/ANY/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2020-11149/camera-kernel/0004.patch --directory=techpack/camera
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2020-11150/camera-kernel/0003.patch --directory=techpack/camera
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2020-15780/^5.8/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2020-16119/^5.10/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2020-16119/^5.10/0002.patch
@@ -67,6 +69,7 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-33630/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-33655/4.19/0005.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-33655/4.19/0006.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-35085/qca-wifi-host-cmn/0001.patch --directory=drivers/staging/qca-wifi-host-cmn
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-35118/camera-kernel/0004.patch --directory=techpack/camera
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-39633/4.19/0003.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-46912/^5.12/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2021-46958/^5.12/0001.patch
@@ -121,6 +124,7 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-23000/^5.16/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-25775/4.19/0004.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-28553/qca-wifi-host-cmn/0001.patch --directory=drivers/staging/qca-wifi-host-cmn
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-31083/4.19/0003.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-43545/qcacld-3.0/0001.patch --directory=drivers/staging/qcacld-3.0
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-46838/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-47233/4.19/0003.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-51780/4.19/0003.patch
@@ -182,6 +186,7 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-1086/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-21459/qca-wifi-host-cmn/0001.patch --directory=drivers/staging/qca-wifi-host-cmn
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-22099/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-23368/ANY/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-23378/audio-kernel/0001.patch --directory=techpack/audio
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-23848/4.19/0005.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-23848/4.19/0006.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-23849/4.19/0002.patch
@@ -310,7 +315,7 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-27436/4.19/0003.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-31076/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-33014/qca-wifi-host-cmn/0001.patch --directory=drivers/staging/qca-wifi-host-cmn
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-33015/4.19/0003.patch
-git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-33060/4.19/0005.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-33060/4.19/0007.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-34027/^6.9/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-35789/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-35806/4.19/0002.patch
@@ -502,6 +507,7 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-42310/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-42311/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-42313/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-42315/^6.10/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-43047-upstream/4.19/0005.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-43830/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-43835/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-43839/4.19/0002.patch
@@ -568,13 +574,16 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-46830/^6.11/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-46840/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-46844/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-46854/^6.11/0001.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-47659/4.19/0003.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-47669/4.19/0003.patch
+git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-47670/^6.10/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-12819/4.19/0007.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2023-52601/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-27424/4.19/0003.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-27425/4.19/0003.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-35812/4.19/0003.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-42104/4.19/0002.patch
-editKernelLocalversion "-dos.p574"
+editKernelLocalversion "-dos.p583"
 else echo "kernel_oneplus_sm7250 is unavailable, not patching.";
 fi;
 cd "$DOS_BUILD_BASE"
