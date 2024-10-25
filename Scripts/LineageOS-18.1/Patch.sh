@@ -725,6 +725,7 @@ enableLowRam "device/lge/d801" "d801";
 enableLowRam "device/lge/d802" "d802";
 enableLowRam "device/lge/d803" "d803";
 enableLowRam "device/lge/g2-common" "g2-common";
+enableLowRam "device/lge/g4" "h815";
 enableLowRam "device/lge/hammerhead" "hammerhead";
 enableLowRam "device/lge/mako" "mako";
 enableLowRam "device/motorola/victara" "victara";
