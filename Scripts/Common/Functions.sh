@@ -708,6 +708,9 @@ hardenUserdata() {
 	if [ "$1" != "device/samsung/tuna" ] && [ "$1" != "device/amazon/hdx-common" ] && [ "$1" != "device/motorola/athene" ] && [[ "$DOS_VERSION" != "LineageOS-20.0" ]] && [[ "$DOS_VERSION" != "LineageOS-21.0" ]]; then #tuna needs first boot to init, hdx-c has broken encryption
 		sed -i 's|encryptable=/|forceencrypt=/|' *fstab* */*fstab* */*/*fstab* &>/dev/null || true;
 	fi;
+ 	if [ "$1" == "device/samsung/klte-common" ];then	# AXP.OS supports forceencrypt on klte
+  		sed -i 's|encryptable=|forceencrypt=|' *fstab* */*fstab* */*/*fstab* &>/dev/null || true;
+	fi
 	echo "Hardened /data for $1";
 	cd "$DOS_BUILD_BASE";
 }
