@@ -292,8 +292,8 @@ sed -i 's/^\treturn VERITY_STATE_DISABLE;//' kernel/*/*/drivers/md/dm-android-ve
 
 ########## AXP.OS-only devices
 # LG G4
-enableVerity "device/lge/g4-common"
-[[ -d kernel/lge/msm8992 ]] && sed -i 's/wait/wait,verify/g' kernel/lge/msm8992/arch/arm64/boot/dts/lge/msm8992-lge.dtsi &>/dev/null #/system
+#enableVerity "device/lge/g4-common"
+#[[ -d kernel/lge/msm8992 ]] && sed -i 's/wait/wait,verify/g' kernel/lge/msm8992/arch/arm64/boot/dts/lge/msm8992-lge.dtsi &>/dev/null #/system
 [[ -d device/lge/g4-common ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/lge/g4-common/system_prop.mk &>/dev/null || true
 # Samsung J5 2017
 enableVerity "device/samsung/exynos7870-common"
