@@ -16,10 +16,10 @@
 #along with this program.  If not, see <https://www.gnu.org/licenses/>.
 umask 0022;
 
-#Last verified: 2022-10-15
+#Last verified: 2024-12-05
 
 patchAllKernels() {
-	startPatcher "kernel_google_gs201_private_gs-google";
+	startPatcher "kernel_google_wahoo";
 }
 export -f patchAllKernels;
 
@@ -33,7 +33,7 @@ export -f scanWorkspaceForMalware;
 buildDevice() {
 	cd "$DOS_BUILD_BASE";
 	if [[ -d "$DOS_SIGNING_KEYS/$1" ]]; then
-		breakfast "lineage_$1-ap1a-user" && mka target-files-package otatools && processRelease $1 true $2;
+		breakfast "lineage_$1-ap2a-user" && mka target-files-package otatools && processRelease $1 true $2;
 	else
 		echo -e "\e[0;31mNo signing keys available for $1\e[0m";
 	fi;
@@ -50,10 +50,16 @@ buildAll() {
 	umask 0022;
 	cd "$DOS_BUILD_BASE";
 	if [ "$DOS_MALWARE_SCAN_ENABLED" = true ]; then scanWorkspaceForMalware; fi;
-	#Tensor
-	buildDevice bluejay avb;
+	#frontloaded for testing
+	buildDevice taimen avb;
+
+	#SD835
+	buildDevice walleye avb;
+
+	#Tensor #TODO: inline kernel building
 	buildDevice oriole avb;
 	buildDevice raven avb;
+	buildDevice bluejay avb;
 	buildDevice panther avb;
 	buildDevice cheetah avb;
 	buildDevice lynx avb;
@@ -79,7 +85,7 @@ patchWorkspaceReal() {
 	sh "$DOS_SCRIPTS/Rebrand.sh";
 	sh "$DOS_SCRIPTS_COMMON/Optimize.sh";
 	sh "$DOS_SCRIPTS_COMMON/Deblob.sh";
-	#sh "$DOS_SCRIPTS_COMMON/Patch_CVE.sh"; #TODO: 21REBASE
+	sh "$DOS_SCRIPTS_COMMON/Patch_CVE.sh";
 	sh "$DOS_SCRIPTS_COMMON/Post.sh";
 	source build/envsetup.sh;
 }

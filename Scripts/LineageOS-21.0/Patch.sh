@@ -18,7 +18,7 @@ umask 0022;
 set -euo pipefail;
 source "$DOS_SCRIPTS_COMMON/Shell.sh";
 
-#Last verified: 2024-05-20
+#Last verified: 2024-12-05
 
 #Initialize aliases
 #source ../../Scripts/init.sh
@@ -69,7 +69,7 @@ applyPatch "$DOS_PATCHES/android_bionic/0001-HM-Runtime_Control-3.patch"; #Suppo
 applyPatch "$DOS_PATCHES/android_bionic/0001-HM-Workaround-1.patch"; #Disable hardened_malloc for Pixel camera provider service (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0001-HM-Workaround-2.patch"; #Disable hardened_malloc for surfaceflinger (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0001-HM-No_GWP_ASan.patch"; #Never enable GWP-ASan (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-1.patch"; #Add a real explicit_bzero implementation (GrapheneOS) #TODO REBASE
+applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-1.patch"; #Add a real explicit_bzero implementation (GrapheneOS)
 #applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-2.patch"; #Replace brk and sbrk with stubs (GrapheneOS) #XXX: some vendor blobs use sbrk
 #applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-3.patch"; #Use blocking getrandom and avoid urandom fallback (GrapheneOS) #XXX: some kernels do not have (working) getrandom
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-4.patch"; #Fix undefined out-of-bounds accesses in sched.h (GrapheneOS)
@@ -103,7 +103,6 @@ fi;
 
 if enterAndClear "build/soong"; then
 applyPatch "$DOS_PATCHES/android_build_soong/0001-Enable_fwrapv.patch"; #Use -fwrapv at a minimum (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_build_soong/0002-hm_available.patch"; #(GrapheneOS)
 fi;
 
 if enterAndClear "external/chromium-webview"; then
@@ -112,6 +111,15 @@ fi;
 
 if enterAndClear "external/conscrypt"; then
 applyPatch "$DOS_PATCHES/android_external_conscrypt/0001-constify_JNINativeMethod.patch"; #Constify JNINativeMethod tables (GrapheneOS)
+fi;
+
+if enterAndClear "external/expat"; then
+applyPatch "$DOS_PATCHES/android_external_expat/0001-lib-Detect-integer-overflow-in-function-nextScaffold.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0002-lib-Reject-negative-len-for-XML_ParseBuffer.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0003-tests-Cover-len-0-for-both-XML_Parse-and-XML_ParseBu.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0004-doc-Document-that-XML_Parse-XML_ParseBuffer-reject-l.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0005-lib-Detect-integer-overflow-in-dtdCopy.patch";
+applyPatch "$DOS_PATCHES/android_external_expat/0006-lib-xmlparse.c-Detect-billion-laughs-attack-with-iso.patch";
 fi;
 
 if enterAndClear "external/hardened_malloc"; then
@@ -123,10 +131,9 @@ sed -i -e '76,78d;' Android.bp; #fix compile under A13
 fi;
 
 if enterAndClear "frameworks/base"; then 
-git revert --no-edit 32602dc51dc88664133eaa905bee62ed20c40c43; #Reverts "JobScheduler: Respect allow-in-power-save perm" in favor of below patch
 git revert --no-edit f9b5586a3887e70aa5580f8073611826eed2b88f; #Reverts "Remove sensitive info from SUPL requests" in favor of below patch
 git revert --no-edit 18f3b5a2615efe61636ff952b500b19d891bdc80; #Reverts "fixup! Allow signature spoofing for microG Companion/Services" in favor of below patch
-git revert --no-edit 6b793fa98a40dd6c2d6eb02988161ed123439428; #Reverts "Allow signature spoofing for microG Companion/Services" in favor of below patch
+applyPatch "$DOS_PATCHES/android_frameworks_base/revert-6b793fa9.patch"; #Reverts "Allow signature spoofing for microG Companion/Services" in favor of below patch
 applyPatch "$DOS_PATCHES/android_frameworks_base/0007-Always_Restict_Serial.patch"; #Always restrict access to Build.SERIAL (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0008-Browser_No_Location.patch"; #Don't grant location permission to system browsers (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0003-SUPL_No_IMSI.patch"; #Don't send IMSI to SUPL (MSe1969)
@@ -170,22 +177,22 @@ applyPatch "$DOS_PATCHES/android_frameworks_base/0022-Ignore_StatementService_AN
 #applyPatch "$DOS_PATCHES/android_frameworks_base/326692.patch"; #Skip screen on animation when wake and unlock via biometrics (jesec) #TODO: 20REBASE
 #applyPatch "$DOS_PATCHES/android_frameworks_base/0023-Skip_Screen_Animation.patch"; #SystemUI: Skip screen-on animation in all scenarios (kdrag0n) #XXX: breaks notification backdrop #TODO: 20REBASE
 applyPatch "$DOS_PATCHES/android_frameworks_base/0024-Burnin_Protection.patch"; #SystemUI: add burnIn protection (arter97)
-applyPatch "$DOS_PATCHES/android_frameworks_base/0026-Crash_Details.patch"; #Add an option to show the details of an application error to the user (GrapheneOS)
+#applyPatch "$DOS_PATCHES/android_frameworks_base/0026-Crash_Details.patch"; #Add an option to show the details of an application error to the user (GrapheneOS) #TODO: 21REBASE
 applyPatch "$DOS_PATCHES/android_frameworks_base/0028-Remove_Legacy_Package_Query.patch"; #Don't leak device-wide package list to apps when work profile is present (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_frameworks_base/0029-Strict_Package_Checks-1.patch"; #Disable package parser cache (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_frameworks_base/0029-Strict_Package_Checks-2.patch"; #Perform additional boot-time checks on system package updates (GrapheneOS)
+#applyPatch "$DOS_PATCHES/android_frameworks_base/0029-Strict_Package_Checks-1.patch"; #Disable package parser cache (GrapheneOS) #TODO: 21REBASE
+#applyPatch "$DOS_PATCHES/android_frameworks_base/0029-Strict_Package_Checks-2.patch"; #Perform additional boot-time checks on system package updates (GrapheneOS) #TODO: 21REBASE
 applyPatch "$DOS_PATCHES/android_frameworks_base/0030-agnss.goog_override.patch"; #Replace agnss.goog with the Broadcom PSDS server (heavily based off of a GrapheneOS patch)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0031-appops_reset_fix-1.patch"; #Revert "Null safe package name in AppOps writeState" (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0031-appops_reset_fix-2.patch"; #appops: skip ops for invalid null package during state serialization (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0032-SUPL_Toggle.patch"; #Add a setting for forcibly disabling SUPL (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0033-Ugly_Orbot_Workaround.patch"; #Always add Briar and Tor Browser to Orbot's lockdown allowlist (CalyxOS)
-applyPatch "$DOS_PATCHES/android_frameworks_base/0034-Allow_Disabling_NTP.patch"; #Dont ping ntp server when nitz time update is toggled off (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_frameworks_base/0035-System_JobScheduler_Allowance.patch"; #DeviceIdleJobsController: don't ignore whitelisted system apps (GrapheneOS)
+#applyPatch "$DOS_PATCHES/android_frameworks_base/0034-Allow_Disabling_NTP.patch"; #Dont ping ntp server when nitz time update is toggled off (GrapheneOS)
 if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_frameworks_base/0036-Unprivileged_microG_Handling.patch"; fi #Unprivileged microG handling (heavily based off of a CalyxOS patch)
+applyPatch "$DOS_PATCHES/android_frameworks_base/0036-Unprivileged_microG_Handling.patch"; #Unprivileged microG handling (heavily based off of a CalyxOS patch)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0037-filter-gms.patch"; #Filter select package queries for GMS (CalyxOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0038-no-camera-lpad.patch"; #Do not auto-grant Camera permission to the eUICC LPA UI app (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_frameworks_base/0039-package_hooks.patch"; #Add hooks for modifying PackageManagerService behavior (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_frameworks_base/0040-euicc-restrictions.patch"; #Integrate Google's EuiccSupportPixel package (GrapheneOS)
+#applyPatch "$DOS_PATCHES/android_frameworks_base/0039-package_hooks.patch"; #Add hooks for modifying PackageManagerService behavior (GrapheneOS) #TODO: 21REBASE
+#applyPatch "$DOS_PATCHES/android_frameworks_base/0040-euicc-restrictions.patch"; #Integrate Google's EuiccSupportPixel package (GrapheneOS) #TODO: 21REBASE
 applyPatch "$DOS_PATCHES/android_frameworks_base/0041-tile_restrictions.patch"; #SystemUI: Require unlocking to use sensitive QS tiles (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0042-minimal_screenshot_exif.patch"; #Put bare minimum metadata in screenshots (CalyxOS)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0008-No_Crash_GSF.patch"; #Don't crash apps that depend on missing Gservices provider (GrapheneOS)
@@ -198,10 +205,6 @@ sed -i 's/MAX_PASSWORD_LENGTH = 16/MAX_PASSWORD_LENGTH = 64/' core/java/android/
 sed -i 's/DEFAULT_STRONG_AUTH_TIMEOUT_MS = 72 \* 60 \* 60 \* 1000;/DEFAULT_STRONG_AUTH_TIMEOUT_MS = 12 * 60 * 60 * 1000;/' core/java/android/app/admin/DevicePolicyManager.java; #Decrease the strong auth prompt timeout to occur more often
 #rm -rf packages/CompanionDeviceManager; #Used to support Android Wear (which hard depends on GMS)
 rm -rf packages/PrintRecommendationService; #Creates popups to install proprietary print apps
-fi;
-
-if enterAndClear "frameworks/ex"; then
-applyPatch "$DOS_PATCHES/android_frameworks_ex/0001-constify_JNINativeMethod.patch"; #Constify JNINativeMethod tables (GrapheneOS)
 fi;
 
 if enterAndClear "frameworks/libs/systemui"; then
@@ -259,10 +262,6 @@ applyPatch "$DOS_PATCHES/android_libcore/0003-Exec_Based_Spawning-1.patch"; #Add
 applyPatch "$DOS_PATCHES/android_libcore/0003-Exec_Based_Spawning-2.patch";
 fi;
 
-if enterAndClear "lineage-sdk"; then
-applyPatch "$DOS_PATCHES/android_lineage-sdk/0001-Private_DNS-Migration.patch"; #Migrate Private DNS preset modes to hostname-mode based (heavily based off of a CalyxOS patch)
-fi;
-
 if enterAndClear "packages/apps/CellBroadcastReceiver"; then
 applyPatch "$DOS_PATCHES/android_packages_apps_CellBroadcastReceiver/0001-presidential_alert_toggle.patch"; #Allow toggling presidential alerts (GrapheneOS)
 fi;
@@ -270,7 +269,7 @@ fi;
 if enterAndClear "packages/apps/Contacts"; then
 applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Contacts/0001-No_Google_Links.patch"; #Remove Privacy Policy and Terms of Service links (GrapheneOS)
 applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Contacts/0002-No_Google_Backup.patch"; #Backups are not sent to Google (GrapheneOS)
-applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Contacts/0003-Skip_Accounts.patch"; #Don't prompt to add account when creating a contact (CalyxOS)
+#applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Contacts/0003-Skip_Accounts.patch"; #Don't prompt to add account when creating a contact (CalyxOS) #TODO: 21REBASE
 applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Contacts/0004-No_GMaps.patch"; #Use common intent for directions instead of Google Maps URL (GrapheneOS)
 fi;
 
@@ -312,7 +311,7 @@ applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0014-LTE_Only_Mode.patch
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0015-SUPL_Toggle.patch"; #Add a toggle for forcibly disabling SUPL (GrapheneOS)
 if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0016-microG_Toggle.patch"; fi; #Add a toggle for microG enablement (heavily based off of a GrapheneOS patch)
 if [ "$DOS_DEBLOBBER_REMOVE_EUICC_FULL" = false ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0017-OpenEUICC_Toggle.patch"; fi; #Add a toggle for OpenEUICC enablement (heavily based off of a GrapheneOS patch)
-applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0018-disable_apps.patch"; #Add an ability to disable non-system apps from the "App info" screen (GrapheneOS)
+if [ -d "$DOS_BUILD_BASE"/vendor/divested-carriersettings ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0018-CC2_Toggle.patch"; fi; #Add a toggle for CarrierConfig2 enablement (heavily based off of a GrapheneOS patch)
 fi;
 
 if enterAndClear "packages/apps/SetupWizard"; then
@@ -337,7 +336,7 @@ applyPatch "$DOS_PATCHES/android_packages_inputmethods_LatinIME/0002-Disable_Per
 fi;
 
 if enterAndClear "packages/modules/Connectivity"; then
-applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Permission-1.patch"; #Enforce INTERNET permission per-uid instead of per-appId (GrapheneOS) #XXX: 21REBASE PROBABLY BROKEN
+applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Permission-1.patch"; #Enforce INTERNET permission per-uid instead of per-appId (GrapheneOS) # XXX: PROBABLY BROKEN
 applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Permission-2.patch"; #Don't crash INTERNET-unaware apps that try to access NsdManager (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Permission-3.patch"; #ConnectivityManager: pretend that network is down to INTERNET-unaware callers (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Permission-4.patch"; #Fixup! don't crash INTERNET-unaware apps that try to access NsdManager (GrapheneOS)
@@ -359,6 +358,7 @@ applyPatch "$DOS_PATCHES/android_packages_modules_Permission/0004-Special_Permis
 applyPatch "$DOS_PATCHES/android_packages_modules_Permission/0004-Special_Permissions-2.patch"; #Fix usage UI summary for Network/Sensors (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_modules_Permission/0005-Browser_No_Location.patch"; #Stop auto-granting location to system browsers (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_modules_Permission/0006-Location_Indicators.patch"; #SystemUI: Use new privacy indicators for location (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_packages_modules_Permission/0007-No_safety_center.patch"; #Disable Safety Center (GrapheneOS)
 fi;
 
 if enterAndClear "packages/modules/Wifi"; then
@@ -367,6 +367,10 @@ fi;
 
 if enterAndClear "packages/providers/DownloadProvider"; then
 applyPatch "$DOS_PATCHES/android_packages_providers_DownloadProvider/0001-Network_Permission.patch"; #Expose the NETWORK permission (GrapheneOS)
+fi;
+
+if enterAndClear "packages/services/Telephony"; then
+if [ -d "$DOS_BUILD_BASE"/vendor/divested-carriersettings ]; then applyPatch "$DOS_PATCHES/android_packages_services_Telephony/0001-CC2.patch"; fi; #Runtime control of platform carrier config package (DivestOS)
 fi;
 
 if enterAndClear "system/ca-certificates"; then
@@ -410,12 +414,12 @@ awk -i inplace '!/security\/lineage/' config/*.mk; #Remove Lineage extra keys
 awk -i inplace '!/config_multiuserMaximumUsers/' overlay/common/frameworks/base/core/res/res/values/config.xml; #Conflict
 sed -i '/config_locationExtraPackageNames/,+11d' overlay/common/frameworks/base/core/res/res/values/config.xml; #Conflict
 awk -i inplace '!/def_backup_transport/' overlay/common/frameworks/base/packages/SettingsProvider/res/values/defaults.xml; #Unset default backup provider
-if [ "$DOS_DEBLOBBER_REMOVE_AUDIOFX" = true ]; then sed -i '/TARGET_EXCLUDES_AUDIOFX/,+3d' config/common_full.mk; fi; #Remove AudioFX
+if [ "$DOS_DEBLOBBER_REMOVE_AUDIOFX" = true ]; then sed -i '/TARGET_EXCLUDES_AUDIOFX/,+3d' config/common_mobile_full.mk; fi; #Remove AudioFX
 sed -i 's/LINEAGE_BUILDTYPE := UNOFFICIAL/LINEAGE_BUILDTYPE := dos/' config/*.mk; #Change buildtype
 echo 'include vendor/divested/divestos.mk' >> config/common.mk; #Include our customizations
 cp -f "$DOS_PATCHES_COMMON/apns-conf.xml" prebuilt/common/etc/apns-conf.xml; #Update APN list
 cp -f "$DOS_PATCHES_COMMON/sensitive_pn.xml" prebuilt/common/etc/sensitive_pn.xml; #Update helplines
-awk -i inplace '!/Eleven/' config/common_full.mk; #Remove Music Player
+awk -i inplace '!/Eleven/' config/common_mobile_full.mk; #Remove Music Player
 awk -i inplace '!/enforce-product-packages-exist-internal/' config/common.mk; #Ignore missing packages
 cp -f "$DOS_PATCHES_COMMON/config_webview_packages.xml" overlay/common/frameworks/base/core/res/res/xml/config_webview_packages.xml; #Change allowed WebView providers
 awk -i inplace '!/com.android.vending/' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml; #Remove unwanted apps
@@ -472,7 +476,7 @@ cd "$DOS_BUILD_BASE";
 deblobAudio;
 removeBuildFingerprints;
 hardenLocationSerials || true;
-enableAutoVarInit || true;
+#enableAutoVarInit || true; #TODO: 21REBASE: has been deprecated and will be ignored
 changeDefaultDNS; #Change the default DNS servers
 fixupCarrierConfigs || true; #Remove silly carrier restrictions
 removeUntrustedCerts || true;
