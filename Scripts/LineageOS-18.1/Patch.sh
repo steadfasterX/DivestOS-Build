@@ -1,3 +1,4 @@
+
 #!/bin/bash
 #DivestOS: A mobile operating system divested from the norm.
 #Copyright (c) 2015-2024 Divested Computing Group
@@ -740,7 +741,7 @@ enableLowRam "device/lge/d801" "d801";
 enableLowRam "device/lge/d802" "d802";
 enableLowRam "device/lge/d803" "d803";
 enableLowRam "device/lge/g2-common" "g2-common";
-enableLowRam "device/lge/g4" "h815";
+#enableLowRam "device/lge/g4" "h815";
 enableLowRam "device/lge/hammerhead" "hammerhead";
 enableLowRam "device/lge/mako" "mako";
 enableLowRam "device/motorola/victara" "victara";
