@@ -305,8 +305,8 @@ AXP_DEVS="device/lge/g4-common \
 # REVERT oem unlock support (see above) to avoid device damage due to people who are not able to read the warnings..
 # "resetprop ro.oem_unlock_supported 1" will immediately show up the toggle in developer options if someone really really understand what he/she does..
 for devpath in $AXP_DEVS do;
-    find $devpath -type f -name '*.prop' -exec "sed -zi '/ro.oem_unlock_supported=0/!s/$/\nro.oem_unlock_supported=0\n/' {} \; || true
-    find $devpath -type f -name '*.prop' -exec "sed -zi '/sys.oem_unlock_allowed=0/!s/$/\nsys.oem_unlock_allowed=0\n/' {} \; || true
+    find $devpath -type f -name '*.prop' -exec "sed -zi '/ro.oem_unlock_supported=0/!s/$/\nro.oem_unlock_supported=0\n/' {} \;" || true
+    find $devpath -type f -name '*.prop' -exec "sed -zi '/sys.oem_unlock_allowed=0/!s/$/\nsys.oem_unlock_allowed=0\n/' {} \;" || true
 done
 
 ########## AXP.OS-only devices
