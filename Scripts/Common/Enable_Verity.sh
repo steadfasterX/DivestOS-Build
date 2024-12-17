@@ -306,6 +306,8 @@ AXP_DEVS="device/lge/g4-common \
 # "resetprop ro.oem_unlock_supported 1" will immediately show up the toggle in developer options if someone really really understand what he/she does..
 for devpath in $AXP_DEVS; do
     if [ -d $devpath ];then
+        find $devpath -type f -name '*.prop' -exec sed -i 's/ro.oem_unlock_supported=1/ro.oem_unlock_supported=0/g' {} \; || true
+	find $devpath -type f -name '*.prop' -exec sed -i 's/sys.oem_unlock_allowed=1/sys.oem_unlock_allowed=0/g' {} \; || true
         find $devpath -type f -name '*.prop' -exec sed -zi '/ro.oem_unlock_supported=0/!s/$/\nro.oem_unlock_supported=0\n/' {} \; || true
         find $devpath -type f -name '*.prop' -exec sed -zi '/sys.oem_unlock_allowed=0/!s/$/\nsys.oem_unlock_allowed=0\n/' {} \; || true
     fi
