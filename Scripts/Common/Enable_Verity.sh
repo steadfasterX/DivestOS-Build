@@ -292,6 +292,8 @@ sed -i 's/^\treturn VERITY_STATE_DISABLE;//' kernel/*/*/drivers/md/dm-android-ve
 
 ########## AXP.OS common
 AXP_DEVS="device/lge/g4-common \
+	  device/google/gs101 \
+   	  device/google/gs201 \
 	  device/google/bluejay \
    	  device/google/sunfish \
       	  device/oneplus/sm8150-common \
