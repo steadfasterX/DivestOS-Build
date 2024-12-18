@@ -306,6 +306,7 @@ AXP_DEVS="device/lge/g4-common \
 # if you came here REALLY read this before proceeding! -> https://github.com/AXP-OS/build/wiki/Bootloader-Lock#oem-unlock-option
 # "resetprop ro.oem_unlock_supported 1" will immediately show up the toggle in developer options if someone really really understand what he/she does..
 # in addition to this "ro.boot.flash.locked=1" is also required to make the toggle usable again.
+# ro.boot.flash.locked=1 might be required also by SafetyNet / Play Integrity API which isn't supported by AXP.OS anyways though
 for devpath in $AXP_DEVS; do
     if [ -d $devpath ];then
         find $devpath -type f -name '*.prop' -exec sed -i 's/ro.oem_unlock_supported=1/ro.oem_unlock_supported=0/g' {} \; || true
