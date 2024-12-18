@@ -312,6 +312,7 @@ AXP_DEVS="device/lge/g4-common \
 for devpath in $AXP_DEVS; do
     if [ -d $devpath ];then
         find $devpath -type f -name '*.prop' -exec sed -i 's/ro.oem_unlock_supported=1/ro.oem_unlock_supported=0/g' {} \; || true
+	find $devpath -type f -name '*.mk' -exec sed -i 's/ro.oem_unlock_supported=1/ro.oem_unlock_supported=0/g' {} \; || true
 	find $devpath -type f -name '*.prop' -exec sed -i 's/sys.oem_unlock_allowed=1/sys.oem_unlock_allowed=0/g' {} \; || true
  	find $devpath -type f -name '*.prop' -exec sed -i 's/ro.boot.flash.locked=1/ro.boot.flash.locked=0/g' {} \; || true
         find $devpath -type f -name '*.prop' -exec sed -zi '/ro.oem_unlock_supported=0/!s/$/\nro.oem_unlock_supported=0\n/' {} \; || true
