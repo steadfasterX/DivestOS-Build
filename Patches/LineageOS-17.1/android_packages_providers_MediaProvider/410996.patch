@@ -25,7 +25,7 @@ Change-Id: I91e9966c012fe292cebc0b544f77032613516fac
  1 file changed, 2 insertions(+)
 
 diff --git a/src/com/android/providers/media/MediaProvider.java b/src/com/android/providers/media/MediaProvider.java
-index 4cd4452d0..6e9845fc6 100644
+index 4cd4452d0..6e15836ce 100644
 --- a/src/com/android/providers/media/MediaProvider.java
 +++ b/src/com/android/providers/media/MediaProvider.java
 @@ -4713,6 +4713,8 @@ public class MediaProvider extends ContentProvider {

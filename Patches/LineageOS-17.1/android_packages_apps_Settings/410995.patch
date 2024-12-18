@@ -1,7 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Fan Wu <cechkahn@google.com>
 Date: Mon, 22 Jul 2024 16:12:46 +0800
-Subject: [PATCH] Checks cross user permission before handling intent
+Subject: [PATCH] RESTRICT AUTOMERGE Checks cross user permission before
+ handling intent
 
 Bug: 326057017
 
@@ -17,7 +18,7 @@ Change-Id: I3444e55b22b7487f96b0e3e9deb3f844c4c4723a
  1 file changed, 36 insertions(+), 2 deletions(-)
 
 diff --git a/src/com/android/settings/applications/AppInfoBase.java b/src/com/android/settings/applications/AppInfoBase.java
-index 71043400ff8..ef5297acaec 100644
+index 71043400ff8..9d098000fbc 100644
 --- a/src/com/android/settings/applications/AppInfoBase.java
 +++ b/src/com/android/settings/applications/AppInfoBase.java
 @@ -18,7 +18,9 @@ package com.android.settings.applications;
@@ -46,7 +47,7 @@ index 71043400ff8..ef5297acaec 100644
 -                    Intent.EXTRA_USER_HANDLE)).getIdentifier();
 +            mUserId = ((UserHandle) intent.getParcelableExtra(Intent.EXTRA_USER_HANDLE))
 +                    .getIdentifier();
-+            if (mUserId != UserHandle.myUserId() && !hasInteractAcrossUsersPerm()) {
++            if (mUserId != UserHandle.myUserId() && !hasInteractAcrossUsersPermission()) {
 +                Log.w(TAG, "Intent not valid.");
 +                finish();
 +                return "";
@@ -59,7 +60,7 @@ index 71043400ff8..ef5297acaec 100644
      }
  
 +    @VisibleForTesting
-+    protected boolean hasInteractAcrossUsersPerm() {
++    protected boolean hasInteractAcrossUsersPermission() {
 +        Activity activity = getActivity();
 +        if (activity == null) {
 +            return false;
