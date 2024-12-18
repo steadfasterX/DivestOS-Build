@@ -303,13 +303,17 @@ AXP_DEVS="device/lge/g4-common \
    	  device/samsung/exynos7870-common"
 
 # REVERT oem unlock support (see above) to avoid device damage due to people who are not able to read the warnings..
+# if you came here REALLY read this before proceeding! -> https://github.com/AXP-OS/build/wiki/Bootloader-Lock#oem-unlock-option
 # "resetprop ro.oem_unlock_supported 1" will immediately show up the toggle in developer options if someone really really understand what he/she does..
+# in addition to this "ro.boot.flash.locked=1" is also required to make the toggle usable again.
 for devpath in $AXP_DEVS; do
     if [ -d $devpath ];then
         find $devpath -type f -name '*.prop' -exec sed -i 's/ro.oem_unlock_supported=1/ro.oem_unlock_supported=0/g' {} \; || true
 	find $devpath -type f -name '*.prop' -exec sed -i 's/sys.oem_unlock_allowed=1/sys.oem_unlock_allowed=0/g' {} \; || true
+ 	find $devpath -type f -name '*.prop' -exec sed -i 's/ro.boot.flash.locked=1/ro.boot.flash.locked=0/g' {} \; || true
         find $devpath -type f -name '*.prop' -exec sed -zi '/ro.oem_unlock_supported=0/!s/$/\nro.oem_unlock_supported=0\n/' {} \; || true
         find $devpath -type f -name '*.prop' -exec sed -zi '/sys.oem_unlock_allowed=0/!s/$/\nsys.oem_unlock_allowed=0\n/' {} \; || true
+	find $devpath -type f -name '*.prop' -exec sed -zi '/ro.boot.flash.locked=0/!s/$/\nro.boot.flash.locked=0\n/' {} \; || true
     fi
 done
 
