@@ -1147,7 +1147,8 @@ hardenDefconfig() {
 	sed -i 's/CONFIG_LSM_MMAP_MIN_ADDR=4096/CONFIG_LSM_MMAP_MIN_ADDR=32768/' $defconfigPath &>/dev/null || true;
 	sed -zi '/CONFIG_LSM_MMAP_MIN_ADDR/!s/$/\nCONFIG_LSM_MMAP_MIN_ADDR=32768/' $defconfigPath &>/dev/null || true;
 
-	editKernelLocalversion "-dos";
+	# do NOT tag the kernel with smth which can easily used for safetynet and others
+	#editKernelLocalversion "-dos";
 
 	echo "Hardened defconfig for $1";
 	cd "$DOS_BUILD_BASE";
