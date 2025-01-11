@@ -295,7 +295,7 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-53141/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-53142/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-12819/4.19/0007.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-35812/4.19/0003.patch
-editKernelLocalversion "-dos.p295"
+editKernelLocalversion ".p295"
 else echo "kernel_google_redbull is unavailable, not patching.";
 fi;
 cd "$DOS_BUILD_BASE"
