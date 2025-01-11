@@ -69,10 +69,10 @@ fi;
 if enter "packages/apps/SetupWizard"; then
 sed -i 's|https://lineageos.org/legal|'"$DOS_BRANDING_LINK_PRIVACY"'|' src/org/lineageos/setupwizard/LineageSettingsActivity.java;
 sed -i '/.*intro_restore/s/LineageOS/'"$DOS_BRANDING_NAME"'/' res/values*/strings.xml;
-sed -i '/.*os_name/s/LineageOS/'"$DOS_BRANDING_NAME"'/' res/values*/strings.xml;
-sed -i '/.*services/s/LineageOS/'"$DOS_BRANDING_NAME"'/g' res/values*/strings.xml;
-sed -i '/.*setup_services/s/LineageOS/'"$DOS_BRANDING_NAME"'/g' res/values*/strings.xml;
-sed -i '/.*update_recovery/s/Lineage/'"$DOS_BRANDING_NAME"'/g' res/values*/strings.xml;
+sed -i '/.*os_name/s/LineageOS/'"$DOS_BRANDING_NAME_WIZARD"'/' res/values*/strings.xml;
+sed -i '/.*services/s/LineageOS/'"$DOS_BRANDING_NAME_WIZARD"'/g' res/values*/strings.xml;
+sed -i '/.*setup_services/s/LineageOS/'"$DOS_BRANDING_NAME_WIZARD"'/g' res/values*/strings.xml;
+sed -i '/.*update_recovery/s/Lineage/'"$DOS_BRANDING_NAME_WIZARD"'/g' res/values*/strings.xml;
 fi;
 
 if enter "packages/apps/Updater"; then
