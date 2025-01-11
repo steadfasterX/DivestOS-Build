@@ -327,6 +327,9 @@ done
 #enableVerity "device/lge/g4-common"
 #[[ -d kernel/lge/msm8992 ]] && sed -i 's/wait/wait,verify/g' kernel/lge/msm8992/arch/arm64/boot/dts/lge/msm8992-lge.dtsi &>/dev/null #/system
 
+# Samsung A52q
+enableVerity "device/samsung/sm7125-common"
+
 # Samsung J5 2017
 enableVerity "device/samsung/exynos7870-common"
 [[ -d kernel/samsung/exynos7870 ]] && sed -i 's/wait/wait,verify/g' kernel/samsung/exynos7870/arch/arm64/boot/dts/exynos7870-j5y17lte_common.dtsi &>/dev/null #/system
