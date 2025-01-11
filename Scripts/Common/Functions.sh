@@ -246,7 +246,7 @@ processRelease() {
 	local DATE=$(date -u '+%Y%m%d')
 	local KEY_DIR="$DOS_SIGNING_KEYS/$DEVICE";
 	local VERSION=$(echo $DOS_VERSION | cut -f2 -d "-");
-	local PREFIX="$DOS_BRANDING_ZIP_PREFIX-$VERSION-$DATE-dos-$DEVICE";
+	local PREFIX="$DOS_BRANDING_ZIP_PREFIX-$VERSION-$DATE-$AOS_BRANDING_BUILDTYPE-$DEVICE";
 	local ARCHIVE="$DOS_BUILDS/$DOS_VERSION/release_keys/";
 	local OUT_DIR="$DOS_BUILD_BASE/out/target/product/$DEVICE/";
 
@@ -447,7 +447,7 @@ processRelease() {
 	if [ "$DOS_GENERATE_DELTAS" = true ]; then
 		# shellcheck disable=SC2199
 		if [[ " ${DOS_GENERATE_DELTAS_DEVICES[@]} " =~ " ${DEVICE} " ]]; then
-			for LAST_TARGET_FILES in $ARCHIVE/target_files/$DOS_BRANDING_ZIP_PREFIX-$VERSION-*-dos-$DEVICE-target_files.zip; do
+			for LAST_TARGET_FILES in $ARCHIVE/target_files/$DOS_BRANDING_ZIP_PREFIX-$VERSION-*-$AOS_BRANDING_BUILDTYPE-$DEVICE-target_files.zip; do
 				if [[ -f "$LAST_TARGET_FILES.id" ]]; then
 					local LAST_INCREMENTAL_ID=$(cat "$LAST_TARGET_FILES.id");
 					echo -e "\e[0;32mGenerating incremental OTA against $LAST_INCREMENTAL_ID\e[0m";
