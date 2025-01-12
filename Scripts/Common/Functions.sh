@@ -873,14 +873,6 @@ editKernelLocalversion() {
 	local replacement=$1;
 	sed -i 's/CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION="'"$replacement"'"/' $defconfigPath &>/dev/null || true;
 	sed -zi '/CONFIG_LOCALVERSION="'"$replacement"'"/!s/$/\nCONFIG_LOCALVERSION="'"$replacement"'"/' $defconfigPath &>/dev/null;
-        git add -A || CMT=1
-        # check for uncommitted changes
-        CMTL=$(git status --porcelain=v1 | wc -l 2>/dev/null)
-        # commit
-        if [ $CMT -eq 1 -o $CMTL -gt 0 ];then 
-          git commit --author="${AXP_GIT_AUTHOR} <${AXP_GIT_MAIL}>" -m "uncatched scripted kernel change(s)"
-          echo "[GIT] committed scripted kernel changes"
-        fi
 }
 export -f editKernelLocalversion;
 
