@@ -873,7 +873,7 @@ editKernelLocalversion() {
 	local replacement=$1;
 	sed -i 's/CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION="'"$replacement"'"/' $defconfigPath &>/dev/null || true;
 	sed -zi '/CONFIG_LOCALVERSION="'"$replacement"'"/!s/$/\nCONFIG_LOCALVERSION="'"$replacement"'"/' $defconfigPath &>/dev/null;
-        git add -A >> {{ BUILD_LOG }} 2>&1 || CMT=1
+        git add -A || CMT=1
         # check for uncommitted changes
         CMTL=$(git status --porcelain=v1 | wc -l 2>/dev/null)
         # commit
