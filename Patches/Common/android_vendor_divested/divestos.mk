@@ -19,10 +19,5 @@ PRODUCT_PROPERTY_OVERRIDES += \
 #    ro.control_privapp_permissions=log
 #    ro.control_privapp_permissions=enforce
 
-#Copy extra files
-PRODUCT_COPY_FILES += \
-    vendor/divested/prebuilts/etc/additional_fdroid_repos.xml:system/etc/org.fdroid.fdroid/additional_repos.xml \
-    vendor/divested/prebuilts/etc/additional_fdroid_repos.xml:system/etc/org.fdroid.basic/additional_repos.xml
-
 #Include packages
 include vendor/divested/packages.mk
