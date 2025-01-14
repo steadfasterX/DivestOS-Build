@@ -1,7 +1,3 @@
-# F-Droid
-PRODUCT_PACKAGES += \
-    F-DroidOfficial
-
 # Replacements
 PRODUCT_PACKAGES += \
     EtarPrebuilt \
@@ -16,8 +12,7 @@ PRODUCT_PACKAGES += \
 # Extras
 PRODUCT_PACKAGES += \
     TalkBack \
-    SupportDivestOS \
-    microg.xml
+    SupportDivestOS
 
 # Notes
 # - Available (via PrebuiltApps submodule): eSpeakNG
