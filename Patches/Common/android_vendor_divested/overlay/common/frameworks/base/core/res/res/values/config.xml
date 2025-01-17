@@ -94,7 +94,7 @@
 
          If this string is empty or the specified package does not exist, then
          the behavior will be as though no app was named as an explicit default. -->
-    <string name="default_browser" translatable="false">us.spotco.fennec_dos</string>
+    <string name="default_browser" translatable="false">org.cromite.cromite</string>
 
     <!-- Default SMS Application. This will be the default SMS application when
          the phone first boots. The user can then change the default app to one
