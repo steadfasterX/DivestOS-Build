@@ -1,4 +1,4 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From b34f9d2ff25827a6b90c1281b11e0eecec45277e Mon Sep 17 00:00:00 2001
 From: Tad <tad@spotco.us>
 Date: Wed, 20 Apr 2022 01:04:27 -0400
 Subject: [PATCH] Add a toggle for CarrierConfig2 enablement
@@ -17,12 +17,12 @@ Signed-off-by: Tad <tad@spotco.us>
  create mode 100644 src/com/android/settings/security/CarrierConfig2PreferenceController.java
 
 diff --git a/res/values/strings.xml b/res/values/strings.xml
-index 5d99076843f..c713758a2cb 100644
+index aed5ad9020f..f003142eeef 100644
 --- a/res/values/strings.xml
 +++ b/res/values/strings.xml
-@@ -677,6 +677,9 @@
-     <string name="sig_spoof_title">Unprivileged microG enablement</string>
-     <string name="sig_spoof_summary">Allows official builds of microG apps to function. Not supported, not recommended. May break apps and/or degrade their security model. Notes: 1) microG connects directly to Google, 2) apps talking to microG do so using proprietary Google libraries, 3) microG can download/execute proprietary code from Google.</string>
+@@ -674,6 +674,9 @@
+     <string name="hosts_disable_title">Disable DNS content blocker</string>
+     <string name="hosts_disable_summary">Disables use of the included /etc/hosts database for data collection and malware blocking.</string>
  
 +    <string name="carrierconfig2_title">Enable CarrierConfig2</string>
 +    <string name="carrierconfig2_summary">Use a larger Google database instead of the AOSP database for carrier specific configurations. May improve cellular network compatibility &amp; functionality. Requires reboot.</string>
@@ -31,12 +31,12 @@ index 5d99076843f..c713758a2cb 100644
      <string name="owner_info_settings_summary">None</string>
      <!-- Hint text shown in owner info edit text [CHAR LIMIT=50] -->
 diff --git a/res/xml/security_dashboard_settings.xml b/res/xml/security_dashboard_settings.xml
-index 604e8720e6f..441231e2b7c 100644
+index db158b72433..9da05244fef 100644
 --- a/res/xml/security_dashboard_settings.xml
 +++ b/res/xml/security_dashboard_settings.xml
-@@ -92,6 +92,12 @@
-             android:title="@string/sig_spoof_title"
-             android:summary="@string/sig_spoof_summary"
+@@ -86,6 +86,12 @@
+             android:title="@string/hosts_disable_title"
+             android:summary="@string/hosts_disable_summary"
              android:persistent="false" />
 +
 +        <SwitchPreference
@@ -160,14 +160,17 @@ index 00000000000..a3e5aa17591
 +    }
 +}
 diff --git a/src/com/android/settings/security/SecuritySettings.java b/src/com/android/settings/security/SecuritySettings.java
-index f009703ed24..2e1f2765614 100644
+index 8079cd5067d..6899d4c9c92 100644
 --- a/src/com/android/settings/security/SecuritySettings.java
 +++ b/src/com/android/settings/security/SecuritySettings.java
-@@ -110,6 +110,7 @@ public class SecuritySettings extends DashboardFragment {
+@@ -109,6 +109,7 @@ public class SecuritySettings extends DashboardFragment {
+         securityPreferenceControllers.add(new ExecSpawnPreferenceController(context));
          securityPreferenceControllers.add(new NativeDebugPreferenceController(context));
          securityPreferenceControllers.add(new HostsPreferenceController(context));
-         securityPreferenceControllers.add(new SigSpoofPreferenceController(context));
-+        securityPreferenceControllers.add(new CarrierConfig2PreferenceController(context));
++	securityPreferenceControllers.add(new CarrierConfig2PreferenceController(context));
          controllers.add(new PreferenceCategoryController(context, SECURITY_CATEGORY)
                  .setChildren(securityPreferenceControllers));
          controllers.addAll(securityPreferenceControllers);
+-- 
+2.48.1
+
