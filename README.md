@@ -1,3 +1,7 @@
-![Banner](https://divestos.org/images/featureGraphics/DivestOS.png)
+# AXP.OS - build
 
-Please see the [website](https://divestos.org) for documentation
+![Banner](https://avatars.githubusercontent.com/u/139685517?s=200&v=4)
+
+Please see the [website](https://axpos.org) for documentation
+
+forked from [DivestOS](https://divestos.org)
