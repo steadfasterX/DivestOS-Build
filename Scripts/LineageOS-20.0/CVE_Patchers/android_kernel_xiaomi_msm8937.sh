@@ -576,7 +576,7 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-27424/4.14/0009.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-27425/4.14/0009.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-42104/4.14/0009.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-43047-upstream/4.9/0009.patch
-editKernelLocalversion ".p576"
+editKernelLocalversion "-p576"
 else echo "kernel_xiaomi_msm8937 is unavailable, not patching.";
 fi;
 cd "$DOS_BUILD_BASE"

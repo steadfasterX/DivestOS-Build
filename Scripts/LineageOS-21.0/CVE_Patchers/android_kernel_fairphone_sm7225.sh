@@ -296,7 +296,7 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-53141/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-53142/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-12819/4.19/0007.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-35812/4.19/0003.patch
-editKernelLocalversion ".p296"
+editKernelLocalversion "-p296"
 else echo "kernel_fairphone_sm7225 is unavailable, not patching.";
 fi;
 cd "$DOS_BUILD_BASE"

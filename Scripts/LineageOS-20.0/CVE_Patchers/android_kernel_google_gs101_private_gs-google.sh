@@ -1293,7 +1293,7 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-27425/5.10/0004.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-35812/5.10/0004.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-42104/5.10/0003.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-49881/5.10/0002.patch
-editKernelLocalversion ".p1293"
+editKernelLocalversion "-p1293"
 else echo "kernel_google_gs101_private_gs-google is unavailable, not patching.";
 fi;
 cd "$DOS_BUILD_BASE"

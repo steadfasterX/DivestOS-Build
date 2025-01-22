@@ -332,7 +332,7 @@ git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-53140/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-53141/4.19/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2019-12819/4.14/0006.patch
 git apply $DOS_PATCHES_LINUX_CVES/CVE-2024-39501/4.14/0009.patch
-editKernelLocalversion ".p332"
+editKernelLocalversion "-p332"
 else echo "kernel_oneplus_sm8150 is unavailable, not patching.";
 fi;
 cd "$DOS_BUILD_BASE"
