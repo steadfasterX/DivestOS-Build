@@ -163,8 +163,7 @@ patchWorkspaceReal() {
 			gpgVerifyGitHead "$DOS_BUILD_BASE/external/chromium-webview";
 
 			source build/envsetup.sh;
-			repopick -it T_asb_2024-12;
-
+   
 			sh "$DOS_SCRIPTS/Patch.sh";
 			sh "$DOS_SCRIPTS_COMMON/Enable_Verity.sh";
 			sh "$DOS_SCRIPTS_COMMON/Copy_Keys.sh";
