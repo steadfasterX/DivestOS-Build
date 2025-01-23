@@ -53,8 +53,8 @@ index 8079cd5067d..f009703ed24 100644
 @@ -109,6 +109,7 @@ public class SecuritySettings extends DashboardFragment {
          securityPreferenceControllers.add(new ExecSpawnPreferenceController(context));
          securityPreferenceControllers.add(new NativeDebugPreferenceController(context));
-         securityPreferenceControllers.add(new HostsPreferenceController(context));
 +        securityPreferenceControllers.add(new SigSpoofPreferenceController(context));
+         securityPreferenceControllers.add(new HostsPreferenceController(context));
          controllers.add(new PreferenceCategoryController(context, SECURITY_CATEGORY)
                  .setChildren(securityPreferenceControllers));
          controllers.addAll(securityPreferenceControllers);

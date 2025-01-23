@@ -165,8 +165,8 @@ index f009703ed24..2e1f2765614 100644
 +++ b/src/com/android/settings/security/SecuritySettings.java
 @@ -110,6 +110,7 @@ public class SecuritySettings extends DashboardFragment {
          securityPreferenceControllers.add(new NativeDebugPreferenceController(context));
-         securityPreferenceControllers.add(new HostsPreferenceController(context));
          securityPreferenceControllers.add(new SigSpoofPreferenceController(context));
+         securityPreferenceControllers.add(new HostsPreferenceController(context));
 +        securityPreferenceControllers.add(new CarrierConfig2PreferenceController(context));
          controllers.add(new PreferenceCategoryController(context, SECURITY_CATEGORY)
                  .setChildren(securityPreferenceControllers));
