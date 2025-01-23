@@ -1,7 +1,6 @@
 # Replacements
 PRODUCT_PACKAGES += \
     EtarPrebuilt \
-    FennecDOS \
     FossifyGallery
 
 #ifeq ($(findstring flox,$(TARGET_PRODUCT)),)
@@ -12,7 +11,6 @@ PRODUCT_PACKAGES += \
 # Extras
 PRODUCT_PACKAGES += \
     TalkBack \
-    SupportDivestOS
 
 # Notes
 # - Available (via PrebuiltApps submodule): eSpeakNG
