@@ -129,11 +129,11 @@ applyPatch "$DOS_PATCHES_COMMON/android_external_hardened_malloc/0001-Broken_Cam
 applyPatch "$DOS_PATCHES_COMMON/android_external_hardened_malloc/0002-Broken_Displays.patch"; #Add workaround for OnePlus 8 & 9 display driver crash (DivestOS)
 applyPatch "$DOS_PATCHES_COMMON/android_external_hardened_malloc/0003-Broken_Audio.patch"; #Workaround for audio service sorting bug (GrapheneOS)
 sed -i 's/34359738368/2147483648/' Android.bp; #revert 48-bit address space requirement
-sed -i -e '76,78d;' Android.bp; #fix compile under A13
+sed -i -e '74,76d;' Android.bp; #fix compile under A13
 sed -i -e '22,24d;' androidtest/Android.bp; #fix compile under A12
 awk -i inplace '!/vendor_ramdisk_available/' Android.bp; #fix compile under A11
 rm -rfv androidtest; #fix compile under A11
-sed -i -e '76,78d;' Android.bp; #fix compile under A10
+sed -i -e '74,76d;' Android.bp; #fix compile under A10
 awk -i inplace '!/ramdisk_available/' Android.bp; #fix compile under A10
 git revert --no-edit 8974af86d12f7e29b54b5090133ab3d7eea0e519; #fix compile under A10
 git revert --no-edit a28da3c65aed0528036da9ebd33e0c05b2c5884a; #fix compile under A9
