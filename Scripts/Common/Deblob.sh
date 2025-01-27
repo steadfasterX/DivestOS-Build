@@ -147,7 +147,7 @@ echo "Deblobbing...";
 	blobs=$blobs"|libDxHdcp.so|libDxModularPluginNv.so|libDxDrmServer.so";
 	blobs=$blobs"|DxHDCP.cfg|DxDrmConfig.txt";
 	blobs=$blobs"|dxhdcp.*|dxcpr.*";
-	blobs=$blobs"|libhdcpsrm.so|libcpion.so";
+	#blobs=$blobs"|libhdcpsrm.so|libcpion.so";
 	makes=$makes"|DxHDCP.cfg";
 
 	#Display Color Tuning [Qualcomm] #XXX: still breaks boot on some devices
