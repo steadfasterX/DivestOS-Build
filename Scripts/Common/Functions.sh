@@ -95,6 +95,7 @@ commitChanges(){
     else
         MSG="$1"
     fi
+    git add -A
     git commit --author="${DOS_GIT_AUTHOR} <${DOS_GIT_MAIL}>" -m "$MSG"
 }
 export -f commitChanges
