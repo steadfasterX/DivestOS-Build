@@ -89,6 +89,16 @@ gitReset() {
 }
 export -f gitReset;
 
+commitChanges(){
+    if [ -z "$1" ];then
+        MSG="DivestOS adjustments"
+    else
+        MSG="$1"
+    fi
+    git commit --author="${DOS_GIT_AUTHOR} <${DOS_GIT_MAIL}>" -m "$MSG"
+}
+export -f commitChanges
+
 applyPatchReal() {
 	currentWorkingPatch=$1;
  	short_patch=$(echo "$currentWorkingPatch" | sed -E 's#(\$DOS_PATCHES/+)(.*)#\2#g')
