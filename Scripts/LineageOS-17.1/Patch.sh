@@ -93,6 +93,7 @@ applyPatch "$DOS_PATCHES_COMMON/android_build/0001-verity-openssl3.patch"; #Fix 
 sed -i '75i$(my_res_package): PRIVATE_AAPT_FLAGS += --auto-add-overlay' core/aapt2.mk; #Enable auto-add-overlay for packages, this allows the vendor overlay to easily work across all branches.
 awk -i inplace '!/updatable_apex.mk/' target/product/mainline_system.mk; #Disable APEX
 sed -i 's/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 23/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 28/' core/version_defaults.mk; #Set the minimum supported target SDK to Pie (GrapheneOS)
+commitChanges
 fi
 
 if enterAndClear "build/soong"; then
@@ -103,6 +104,7 @@ fi;
 if enterAndClear "device/qcom/sepolicy-legacy"; then
 applyPatch "$DOS_PATCHES/android_device_qcom_sepolicy-legacy/0001-Camera_Fix.patch"; #Fix camera on -user builds XXX: REMOVE THIS TRASH (DivestOS)
 echo "SELINUX_IGNORE_NEVERALLOWS := true" >> sepolicy.mk; #Ignore neverallow violations XXX: necessary for -user builds of legacy devices
+commitChanges
 fi;
 
 if enterAndClear "external/aac"; then
@@ -144,6 +146,7 @@ sed -i -e '74,76d;' Android.bp; #fix compile under A10
 awk -i inplace '!/ramdisk_available/' Android.bp; #fix compile under A10
 git revert --no-edit 8974af86d12f7e29b54b5090133ab3d7eea0e519; #fix compile under A10
 mv include/h_malloc.h . ; #fix compile under A10
+commitChanges
 fi;
 
 if enterAndClear "external/libcups"; then
@@ -186,6 +189,7 @@ git revert --no-edit 1419d63b4889a26d22443fd8df1f9073bf229d3d; #Add back Makefil
 sed -i '12iLOCAL_SDK_VERSION := current' pico/Android.mk; #Fix build under Pie
 sed -i 's/about to delete/unable to delete/' pico/src/com/svox/pico/LangPackUninstaller.java;
 awk -i inplace '!/deletePackage/' pico/src/com/svox/pico/LangPackUninstaller.java;
+commitChanges
 fi;
 
 if enterAndClear "external/zlib"; then
@@ -398,6 +402,7 @@ hardenLocationConf services/core/java/com/android/server/location/gps_debug.conf
 #sed -i '295i\        if(packageList != null && packageList.size() > 0) { packageList.add("net.sourceforge.opencamera"); }' core/java/android/hardware/Camera.java; #Add Open Camera to aux camera allowlist XXX: needs testing, broke boot last time
 rm -rf packages/OsuLogin; #Automatic Wi-Fi connection non-sense
 rm -rf packages/PrintRecommendationService; #Creates popups to install proprietary print apps
+commitChanges
 fi;
 
 if enterAndClear "frameworks/native"; then
@@ -476,6 +481,7 @@ fi;
 if enterAndClear "lineage-sdk"; then
 awk -i inplace '!/LineageWeatherManagerService/' lineage/res/res/values/config.xml; #Disable Weather
 if [ "$DOS_DEBLOBBER_REMOVE_AUDIOFX" = true ]; then awk -i inplace '!/LineageAudioService/' lineage/res/res/values/config.xml; fi; #Remove AudioFX
+commitChanges
 fi;
 
 if enterAndClear "packages/apps/Bluetooth"; then
@@ -510,6 +516,7 @@ if enterAndClear "packages/apps/LineageParts"; then
 rm -rf src/org/lineageos/lineageparts/lineagestats/ res/xml/anonymous_stats.xml res/xml/preview_data.xml; #Nuke part of the analytics
 applyPatch "$DOS_PATCHES/android_packages_apps_LineageParts/0001-Remove_Analytics.patch"; #Remove analytics (DivestOS)
 cp -f "$DOS_PATCHES_COMMON/contributors.db" assets/contributors.db; #Update contributors cloud
+commitChanges
 fi;
 
 if enterAndClear "packages/apps/Messaging"; then
@@ -570,6 +577,7 @@ if [ "$DOS_MICROG_SUPPORT" = true ]; then applyPatch "$DOS_PATCHES/android_packa
 applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Settings/0001-disable_apps.patch"; #Add an ability to disable non-system apps from the "App info" screen (GrapheneOS)
 sed -i 's/private int mPasswordMaxLength = 16;/private int mPasswordMaxLength = 64;/' src/com/android/settings/password/ChooseLockPassword.java; #Increase default max password length to 64 (GrapheneOS)
 sed -i 's/if (isFullDiskEncrypted()) {/if (false) {/' src/com/android/settings/accessibility/*AccessibilityService*.java; #Never disable secure start-up when enabling an accessibility service
+commitChanges
 fi;
 
 if enterAndClear "packages/apps/SetupWizard"; then
@@ -587,6 +595,7 @@ if enterAndClear "packages/apps/Trebuchet"; then
 applyPatch "$DOS_PATCHES/android_packages_apps_Trebuchet/368013.patch"; #Q_asb_2023-09 Fix permission issue in legacy shortcut
 applyPatch "$DOS_PATCHES/android_packages_apps_Trebuchet/378063.patch"; #Q_asb_2023-12 Fix permission bypass in legacy shortcut
 cp $DOS_BUILD_BASE/vendor/divested/overlay/common/packages/apps/Trebuchet/res/xml/default_workspace_*.xml res/xml/; #XXX: Likely no longer needed
+commitChanges
 fi;
 
 if enterAndClear "packages/apps/TvSettings"; then
@@ -597,6 +606,7 @@ if enterAndClear "packages/apps/Updater"; then
 applyPatch "$DOS_PATCHES/android_packages_apps_Updater/0001-Server.patch"; #Switch to our server (DivestOS)
 applyPatch "$DOS_PATCHES/android_packages_apps_Updater/0002-Tor_Support.patch"; #Add Tor support (DivestOS)
 sed -i 's/PROP_BUILD_VERSION_INCREMENTAL);/PROP_BUILD_VERSION_INCREMENTAL).replaceAll("\\\\.", "");/' src/org/lineageos/updater/misc/Utils.java; #Remove periods from incremental version
+commitChanges
 fi;
 
 if enterAndClear "packages/inputmethods/LatinIME"; then
@@ -706,6 +716,7 @@ fi;
 if enterAndClear "system/ca-certificates"; then
 rm -rf files; #Remove old certs
 cp -r "$DOS_PATCHES_COMMON/android_system_ca-certificates/files" .; #Copy the new ones into place
+commitChanges
 fi;
 
 if enterAndClear "system/core"; then
@@ -717,6 +728,7 @@ applyPatch "$DOS_PATCHES/android_system_core/0001-Harden.patch"; #Harden mounts 
 applyPatch "$DOS_PATCHES/android_system_core/0002-HM-Increase_vm_mmc.patch"; #(GrapheneOS)
 applyPatch "$DOS_PATCHES/android_system_core/0003-Zero_Sensitive_Info.patch"; #Zero sensitive information with explicit_bzero (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_system_core/0004-ptrace_scope.patch"; #Add a property for controlling ptrace_scope (GrapheneOS)
+commitChanges
 fi;
 
 if enterAndClear "system/extras"; then
@@ -751,6 +763,7 @@ patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --direct
 patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --directory="prebuilts/api/27.0";
 patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --directory="prebuilts/api/26.0";
 awk -i inplace '!/true cannot be used in user builds/' Android.mk; #Allow ignoring neverallows under -user
+commitChanges
 fi;
 
 if enterAndClear "system/update_engine"; then
@@ -759,7 +772,6 @@ fi;
 
 if enterAndClear "tools/apksig"; then
 applyPatch "$DOS_PATCHES/android_tools_apksig/376559.patch"; #Q_asb_2023-07 Limit the number of supported v1 and v2 signers
-
 fi;
 
 if enterAndClear "vendor/nxp/opensource/commonsys/external/libnfc-nci"; then
@@ -849,11 +861,13 @@ awk -i inplace '!/Email/' config/common_mobile.mk; #Remove Email
 awk -i inplace '!/Exchange2/' config/common_mobile.mk;
 awk -i inplace '!/com.android.vending/' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml; #Remove unwanted apps
 awk -i inplace '!/com.google.android/' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml;
+commitChanges
 fi;
 
 if enter "vendor/divested"; then
 echo "PRODUCT_PACKAGES += vendor.lineage.trust@1.0-service" >> packages.mk; #Add deny usb service, all of our kernels have the necessary patch
 awk -i inplace '!/speed-profile/' build/target/product/lowram.mk; #breaks compile on some dexpreopt devices
+commitChanges
 fi;
 #
 #END OF ROM CHANGES
@@ -876,6 +890,7 @@ echo "  allow firmware_file labeledfs:filesystem associate;" >> sepolicy/recover
 echo "  allow recovery firmware_file:dir rw_dir_perms;" >> sepolicy/recovery.te;
 echo "  allow recovery firmware_file:file create_file_perms;" >> sepolicy/recovery.te;
 echo "')" >> sepolicy/recovery.te;
+commitChanges
 fi;
 
 if enterAndClear "device/motorola/msm8916-common"; then
@@ -885,6 +900,7 @@ echo "  allow firmware_file labeledfs:filesystem associate;" >> sepolicy/recover
 echo "  allow recovery firmware_file:dir rw_dir_perms;" >> sepolicy/recovery.te;
 echo "  allow recovery firmware_file:file create_file_perms;" >> sepolicy/recovery.te;
 echo "')" >> sepolicy/recovery.te;
+commitChanges
 fi;
 
 if enterAndClear "device/oneplus/oneplus2"; then
@@ -896,10 +912,12 @@ echo "allow mm-qcamerad self:tcp_socket { accept listen };" >> sepolicy/mm-qcame
 echo "allow mm-qcamerad self:tcp_socket { bind create setopt };" >> sepolicy/mm-qcamerad.te;
 echo "allow mm-qcamerad camera_prop:file read;" >> sepolicy/mm-qcamerad.te;
 echo "set_prop(mm-qcamerad, camera_prop)" >> sepolicy/mm-qcamerad.te;
+commitChanges
 fi;
 
 if enterAndClear "device/oppo/common"; then
 awk -i inplace '!/TARGET_RELEASETOOLS_EXTENSIONS/' BoardConfigCommon.mk; #disable releasetools to fix delta ota generation
+commitChanges
 fi;
 
 if enterAndClear "device/xiaomi/davinci"; then
