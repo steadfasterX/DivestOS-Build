@@ -95,7 +95,7 @@ commitChanges(){
     if [ -z "$MSG" ];then
         MSG="DivestOS adjustments"
     fi
-    git add -A
+    git add -A || return
     git commit --author="${DOS_GIT_AUTHOR} <${DOS_GIT_MAIL}>" -m "$MSG"
 }
 export -f commitChanges
