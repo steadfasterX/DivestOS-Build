@@ -92,11 +92,18 @@ gitReset() {
 export -f gitReset;
 
 commitChanges(){
-    if [ -z "$MSG" ];then
-        MSG="DivestOS adjustments"
-    fi
-    git add -A || return
-    git commit --author="${DOS_GIT_AUTHOR} <${DOS_GIT_MAIL}>" -m "$MSG"
+      if [ -z "$MSG" ];then
+        MSG="DivestOS script adjustments"
+      fi
+      # add unstaged changes
+      CMT=0
+      git add -A || CMT=1
+      # check for uncommitted changes
+      CMTL=$(git status --porcelain=v1 | wc -l 2>/dev/null)
+      # commit if any of the above require it
+      if [ $CMT -eq 1 -o $CMTL -gt 0 ];then 
+          git commit --author="${DOS_GIT_AUTHOR} <${DOS_GIT_MAIL}>" -m "$MSG"
+      fi
 }
 export -f commitChanges
 
