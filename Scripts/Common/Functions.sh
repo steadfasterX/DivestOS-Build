@@ -16,6 +16,8 @@
 #along with this program.  If not, see <https://www.gnu.org/licenses/>.
 umask 0022;
 
+MSG=
+
 _fetchError(){
     local last_status="$1";
     local error_line_number="$2";
@@ -90,10 +92,8 @@ gitReset() {
 export -f gitReset;
 
 commitChanges(){
-    if [ -z "$1" ];then
+    if [ -z "$MSG" ];then
         MSG="DivestOS adjustments"
-    else
-        MSG="$1"
     fi
     git add -A
     git commit --author="${DOS_GIT_AUTHOR} <${DOS_GIT_MAIL}>" -m "$MSG"
