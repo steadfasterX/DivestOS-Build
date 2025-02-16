@@ -101,7 +101,8 @@ commitChanges(){
       # check for uncommitted changes
       CMTL=$(git status --porcelain=v1 | wc -l 2>/dev/null)
       # commit if any of the above require it
-      if [ $CMT -eq 1 -o $CMTL -gt 0 ];then 
+      if [ $CMT -eq 1 -o $CMTL -gt 0 ];then
+          echo "Adding commit: $MSG"
           git commit --author="${DOS_GIT_AUTHOR} <${DOS_GIT_MAIL}>" -m "$MSG"
       fi
 }
