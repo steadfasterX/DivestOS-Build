@@ -3,7 +3,7 @@
 	url = ssh://git@code.binbash.rocks:22443/AXP.OS/wallpapers.git
 [submodule "Patches/Linux"]
 	path = Patches/Linux
-	url = https://gitlab.com/divested-mobile/kernel_patches.git
+	url = https://codeberg.org/AXP-OS/kernel_patches.git
 [submodule "PrebuiltApps"]
 	path = PrebuiltApps
 	url = ssh://git@code.binbash.rocks:22443/AXP.OS/legacy_prebuilt_apps.git
