@@ -1,9 +1,9 @@
 [submodule "Patches/DivestOS_Wallpapers"]
 	path = Patches/Wallpapers
-	url = ssh://git@code.binbash.rocks:22443/AXP.OS/wallpapers.git
+	url = https://codeberg.org/AXP-OS/wallpapers.git
 [submodule "Patches/Linux"]
 	path = Patches/Linux
 	url = https://codeberg.org/AXP-OS/kernel_patches.git
 [submodule "PrebuiltApps"]
 	path = PrebuiltApps
-	url = ssh://git@code.binbash.rocks:22443/AXP.OS/legacy_prebuilt_apps.git
+	url = https://codeberg.org/AXP-OS/legacy_prebuilt_apps.git
