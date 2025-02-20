@@ -43,7 +43,7 @@ _fetchError(){
 export -f _fetchError;
 
 startPatcher() {
-	java -jar "$DOS_BINARY_PATCHER" patch workspace "$DOS_BUILD_BASE" "$DOS_WORKSPACE_ROOT""Patches/Linux/" "$DOS_SCRIPTS_CVES" $1;
+	java -jar "$DOS_BINARY_PATCHER" patch workspace "$DOS_BUILD_BASE" "$DOS_PATCHES_LINUX_CVES" "$DOS_SCRIPTS_CVES" $1;
 }
 export -f startPatcher;
 
