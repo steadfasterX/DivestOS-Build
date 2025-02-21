@@ -276,7 +276,7 @@ gpgVerifyGitHead "$DOS_WALLPAPERS";
 source "$DOS_SCRIPTS_COMMON/Shell.sh";
 source "$DOS_SCRIPTS_COMMON/Functions.sh";
 source "$DOS_SCRIPTS_COMMON/Tag_Verifier.sh";
-source "$DOS_SCRIPTS/Functions.sh";
+#source "$DOS_SCRIPTS/Functions.sh";
 
 if [[ -f "$DOS_BUILD_BASE/.repo/local_manifests/roomservice.xml" ]];then echo "roomservice manifest found! Please fix your manifests before continuing!";fi
 if [[ -f "$DOS_BUILD_BASE/DOS_PATCHED_FLAG" ]];then echo "NOTE: THIS WORKSPACE IS ALREADY PATCHED, PLEASE RESET BEFORE PATCHING AGAIN!";fi
