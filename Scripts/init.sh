@@ -251,40 +251,16 @@ if [ ! -d "$DOS_BUILD_BASE" ]; then
 	return 1;
 fi;
 
-export DOS_TMP_DIR="/tmp/dos_tmp";
 mkdir -p "$DOS_TMP_DIR";
-export DOS_HOSTS_FILE="$DOS_TMP_DIR/hosts";
-export DOS_TMP_GNUPG="$DOS_TMP_DIR/gnupg-$RANDOM";
 mkdir -p "$DOS_TMP_GNUPG";
-export GNUPGHOME="$DOS_TMP_GNUPG";
 chmod 700 "$DOS_TMP_GNUPG";
-export DOS_VERIFICATION_KEYRING="$DOS_WORKSPACE_ROOT/Misc/pubring.kbx";
 cp "$DOS_VERIFICATION_KEYRING" "$DOS_TMP_GNUPG/";
 
-export DOS_PREBUILT_APPS="$DOS_WORKSPACE_ROOT/PrebuiltApps/";
-export DOS_PATCHES_COMMON="$DOS_WORKSPACE_ROOT/Patches/Common/";
-export DOS_PATCHES="$DOS_WORKSPACE_ROOT/Patches/$BUILD_WORKING_DIR/";
-export DOS_PATCHES_LINUX_CVES="$DOS_WORKSPACE_ROOT/Patches/Linux/";
-export DOS_WALLPAPERS="$DOS_WORKSPACE_ROOT/Patches/Wallpapers/";
-
-export DOS_SCRIPTS_COMMON="$DOS_WORKSPACE_ROOT/Scripts/Common/";
-export DOS_SCRIPTS="$DOS_WORKSPACE_ROOT/Scripts/$BUILD_WORKING_DIR/";
 if [ ! -d "$DOS_SCRIPTS" ]; then
 	echo "$BUILD_WORKING_DIR is not supported!";
 	return 1;
 fi;
-export DOS_SCRIPTS_CVES="$DOS_SCRIPTS/CVE_Patchers/";
 
-export KBUILD_BUILD_USER="emy";
-export KBUILD_BUILD_HOST="dosbm";
-export BUILD_USERNAME="emy";
-export BUILD_HOSTNAME="dosbm";
-
-export ANDROID_JACK_VM_ARGS="-Xmx8192m -Xms512m -Dfile.encoding=UTF-8 -XX:+TieredCompilation";
-export JACK_SERVER_VM_ARGUMENTS="${ANDROID_JACK_VM_ARGS}";
-export EXPERIMENTAL_USE_JAVA8=true;
-export GRADLE_OPTS="-Xmx2048m";
-export TZ=:/etc/localtime;
 export LC_ALL=C;
 export LANG=C.UTF-8;
 
