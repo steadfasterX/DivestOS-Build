@@ -27,9 +27,6 @@ commentPatches() {
 			#echo $escaped;
 			sed -i "$file" -e '\|'$var'| s|^#*|#|';
 		done
-  		# re-count patches!
-		PCNT=$(grep '^e' "$file" | wc -l)
-        	sed -i "s/editKernelLocalversion .*/editKernelLocalversion '-p${PCNT}'/g" "$file"
 	fi;
 }
 
