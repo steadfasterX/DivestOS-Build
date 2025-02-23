@@ -74,7 +74,7 @@ commentPatches android_kernel_htc_msm8960.sh "CVE-2018-10876" "CVE-2021-0695" "C
 commentPatches android_kernel_htc_msm8974.sh "CVE-2016-8393" "CVE-2022-22058" "CVE-2016-10284/3.18/0001.patch";
 commentPatches android_kernel_htc_msm8994.sh "CVE-2016-8394/ANY/0001.patch" "CVE-2017-13166" "CVE-2018-3585" "CVE-2018-9514";
 commentPatches android_kernel_lge_bullhead.sh "CVE-2014-8559";
-commentPatches android_kernel_lge_msm8992.sh "CVE-2018-5897" "CVE-2018-11266" "CVE-2018-5849" "CVE-2017-9704/ANY/0003.patch" "CVE-2021-47277/3.18/0001.patch";
+commentPatches android_kernel_lge_msm8992.sh "CVE-2018-5897" "CVE-2018-11266" "CVE-2018-5849" "CVE-2017-9704/ANY/0003.patch" "CVE-2021-47277/3.18/0001.patch" "CVE-2024-47709/^6.11/0001.patch"
 commentPatches android_kernel_lge_msm8996.sh "0008-Graphene-Kernel_Hardening-canaries/4.4/0002.patch";
 commentPatches android_kernel_moto_shamu.sh "CVE-2014-8559";
 commentPatches android_kernel_motorola_msm8916.sh "0001-LinuxIncrementals/3.10/3.10.0050-0051.patch" "CVE-2014-8559" "CVE-2017-15817" "CVE-2018-9514";
