@@ -648,8 +648,9 @@ applyPatch "$DOS_PATCHES/android_packages_services_Telecomm/378122.patch"; #Q_as
 applyPatch "$DOS_PATCHES/android_packages_services_Telecomm/369703.patch"; #Q_asb_2023-12 Fix vulnerability in CallRedirectionService.
 applyPatch "$DOS_PATCHES/android_packages_services_Telecomm/378123.patch"; #Q_asb_2023-12 Support for API cleanups.
 applyPatch "$DOS_PATCHES/android_packages_services_Telecomm/378065.patch"; #Q_asb_2023-12 Resolve account image icon profile boundary exploit.
-applyPatch "$DOS_PATCHES/android_packages_services_Telecomm/403306.patch"; #Q_asb_2024-09 Unbind CS if connection is not created within 15 seconds.
 applyPatch "$DOS_PATCHES/android_packages_services_Telecomm/403307.patch"; #Q_asb_2024-09 Unbind CallScreeningService when timeout reached.
+applyPatch "$DOS_PATCHES/android_packages_services_Telecomm/408528.patch" # Q_asb_2024-10 BACKPORT: RESTRICT AUTOMERGE Disallow unexpected incoming HID
+applyPatch "$DOS_PATCHES/android_packages_services_Telecomm/408533.patch" # Q_asb_2024-10 BACKPORT: RESTRICT AUTOMERGE Disallow unexpected incoming HID
 fi;
 
 if enterAndClear "packages/services/Telephony"; then
