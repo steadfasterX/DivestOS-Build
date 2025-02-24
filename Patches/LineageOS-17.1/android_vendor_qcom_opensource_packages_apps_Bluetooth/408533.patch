@@ -62,7 +62,7 @@ diff --git a/src/com/android/bluetooth/hid/HidHostService.java b/src/com/android
 index bbde61948..63f0bc9a9 100644
 --- a/src/com/android/bluetooth/hid/HidHostService.java
 +++ b/src/com/android/bluetooth/hid/HidHostService.java
-@@ -156,7 +156,10 @@ public class HidHostService extends ProfileService {
+@@ -156,7 +156,10 @@ public void handleMessage(Message msg) {
                  break;
                  case MESSAGE_DISCONNECT: {
                      BluetoothDevice device = (BluetoothDevice) msg.obj;
@@ -74,7 +74,7 @@ index bbde61948..63f0bc9a9 100644
                          broadcastConnectionState(device, BluetoothProfile.STATE_DISCONNECTING);
                          broadcastConnectionState(device, BluetoothProfile.STATE_DISCONNECTED);
                          break;
-@@ -181,7 +184,10 @@ public class HidHostService extends ProfileService {
+@@ -181,7 +184,10 @@ public void handleMessage(Message msg) {
                              Log.d(TAG, "Incoming HID connection rejected");
                          }
                          if (disconnectRemote(device)) {
@@ -86,7 +86,7 @@ index bbde61948..63f0bc9a9 100644
                          } else {
                              virtualUnPlugNative(Utils.getByteAddress(device));
                          }
-@@ -906,7 +912,7 @@ public class HidHostService extends ProfileService {
+@@ -906,7 +912,7 @@ public void dump(StringBuilder sb) {
  
      private native boolean connectHidNative(byte[] btAddress);
  
