@@ -157,7 +157,7 @@ done
 declare -a fourDotNine=("${fourDotFour[@]}" "android_kernel_fairphone_sdm632.sh" "android_kernel_google_msm-4.9.sh" "android_kernel_oneplus_sdm845.sh" "android_kernel_razer_sdm845.sh" "android_kernel_samsung_exynos9810.sh" "android_kernel_samsung_universal9810.sh" "android_kernel_sony_sdm845.sh" "android_kernel_xiaomi_msm8937.sh" "android_kernel_xiaomi_sdm845.sh");
 for script in "${fourDotNine[@]}"
 do
-	commentPatches $script "CVE-2018-11412/4.14" "CVE-2020-0067/4.14" "CVE-2022-1204/4.14" "CVE-2023-0461/4.14" "CVE-2023-31084" "CVE-2023-4623/^6.5" "CVE-2024-0775/4.14" "CVE-2024-26763" "CVE-2024-42106" "CVE-2023-52901" "CVE-2024-46771" "CVE-2024-47709/4.19/0006.patch" "CVE-2024-56692/ANY/0001.patch" "CVE-2024-56554/ANY/0001.patch" "CVE-2024-56553/ANY/0001.patch"
+	commentPatches $script "CVE-2018-11412/4.14" "CVE-2020-0067/4.14" "CVE-2022-1204/4.14" "CVE-2023-0461/4.14" "CVE-2023-31084" "CVE-2023-4623/^6.5" "CVE-2024-0775/4.14" "CVE-2024-26763" "CVE-2024-42106" "CVE-2023-52901" "CVE-2024-46771" "CVE-2024-47709/4.19/0006.patch" "CVE-2024-56692/ANY/0001.patch" "CVE-2024-56554/ANY/0001.patch" "CVE-2024-56553/ANY/0001.patch" "CVE-2025-21653/ANY/0001.patch"
 done
 
 #4.14
