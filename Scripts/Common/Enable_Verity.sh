@@ -79,12 +79,15 @@ enableVerity "device/google/sailfish";
 #enableVerity "device/htc/flounder_lte";
 enableVerity "device/huawei/angler";
 enableVerity "device/lge/bullhead";
+#enableVerity "device/lge/g4-common"
 enableVerity "device/moto/shamu";
 enableVerity "device/oneplus/cheeseburger";
 enableVerity "device/oneplus/dumpling";
 enableVerity "device/oneplus/msm8998-common";
 enableVerity "device/oneplus/oneplus3";
 enableVerity "device/razer/cheryl";
+enableVerity "device/samsung/exynos7870-common" # Samsung J5 2017
+enableVerity "device/samsung/sm7125-common" # Samsung A52q
 #enableVerity "device/sony/discovery";
 #enableVerity "device/sony/nile-common";
 #enableVerity "device/sony/pioneer";
@@ -176,12 +179,15 @@ enableAVB "device/xiaomi/whyred";
 #Kernel Changes
 [[ -d kernel/essential/msm8998 ]] && sed -i 's/slotselect/slotselect,verify/' kernel/essential/msm8998/arch/arm64/boot/dts/essential/msm8998-mata-lineage.dtsi &>/dev/null || true; #/vendor
 [[ -d kernel/google/marlin ]] && sed -i 's/wait,slotselect/wait,slotselect,verify/' kernel/google/marlin/arch/arm64/boot/dts/htc/msm8996-htc-common.dtsi &>/dev/null || true; #/vendor
+#[[ -d kernel/lge/msm8992 ]] && sed -i 's/wait/wait,verify/g' kernel/lge/msm8992/arch/arm64/boot/dts/lge/msm8992-lge.dtsi &>/dev/null #/system
 #[[ -d kernel/htc/flounder ]] && sed -i 's/wait/wait,verify/g' kernel/htc/flounder/arch/arm64/boot/dts/tegra132.dtsi &>/dev/null || true; #/system #XXX: no boot
 [[ -d kernel/moto/shamu ]] && sed -i 's/wait/wait,verify/g' kernel/moto/shamu/arch/arm/boot/dts/qcom/apq8084.dtsi &>/dev/null || true; #/system
 [[ -d kernel/oneplus/msm8996 ]] && sed -i 's/wait/wait,verify/g' kernel/oneplus/msm8996/arch/arm/boot/dts/qcom/15801/msm8996-mtp.dtsi &>/dev/null || true; #/system
 [[ -d kernel/oneplus/msm8998 ]] && sed -i 's/wait/wait,verify/g' kernel/oneplus/msm8998/arch/arm/boot/dts/qcom/cheeseburger.dtsi &>/dev/null || true; #/system and /vendor
 [[ -d kernel/oneplus/msm8998 ]] && sed -i 's/wait/wait,verify/g' kernel/oneplus/msm8998/arch/arm/boot/dts/qcom/dumpling.dtsi &>/dev/null || true; #/system and /vendor
+[[ -d kernel/samsung/exynos7870 ]] && sed -i 's/wait/wait,verify/g' kernel/samsung/exynos7870/arch/arm64/boot/dts/exynos7870-j5y17lte_common.dtsi &>/dev/null #/system
 [[ -d kernel/zuk/msm8996 ]] && sed -i 's/wait/wait,verify/g' kernel/zuk/msm8996/arch/arm/boot/dts/qcom/zuk/common.dtsi &>/dev/null || true; #/system and /vendor
+
 #not used
 #sed -i 's/wait/wait,verify/g' kernel/cyanogen/msm8916/arch/arm/boot/dts/qcom/msm8916.dtsi &>/dev/null || true; #/system
 #sed -i 's/wait/wait,verify/g' kernel/cyanogen/msm8974/arch/arm/boot/dts/msm8974.dtsi &>/dev/null || true; #/system
@@ -203,80 +209,8 @@ enableAVB "device/xiaomi/whyred";
 #sed -i 's/wait/wait,verify/g' kernel/zte/msm8996/arch/arm/boot/dts/qcom/msm8996.dtsi &>/dev/null || true; #/system and /vendor
 #sed -i 's/wait/wait,verify/g' kernel/zte/msm8996/arch/arm/boot/dts/qcom/zte-msm8996-v3-pmi8996-ailsa_ii.dtsi &>/dev/null || true; #/system and /vendor
 
-
 sed -i 's/^\treturn VERITY_STATE_DISABLE;//' kernel/*/*/drivers/md/dm-android-verity.c &>/dev/null || true;
 #sed -i 's/#if 0/#if 1/' kernel/*/*/drivers/power/reset/msm-poweroff.c &>/dev/null || true; #TODO: needs refinement
-
-#Ensure OEM unlocking toggle is always available
-[[ -d device/essential/mata ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/essential/mata/system.prop &>/dev/null || true;
-[[ -d device/essential/mata ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/essential/mata/vendor.prop &>/dev/null || true;
-[[ -d device/fairphone/FP3 ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/fairphone/FP3/system.prop &>/dev/null || true;
-[[ -d device/fairphone/FP3 ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/fairphone/FP3/vendor.prop &>/dev/null || true;
-[[ -d device/fairphone/FP4 ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/fairphone/FP4/system.prop &>/dev/null || true;
-[[ -d device/fairphone/FP4 ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/fairphone/FP4/vendor.prop &>/dev/null || true;
-[[ -d device/fxtec/pro1 ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/fxtec/pro1/system.prop &>/dev/null || true;
-[[ -d device/fxtec/pro1 ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/fxtec/pro1/vendor.prop &>/dev/null || true;
-[[ -d device/fxtec/pro1x ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/fxtec/pro1x/system.prop &>/dev/null || true;
-[[ -d device/fxtec/pro1x ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/fxtec/pro1x/vendor.prop &>/dev/null || true;
-[[ -d device/google/bluejay ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/bluejay/system.prop &>/dev/null || true;
-[[ -d device/google/bluejay ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/bluejay/vendor.prop &>/dev/null || true;
-[[ -d device/google/bonito ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/bonito/system.prop &>/dev/null || true;
-[[ -d device/google/bonito ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/bonito/vendor.prop &>/dev/null || true;
-[[ -d device/google/coral ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/coral/system.prop &>/dev/null || true;
-[[ -d device/google/coral ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/coral/vendor.prop &>/dev/null || true;
-[[ -d device/google/crosshatch ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/crosshatch/product.prop &>/dev/null || true;
-[[ -d device/google/crosshatch ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/crosshatch/system.prop &>/dev/null || true;
-[[ -d device/google/crosshatch ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/crosshatch/vendor.prop &>/dev/null || true;
-[[ -d device/google/felix ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/felix/system.prop &>/dev/null || true;
-[[ -d device/google/felix ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/felix/vendor.prop &>/dev/null || true;
-[[ -d device/google/lynx ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/lynx/system.prop &>/dev/null || true;
-[[ -d device/google/lynx ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/lynx/vendor.prop &>/dev/null || true;
-[[ -d device/google/marlin ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/marlin/system.prop &>/dev/null || true;
-[[ -d device/google/marlin ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/marlin/vendor.prop &>/dev/null || true;
-[[ -d device/google/pantah ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/pantah/system.prop &>/dev/null || true;
-[[ -d device/google/pantah ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/pantah/vendor.prop &>/dev/null || true;
-[[ -d device/google/pantah/cheetah ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/pantah/cheetah/system.prop &>/dev/null || true;
-[[ -d device/google/pantah/cheetah ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/pantah/cheetah/vendor.prop &>/dev/null || true;
-[[ -d device/google/pantah/panther ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/pantah/panther/system.prop &>/dev/null || true;
-[[ -d device/google/pantah/panther ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/pantah/panther/vendor.prop &>/dev/null || true;
-[[ -d device/google/raviole ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/raviole/system.prop &>/dev/null || true;
-[[ -d device/google/raviole ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/raviole/vendor.prop &>/dev/null || true;
-[[ -d device/google/raviole/oriole ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/raviole/oriole/system.prop &>/dev/null || true;
-[[ -d device/google/raviole/oriole ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/raviole/oriole/vendor.prop &>/dev/null || true;
-[[ -d device/google/raviole/raven ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/raviole/raven/system.prop &>/dev/null || true;
-[[ -d device/google/raviole/raven ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/raviole/raven/vendor.prop &>/dev/null || true;
-[[ -d device/google/redbull ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/redbull/system.prop &>/dev/null || true;
-[[ -d device/google/redbull ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/redbull/vendor.prop &>/dev/null || true;
-[[ -d device/google/sunfish ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/sunfish/system.prop &>/dev/null || true;
-[[ -d device/google/sunfish ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/sunfish/vendor.prop &>/dev/null || true;
-[[ -d device/google/tangorpro ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/tangorpro/system.prop &>/dev/null || true;
-[[ -d device/google/tangorpro ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/tangorpro/vendor.prop &>/dev/null || true;
-[[ -d device/google/wahoo ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/wahoo/system.prop &>/dev/null || true;
-[[ -d device/google/wahoo ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/wahoo/vendor.prop &>/dev/null || true;
-[[ -d device/nextbit/ether ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/nextbit/ether/system.prop &>/dev/null || true;
-[[ -d device/nextbit/ether ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/nextbit/ether/vendor.prop &>/dev/null || true;
-[[ -d device/oneplus/avicii ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/avicii/system.prop &>/dev/null || true;
-[[ -d device/oneplus/avicii ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/avicii/vendor.prop &>/dev/null || true;
-[[ -d device/oneplus/msm8998-common ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/msm8998-common/system.prop &>/dev/null || true;
-[[ -d device/oneplus/msm8998-common ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/msm8998-common/vendor.prop &>/dev/null || true;
-[[ -d device/oneplus/oneplus2 ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/oneplus2/system.prop &>/dev/null || true;
-[[ -d device/oneplus/oneplus2 ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/oneplus2/vendor.prop &>/dev/null || true;
-[[ -d device/oneplus/oneplus3 ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/oneplus3/system.prop &>/dev/null || true;
-[[ -d device/oneplus/oneplus3 ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/oneplus3/vendor.prop &>/dev/null || true;
-[[ -d device/oneplus/sdm845-common ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/sdm845-common/system.prop &>/dev/null || true;
-[[ -d device/oneplus/sdm845-common ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/sdm845-common/vendor.prop &>/dev/null || true;
-[[ -d device/oneplus/sm8150-common ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/sm8150-common/system.prop &>/dev/null || true;
-[[ -d device/oneplus/sm8150-common ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/sm8150-common/vendor.prop &>/dev/null || true;
-[[ -d device/oneplus/sm8250-common ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/sm8250-common/system.prop &>/dev/null || true;
-[[ -d device/oneplus/sm8250-common ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/sm8250-common/vendor.prop &>/dev/null || true;
-[[ -d device/oneplus/sm8350-common ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/sm8350-common/system.prop &>/dev/null || true;
-[[ -d device/oneplus/sm8350-common ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/oneplus/sm8350-common/vendor.prop &>/dev/null || true;
-[[ -d device/razer/aura ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/razer/aura/system.prop &>/dev/null || true;
-[[ -d device/razer/aura ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/razer/aura/vendor.prop &>/dev/null || true;
-[[ -d device/razer/cheryl ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/razer/cheryl/system.prop &>/dev/null || true;
-[[ -d device/razer/cheryl ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/razer/cheryl/vendor.prop &>/dev/null || true;
-[[ -d device/yandex/Amber ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/yandex/Amber/system.prop &>/dev/null || true;
-[[ -d device/yandex/Amber ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/yandex/Amber/vendor.prop &>/dev/null || true;
 
 #FIXME: needs makefile edits instead
 [[ -d device/google/dragon ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/google/dragon/system.prop &>/dev/null || true;
@@ -290,49 +224,18 @@ sed -i 's/^\treturn VERITY_STATE_DISABLE;//' kernel/*/*/drivers/md/dm-android-ve
 [[ -d device/moto/shamu ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/moto/shamu/system.prop &>/dev/null || true;
 [[ -d device/moto/shamu ]] && sed -zi '/ro.oem_unlock_supported=1/!s/$/\nro.oem_unlock_supported=1\n/' device/moto/shamu/vendor.prop &>/dev/null || true;
 
-########## AXP.OS common
-AXP_DEVS="device/lge/g4-common \
-	  device/google/gs101 \
-   	  device/google/gs201 \
-	  device/google/bluejay \
-   	  device/google/sunfish \
-      	  device/oneplus/sm8150-common \
-	  device/oneplus/sdm845-common \
-   	  device/google/raviole/oriole \
-      	  device/google/pantah/cheetah \
-	  device/google/lynx \
-   	  device/sony/tama-common \
-   	  device/samsung/exynos7870-common"
-
-# REVERT oem unlock support (see above) to avoid device damage due to people who are not able to read the warnings..
-# if you came here REALLY read this before proceeding! -> https://github.com/AXP-OS/build/wiki/Bootloader-Lock#oem-unlock-option
+# DISABLE ability for DISABLING oem unlock support (see above) to avoid device damage due to people who are not able to read the warnings..
+# if you came here REALLY read this before proceeding! -> https://axpos.org/docs/guides/bootloaderlock/#oem-unlock-option
 # "resetprop ro.oem_unlock_supported 1" will immediately show up the toggle in developer options if someone really really understand what he/she does..
 # in addition to this "ro.boot.flash.locked=1" is also required to make the toggle usable again.
 # ro.boot.flash.locked=1 might be required also by SafetyNet / Play Integrity API which isn't supported by AXP.OS anyways though
-for devpath in $AXP_DEVS; do
-    if [ -d $devpath ];then
-        find $devpath -type f -name '*.prop' -exec sed -i 's/ro.oem_unlock_supported=1/ro.oem_unlock_supported=0/g' {} \; || true
-	find $devpath -type f -name '*.mk' -exec sed -i 's/ro.oem_unlock_supported=1/ro.oem_unlock_supported=0/g' {} \; || true
-	find $devpath -type f -name '*.prop' -exec sed -i 's/sys.oem_unlock_allowed=1/sys.oem_unlock_allowed=0/g' {} \; || true
- 	find $devpath -type f -name '*.prop' -exec sed -i 's/ro.boot.flash.locked=1/ro.boot.flash.locked=0/g' {} \; || true
-        find $devpath -type f -name '*.prop' -exec sed -zi '/ro.oem_unlock_supported=0/!s/$/\nro.oem_unlock_supported=0\n/' {} \; || true
-        find $devpath -type f -name '*.prop' -exec sed -zi '/sys.oem_unlock_allowed=0/!s/$/\nsys.oem_unlock_allowed=0\n/' {} \; || true
-	find $devpath -type f -name '*.prop' -exec sed -zi '/ro.boot.flash.locked=0/!s/$/\nro.boot.flash.locked=0\n/' {} \; || true
-    fi
-done
-
-########## AXP.OS-only devices
-
-# LG G4
-#enableVerity "device/lge/g4-common"
-#[[ -d kernel/lge/msm8992 ]] && sed -i 's/wait/wait,verify/g' kernel/lge/msm8992/arch/arm64/boot/dts/lge/msm8992-lge.dtsi &>/dev/null #/system
-
-# Samsung A52q
-enableVerity "device/samsung/sm7125-common"
-
-# Samsung J5 2017
-enableVerity "device/samsung/exynos7870-common"
-[[ -d kernel/samsung/exynos7870 ]] && sed -i 's/wait/wait,verify/g' kernel/samsung/exynos7870/arch/arm64/boot/dts/exynos7870-j5y17lte_common.dtsi &>/dev/null #/system
+find device/ -type f -name '*.prop' -exec sed -i 's/ro.oem_unlock_supported=1/ro.oem_unlock_supported=0/g' {} \; || true
+find device/ -type f -name '*.mk' -exec sed -i 's/ro.oem_unlock_supported=1/ro.oem_unlock_supported=0/g' {} \; || true
+find device/ -type f -name '*.prop' -exec sed -i 's/sys.oem_unlock_allowed=1/sys.oem_unlock_allowed=0/g' {} \; || true
+find device/ -type f -name '*.prop' -exec sed -i 's/ro.boot.flash.locked=1/ro.boot.flash.locked=0/g' {} \; || true
+find device/ -type f -name '*.prop' -exec sed -zi '/ro.oem_unlock_supported=0/!s/$/\nro.oem_unlock_supported=0\n/' {} \; || true
+find device/ -type f -name '*.prop' -exec sed -zi '/sys.oem_unlock_allowed=0/!s/$/\nsys.oem_unlock_allowed=0\n/' {} \; || true
+find device/ -type f -name '*.prop' -exec sed -zi '/ro.boot.flash.locked=0/!s/$/\nro.boot.flash.locked=0\n/' {} \; || true
 
 cd "$DOS_BUILD_BASE";
 echo -e "\e[0;32m[SCRIPT COMPLETE] Verity enablement complete\e[0m";
